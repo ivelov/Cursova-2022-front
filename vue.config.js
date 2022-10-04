@@ -3,5 +3,16 @@ module.exports = defineConfig({
   transpileDependencies: [
     'vuetify'
   ],
-  runtimeCompiler: true
+  runtimeCompiler: true,
+  devServer: {
+    proxy: {
+      '/V1': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        pathRewrite: {
+            '^/V1': ''
+        }
+    }
+    }
+}
 })
