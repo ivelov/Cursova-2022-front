@@ -13,30 +13,39 @@
       <v-btn
         href="/login"
         text
-        v-if="buttons['login']"
+        v-if="typeof(buttons['login']) != undefined?buttons['login']:false"
       >
         <span class="mr-2">Log in</span>
       </v-btn>
       <v-btn
-        href="/logout"
+        @click="logout"
         text
-        v-if="buttons['logout']"
+        :disabled="logoutDisable"
+        v-if="typeof(buttons['logout']) != undefined?buttons['logout']:false"
       >
         <span class="mr-2">Log out</span>
       </v-btn>
       <v-btn
         href="/"
         text
-        v-if="buttons['back']"
+        v-if="typeof(buttons['back']) != undefined?buttons['back']:false"
       >
         <span class="mr-2">Back</span>
       </v-btn>
       <v-btn
         href="/"
         text
-        v-if="buttons['add']"
+        v-if="typeof(buttons['add']) != undefined?buttons['add']:false"
       >
         <span class="mr-2">Add conference</span>
+      </v-btn>
+
+      <v-btn
+        href="/"
+        text
+        v-if="typeof(buttons['view']) != undefined?buttons['view']:false"
+      >
+        <span class="mr-2">View conferences</span>
       </v-btn>
 
     </v-app-bar>
@@ -49,22 +58,23 @@
   
     data: function () {
         return {
-            
+            logoutDisable:false,
         };
-    },
-
-    mounted(){
-        this.$store.dispatch('setConferences');
     },
 
     props:{
         buttons:Object
     },
-
-    computed:{
-        conferences(){
-        return this.$store.getters.getConferences;
-    }
+    
+    methods:{
+      logout(){
+        this.logoutDisable = true;
+        this.axios.post("/V1/logout").then(() => {
+                this.$router.go();
+            }).catch((e)=>{
+                console.log(e);
+            });
+      }
     }
     }
 </script>

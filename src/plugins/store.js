@@ -6,9 +6,10 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state:{
-        currentConference: 'Conf',
         conferences:null,
-        loading:true
+        loading:true,
+        csrf:'',
+        isAuth:false
     },
     mutations:{
         //sync
@@ -18,16 +19,14 @@ export default new Vuex.Store({
                 state.loading = false;
               })
         },
-        setCurrentConference(state, id){ 
-            for(let conference of state.conferences) {
-                if(conference.id == id){
-                    state.currentConference = conference;
-                    break;
-                }
-            }
-        },
         setLoading(state, loading){
             state.loading = loading;
+        },
+        setCSRF(state, csrf){
+            state.csrf = csrf;
+        },
+        setAuth(state, isAuth){
+            state.isAuth = isAuth;
         },
     },
     actions:{
@@ -35,18 +34,31 @@ export default new Vuex.Store({
         async setConferences(state, page = 1){
             state.commit('setLoading', true);
             state.commit('setConferences', page);
+        },
+        async setCSRF(state){
+            axios.get('/V1/getCSRF').then((response)=>{
+                state.commit('setCSRF', response.data);
+              })
+        },
+        async setAuth(state){
+            axios.get('/V1/isAuth').then((response)=>{
+                state.commit('setAuth', response.data);
+              })
         }
     },
     getters:{
-        getCurrentConference(state){
-            return state.currentConference;
-        },
         getConferences(state){
             return state.conferences;
         },
         isLoading(state){
             return state.loading;
-        }
+        },
+        getCSRF(state){
+            return state.csrf;
+        },
+        isAuth(state){
+            return state.isAuth;
+        },
     }
 
 })

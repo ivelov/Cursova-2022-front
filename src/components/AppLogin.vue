@@ -1,55 +1,111 @@
 <template>
-    <v-form method="post">
-        <br><br>
-    <v-container>
-        <v-row>
-            <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" placeholder="Email" name='email'>
-            @if($errors->getBag('default')->has('email'))
-                <div class="alert alert-danger form-error" role="alert">
-                {{$errors->getBag('default')->get('email')[0]}}
-                </div>
-            @endif
-        </v-row>
-        <v-row>
-            <v-col>
-                <label for="password">Password</label>
-            </v-col>
-            <v-col>
-                <input type="password" class="form-control" id="password" placeholder="Password" name="password">
-                <div class="alert alert-danger form-error" role="alert">
-                
-                </div>
-            </v-col>
+    <div>
+        <AppHeader
+            :buttons="buttons"
+        ></AppHeader>
+        
+        <v-main>
+            <br><br>
+        <v-form 
+        v-model="valid"
+        >
+
+        
+        <v-container>
+            <v-row>
+                <v-text-field
+                    v-model="email"
+                    :rules="[rules.required, rules.email]"
+                    label="E-mail"
+                    outlined
+                    :error-messages="emailErrors"
+                ></v-text-field>
+            </v-row>
+            <v-row>
+                <v-text-field
+                    v-model="password"
+                    type="password"
+                    :rules="[rules.required, rules.counter]"
+                    label="Password"
+                    outlined
+                    :error-messages="passErrors"
+                ></v-text-field>
             
-           
-        </v-row>
-        <button type="submit" class="btn btn-success">Enter</button>
-    </v-container>
-    </v-form>
+            </v-row>
+            <br>
+            <v-btn
+                @click="enter"
+                class="btn"
+                :disabled="!valid"
+            >
+                <span>Enter</span>
+            </v-btn>
+            <br><br>
+            <p>Don't have an account? <a href="/register">Register</a></p>
+        </v-container>
+        </v-form>
+    </v-main>
+    </div>
+   
 </template>
 
 <script>
+import AppHeader from './AppHeader.vue';
 
     export default {
-    name: "AppLoginAndRegister",
+    name: "AppLogin",
 
     data: () => ({
-        
+        valid:true,
+        emailErrors:null,
+        passErrors:null,
+        email:'',
+        password:'',
+        buttons:{
+            view:true
+          },
+        rules: {
+          required: value => !!value || 'Required.',
+          counter: value => value.length >= 6 || 'Min 6 characters',
+          email: value => {
+            const pattern = new RegExp('\\w@\\w');
+            return pattern.test(value) || 'Invalid e-mail.'
+          },
+        }
     }),
-    computed: {
-        
-    },
-    mounted() {
-        
-    },
     methods:{
-        
+        enter(){
+            this.emailErrors = null;
+            this.passErrors = null;
+            this.axios.post("/V1/login",{
+                email:this.email,
+                password:this.password
+            }).then((response) => {
+                if(response.data == 1){
+                    this.$router.push('/');
+                }
+            }).catch((e)=>{
+                console.log(e);
+                let errors = e.response.data.errors;
+                if(typeof(errors.email) != undefined){
+                    this.emailErrors = errors.email;
+                }
+                if(typeof(errors.password) != undefined){
+                    this.passErrors = errors.password;
+                }
+            });
+        }
     },
-    components: { }
+    components: { AppHeader }
 }
   </script>
 
   <style scoped>
-    
+    .v-form{
+        width: 90%;
+        margin: auto;
+    }
+    .v-text-field{
+        max-width: 300px;
+    }
   </style>
