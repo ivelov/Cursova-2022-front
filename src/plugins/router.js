@@ -6,6 +6,8 @@ import AppConferences from '../components/AppConferences';
 import AppLogin from '../components/AppLogin';
 import AppRegister from '../components/AppRegister';
 import AppDetails from '../components/AppDetails';
+import AppEdit from '../components/AppEdit';
+import AppAdd from '../components/AppAdd';
 
 
 Vue.use(VueRouter);
@@ -30,6 +32,14 @@ export default new VueRouter({
     {
       path: '/conference/:id',
       component: AppDetails,
+    },
+    {
+      path: '/conference/:id/edit',
+      component: AppEdit,
+    },
+    {
+      path: '/add',
+      component: AppAdd,
     },
   ],
   mode:'history'

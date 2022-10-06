@@ -11,7 +11,7 @@
       <v-spacer></v-spacer>
 
       <v-btn
-        href="/login"
+        @click="$router.push('/login')"
         text
         v-if="typeof(buttons['login']) != undefined?buttons['login']:false"
       >
@@ -26,14 +26,14 @@
         <span class="mr-2">Log out</span>
       </v-btn>
       <v-btn
-        href="/"
+        @click="back"
         text
         v-if="typeof(buttons['back']) != undefined?buttons['back']:false"
       >
         <span class="mr-2">Back</span>
       </v-btn>
       <v-btn
-        href="/"
+        @click="gotoAdd"
         text
         v-if="typeof(buttons['add']) != undefined?buttons['add']:false"
       >
@@ -74,7 +74,16 @@
             }).catch((e)=>{
                 console.log(e);
             });
+      },
+      back(){
+        this.$store.commit('setLoading',true);
+        this.$router.push('/');
+      },
+      gotoAdd(){
+        this.$store.commit('clearCurrentConferenceData');
+        this.$router.push('/add');
       }
+
     }
     }
 </script>

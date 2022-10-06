@@ -115,11 +115,12 @@
                 @click="register"
                 class="btn"
                 :disabled="!valid||!phoneValid"
+                color="success"
             >
                 <span>Register</span>
             </v-btn>
             <br><br>
-            <p>Have an account? <a href="/login">Login</a></p>
+            <p>Have an account? <a @click="$router.push('/login')">Login</a></p>
             
         </v-container>
         </v-form>
@@ -159,10 +160,6 @@ import 'maz-ui/lib/css/base.css'
             country:'',
             role:''
         },
-        countries:[
-            {state:'Russia',value:'ru'},
-            {state:'Ukraine',value:'ukr'}
-        ],
         roles:[
             {state:'Listener',value:'listener'},
             {state:'Announcer',value:'announcer'}
@@ -179,6 +176,11 @@ import 'maz-ui/lib/css/base.css'
           },
         }
     }),
+    computed:{
+        countries(){
+            return this.$store.getters.getCountries;
+        }
+    },
     mounted(){
         this.$store.dispatch('setCSRF');
     },
@@ -217,15 +219,11 @@ import 'maz-ui/lib/css/base.css'
         margin: auto;
     }
     .row{
-        max-width: 300px;
+        max-width: 350px;
         min-height: 86px;
     }
   </style>
   <style>
-    .country-selector{
-        max-width: 100px;
-        
-    }
     .maz-border-radius{
         border-radius: 5px;
     }
@@ -234,5 +232,8 @@ import 'maz-ui/lib/css/base.css'
     }
     .maz-border-color{
         border-color: rgba(0, 0, 0, 0.38);
+    }
+    .form-input{
+        max-height: 46px;
     }
   </style>

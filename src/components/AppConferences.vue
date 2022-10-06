@@ -26,20 +26,44 @@
             <v-col>{{conference.title}}</v-col>
             <v-col>{{conference.date}}</v-col>
             <v-col>
-                <v-btn
-                    @click="cancelJoin(conference.id)"
-                    v-if="conference.participant"
+                <v-row 
+                class="share-row"
+                v-if="conference.participant"
                 >
-                    <span>Cancel join</span>
-                </v-btn>
+                    <v-btn
+                        @click="cancelJoin(conference.id)"
+                        color="primary"
+                    >
+                        <span>Cancel join</span>
+                    </v-btn>
+                    <ShareNetwork
+                        network="facebook"
+                        :url="'http://google.com'"
+                        title="Facebook share!"
+                        :description="'Title:'+conference.title+'\nDate:'+conference.date"
+                    >
+                        <img src="../assets/facebook.svg" alt="facebook">
+                    </ShareNetwork>
+                    <ShareNetwork
+                        network="twitter"
+                        :url="'http://google.com'"
+                        title="Twitter share!"
+                        :description="'Title:'+conference.title+'\nDate:'+conference.date"
+                    >
+                        <img src="../assets/twitter.svg" alt="twitter">
+                    </ShareNetwork>
+                </v-row>
+                
                 <v-btn
-                    href="/login"
+                    @click="deleteConf(conference.id)"
+                    color="error"
                     v-else-if="conference.canEdit"
                 >
                     <span>Delete</span>
                 </v-btn>
                 <v-btn
                     @click="joinConf(conference.id)"
+                    color="primary"
                     v-else
                 >
                     <span>Join</span>
@@ -48,6 +72,7 @@
             <v-col>
                 <v-btn
                     @click="details(conference.id)"
+                    color="primary"
                 >
                     <span>Details</span>
                 </v-btn>
@@ -110,7 +135,7 @@ import AppHeader from './AppHeader.vue';
 
         this.$store.dispatch("setConferences", this.pages.current);
 
-        this.axios.get("/V1/getPageInfo/" + this.pages.current).then((response) => {
+        this.axios.get("/V1/getPageInfo").then((response) => {
 
             this.pages.max = response.data.maxPage;
             for(let buttonName of response.data.buttons) {
@@ -118,32 +143,42 @@ import AppHeader from './AppHeader.vue';
             }
             
         });
+
+
     },
     methods:{
         joinConf(id){
             if(!this.$store.getters.isAuth){
+                this.$store.commit('setLoading', true);
                 this.$router.push('/login');
             }else{
-                this.axios.get("/V1/conferences/join/" + id).then(() => {
-                    this.$router.go();
+                this.axios.post("/V1/conferences/join/" + id).then(() => {
+                    this.$store.dispatch("setConferences", this.pages.current);
                 });
             }
             
         },
+        deleteConf(id){
+            this.axios.post("/V1/conferences/delete/" + id).then(() => {
+                this.$store.dispatch("setConferences", this.pages.current);
+            });
+        },
         cancelJoin(id){
-            this.axios.get("/V1/conferences/cancel/" + id).then(() => {
-                this.$router.go();
+            this.axios.post("/V1/conferences/cancel/" + id).then(() => {
+                this.$store.dispatch("setConferences", this.pages.current);
             });
         },
         details(id){
             if(!this.$store.getters.isAuth){
+                this.$store.commit('setLoading', true);
                 this.$router.push('/login');
             }else{
+                this.$store.commit('setLoading', true);
                 this.$router.push('/conference/'+id);
             }
         },
         nextPage(){
-            this.pages.current += 1;
+            this.pages.current = parseInt(this.pages.current) + 1;
             this.$store.dispatch("setConferences", this.pages.current);
         },
         prevPage(){
@@ -162,11 +197,27 @@ import AppHeader from './AppHeader.vue';
     }
     .row{
         outline:3px solid #ced4da;
+        align-items: center;
     }
     .row:nth-child(n+2) {
         margin-top: 16px;
     }
     .pageBtn{
         margin-left: 5px;
+    }
+    .share-row{
+        outline:none;
+    }
+    
+    .share-network-facebook, 
+    .share-network-twitter, 
+    .share-network-twitter img{
+        width: 30px;
+        height: 30px;
+    }
+
+    .share-network-facebook{
+        margin-left: 5px;
+        margin-right: 5px;
     }
   </style>

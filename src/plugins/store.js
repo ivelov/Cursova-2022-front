@@ -6,6 +6,25 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state:{
+        countries: [
+            { state: "Russia", value: "ru" },
+            { state: "Ukraine", value: "ukr" },
+            { state: "United States", value: "usa" },
+            { state: "United Kingdom", value: "uk" },
+        ],
+        currentConferenceData:{
+            conference:{
+                id: null,
+                title: "",
+                country: "",
+                date:"",
+                time:"",
+                latitude: 0,
+                longitude: 0,
+            },
+            participant:false,
+            canUpdate:false
+        },
         conferences:null,
         loading:true,
         csrf:'',
@@ -13,11 +32,8 @@ export default new Vuex.Store({
     },
     mutations:{
         //sync
-        setConferences(state, page){
-            axios.get('/V1/conferences/'+page).then((response)=>{
-                state.conferences = response.data;
-                state.loading = false;
-              })
+        setConferences(state, conferences){
+            state.conferences = conferences;
         },
         setLoading(state, loading){
             state.loading = loading;
@@ -28,12 +44,33 @@ export default new Vuex.Store({
         setAuth(state, isAuth){
             state.isAuth = isAuth;
         },
+        setCurrentConferenceData(state, currentConferenceData){
+            state.currentConferenceData = currentConferenceData;
+        },
+        clearCurrentConferenceData(state){
+            state.currentConferenceData = {
+                conference:{
+                    id: null,
+                    title: "",
+                    country: "",
+                    date:"",
+                    time:"",
+                    latitude: 0,
+                    longitude: 0,
+                },
+                participant:false,
+                canUpdate:false
+            };
+        },
     },
     actions:{
         //async
         async setConferences(state, page = 1){
             state.commit('setLoading', true);
-            state.commit('setConferences', page);
+            axios.get('/V1/conferences/'+page).then((response)=>{
+                state.commit('setConferences', response.data);
+                state.commit('setLoading', false);
+              })
         },
         async setCSRF(state){
             axios.get('/V1/getCSRF').then((response)=>{
@@ -44,9 +81,30 @@ export default new Vuex.Store({
             axios.get('/V1/isAuth').then((response)=>{
                 state.commit('setAuth', response.data);
               })
+        },
+        /**
+         * Set current conference data
+         * @param payload Object: id - id of conference, [hard - ignore stored data] 
+         *
+         * @return void
+         */
+        async setCurrentConferenceData(state, payload){
+            if(payload.id == state.getters.getCurrentConferenceData.conference.id 
+                && payload['hard'] == undefined){
+                state.commit('setLoading', false);
+                return;
+            }
+            state.commit('setLoading', true);
+            axios.get('/V1/conference/' + payload.id).then((response)=>{
+                state.commit('setCurrentConferenceData',  response.data);
+                state.commit('setLoading', false);
+              })
         }
     },
     getters:{
+        getCountries(state){
+            return state.countries;
+        },
         getConferences(state){
             return state.conferences;
         },
@@ -59,6 +117,9 @@ export default new Vuex.Store({
         isAuth(state){
             return state.isAuth;
         },
+        getCurrentConferenceData(state){
+            return state.currentConferenceData;
+        }
     }
 
 })

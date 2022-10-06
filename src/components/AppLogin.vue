@@ -19,6 +19,7 @@
                     label="E-mail"
                     outlined
                     :error-messages="emailErrors"
+                    @blur="removeErrors"
                 ></v-text-field>
             </v-row>
             <v-row>
@@ -29,6 +30,7 @@
                     label="Password"
                     outlined
                     :error-messages="passErrors"
+                    @blur="removeErrors"
                 ></v-text-field>
             
             </v-row>
@@ -37,11 +39,12 @@
                 @click="enter"
                 class="btn"
                 :disabled="!valid"
+                color="success"
             >
                 <span>Enter</span>
             </v-btn>
             <br><br>
-            <p>Don't have an account? <a href="/register">Register</a></p>
+            <p>Don't have an account? <a @click="$router.push('/register')">Register</a></p>
         </v-container>
         </v-form>
     </v-main>
@@ -73,11 +76,15 @@ import AppHeader from './AppHeader.vue';
           },
         }
     }),
+    mounted(){
+        this.$store.dispatch('setCSRF');
+    },
     methods:{
         enter(){
             this.emailErrors = null;
             this.passErrors = null;
             this.axios.post("/V1/login",{
+                csrfToken:this.$store.getters.getCSRF,
                 email:this.email,
                 password:this.password
             }).then((response) => {
@@ -94,6 +101,10 @@ import AppHeader from './AppHeader.vue';
                     this.passErrors = errors.password;
                 }
             });
+        },
+        removeErrors(){
+            this.emailErrors = null;
+            this.passErrors = null;
         }
     },
     components: { AppHeader }
@@ -106,6 +117,6 @@ import AppHeader from './AppHeader.vue';
         margin: auto;
     }
     .v-text-field{
-        max-width: 300px;
+        max-width: 350px;
     }
   </style>
