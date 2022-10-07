@@ -186,9 +186,6 @@ export default {
       usa: { lat: 38.897029, lng: -77.071906 },
       uk: { lat: 51.504263, lng: -0.13515 },
     },
-    rules: {
-      required: (value) => !!value || "Required.",
-    },
     buttons: {
       back: true,
     },
@@ -203,6 +200,9 @@ export default {
     countries() {
       return this.$store.getters.getCountries;
     },
+    rules(){
+      return this.$store.getters.getRules;
+    }
   },
   mounted() {
     this.$store.dispatch("setCurrentConferenceData", {
