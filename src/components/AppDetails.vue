@@ -171,7 +171,7 @@ export default {
   methods: {
     cancelJoin() {
       this.axios
-        .get("/V1/conferences/cancel/" + this.conferenceData.conference.id)
+        .post("/V1/conferences/cancel/" + this.conferenceData.conference.id)
         .then(() => {
           this.$store.dispatch("setCurrentConferenceData", {
             id: this.$route.params.id,
@@ -181,7 +181,7 @@ export default {
     },
     joinConf() {
       this.axios
-        .get("/V1/conferences/join/" + this.conferenceData.conference.id)
+        .post("/V1/conferences/join/" + this.conferenceData.conference.id)
         .then(() => {
           this.$store.dispatch("setCurrentConferenceData", {
             id: this.$route.params.id,

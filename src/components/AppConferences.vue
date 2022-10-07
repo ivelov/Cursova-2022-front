@@ -67,7 +67,9 @@
         </v-row>
         <br />
         <br />
-        <p width="100%" class="text-center">
+        
+      </v-container>
+      <p width="100%" class="text-center">
           Page {{ curPage }} of {{ pageInfo.maxPage }}
           <v-btn @click="prevPage" text :disabled="prevBtnDisabled">
             <span>Prev</span>
@@ -77,7 +79,6 @@
           </v-btn>
         </p>
         <br />
-      </v-container>
     </v-main>
   </div>
 </template>
@@ -175,6 +176,7 @@ export default {
   align-items: center;
 }
 
+
 .row:nth-child(n + 2) {
   margin-top: 16px;
 }
@@ -186,6 +188,10 @@ export default {
 .conf-btn{
   margin-top: 2px;
   margin-bottom: 2px;
+}
+
+.share-row {
+  align-items: center;
 }
 
 .share-row {
