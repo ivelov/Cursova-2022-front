@@ -92,6 +92,7 @@
           </v-row>
           <br /><br />
           <v-btn
+            class="btn"
             v-if="conferenceData.canUpdate"
             color="warning"
             @click="
@@ -101,6 +102,14 @@
             "
           >
             <span>Update</span>
+          </v-btn>
+          <v-btn
+            class="btn"
+            v-if="conferenceData.canUpdate"
+            color="error"
+            @click="deleteConf"
+          >
+            <span>Delete</span>
           </v-btn>
           <v-row class="share-row" v-else-if="conferenceData.participant">
             <v-btn class="mb-1" @click="cancelJoin" color="primary">
@@ -170,6 +179,7 @@ export default {
   },
   methods: {
     cancelJoin() {
+      this.loading = true;
       this.axios
         .post("/V1/conferences/cancel/" + this.conferenceData.conference.id)
         .then(() => {
@@ -180,6 +190,7 @@ export default {
         });
     },
     joinConf() {
+      this.loading = true;
       this.axios
         .post("/V1/conferences/join/" + this.conferenceData.conference.id)
         .then(() => {
@@ -188,6 +199,12 @@ export default {
             hard: true,
           });
         });
+    },
+    deleteConf() {
+      this.loading = true;
+      this.axios.post("/V1/conferences/delete/" + this.conferenceData.conference.id).then(() => {
+        this.$router.push('/');
+      });
     },
   },
   components: { AppHeader },
@@ -214,5 +231,10 @@ export default {
 .share-network-facebook {
   margin-left: 5px;
   margin-right: 5px;
+}
+
+.btn{
+  margin-left: 5px;
+  margin-bottom: 5px;
 }
 </style>
