@@ -1,46 +1,45 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router'
+import Vue from "vue";
+import VueRouter from "vue-router";
 //import App from '../App.vue'
 
-import AppConferences from '../components/AppConferences';
-import AppLogin from '../components/AppLogin';
-import AppRegister from '../components/AppRegister';
-import AppDetails from '../components/AppDetails';
-import AppEdit from '../components/AppEdit';
-import AppAdd from '../components/AppAdd';
-
+import AppConferences from "../components/AppConferences";
+import AppLogin from "../components/AppLogin";
+import AppRegister from "../components/AppRegister";
+import AppDetails from "../components/AppDetails";
+import AppEdit from "../components/AppEdit";
+import AppAdd from "../components/AppAdd";
 
 Vue.use(VueRouter);
 export default new VueRouter({
   routes: [
     {
-      path: '/',
-      redirect: '/conferences/1'
+      path: "/",
+      redirect: "/conferences/1",
     },
     {
-      path: '/conferences/:page',
+      path: "/conferences/:page",
       component: AppConferences,
     },
     {
-      path: '/login',
+      path: "/login",
       component: AppLogin,
     },
     {
-      path: '/register',
+      path: "/register",
       component: AppRegister,
     },
     {
-      path: '/conference/:id',
+      path: "/conference/:id",
       component: AppDetails,
     },
     {
-      path: '/conference/:id/edit',
+      path: "/conference/:id/edit",
       component: AppEdit,
     },
     {
-      path: '/add',
+      path: "/add",
       component: AppAdd,
     },
   ],
-  mode:'history'
-})
+  mode: "history",
+});

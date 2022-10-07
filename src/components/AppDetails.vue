@@ -38,18 +38,18 @@
           </v-row>
           <v-row>
             <v-text-field
-                v-model="conferenceData.conference.date"
-                label="Date"
-                disabled
-                outlined
+              v-model="conferenceData.conference.date"
+              label="Date"
+              disabled
+              outlined
             ></v-text-field>
           </v-row>
           <v-row>
             <v-text-field
-                v-model="conferenceData.conference.time"
-                label="Time"
-                disabled
-                outlined
+              v-model="conferenceData.conference.time"
+              label="Time"
+              disabled
+              outlined
             ></v-text-field>
           </v-row>
           <v-row>
@@ -91,22 +91,49 @@
             </GmapMap>
           </v-row>
           <br /><br />
-          <v-btn v-if="conferenceData.canUpdate"
+          <v-btn
+            v-if="conferenceData.canUpdate"
             color="warning"
-            @click="$router.push('/conference/'+conferenceData.conference.id+'/edit')"
+            @click="
+              $router.push(
+                '/conference/' + conferenceData.conference.id + '/edit'
+              )
+            "
           >
             <span>Update</span>
           </v-btn>
-          <v-btn v-else-if="conferenceData.participant"
-            color="primary"
-            @click="cancelJoin"
-          >
-            <span>Cancel join</span>
-          </v-btn>
-          <v-btn v-else
-            color="primary"
-            @click="joinConf"
-          >
+          <v-row class="share-row" v-else-if="conferenceData.participant">
+            <v-btn class="mb-1" @click="cancelJoin" color="primary">
+              <span>Cancel join</span>
+            </v-btn>
+            <ShareNetwork
+              network="facebook"
+              :url="'http://google.com'"
+              title="Facebook share!"
+              :description="
+                'Title:' +
+                conferenceData.conference.title +
+                '\nDate:' +
+                conferenceData.conference.date
+              "
+            >
+              <img src="../assets/facebook.svg" alt="facebook" />
+            </ShareNetwork>
+            <ShareNetwork
+              network="twitter"
+              :url="'http://google.com'"
+              title="Twitter share!"
+              :description="
+                'Title:' +
+                conferenceData.conference.title +
+                '\nDate:' +
+                conferenceData.conference.date
+              "
+            >
+              <img src="../assets/twitter.svg" alt="twitter" />
+            </ShareNetwork>
+          </v-row>
+          <v-btn v-else color="primary" @click="joinConf">
             <span>Join</span>
           </v-btn>
         </v-container>
@@ -132,25 +159,36 @@ export default {
     loading() {
       return this.$store.getters.isLoading;
     },
-    countries(){
-        return this.$store.getters.getCountries;
-    }
+    countries() {
+      return this.$store.getters.getCountries;
+    },
   },
   mounted() {
-    this.$store.dispatch("setCurrentConferenceData", {id: this.$route.params.id});
+    this.$store.dispatch("setCurrentConferenceData", {
+      id: this.$route.params.id,
+    });
   },
   methods: {
-    cancelJoin(){
-      this.axios.get("/V1/conferences/cancel/" + this.conferenceData.conference.id).then(() => {
-        this.$store.dispatch("setCurrentConferenceData", {id: this.$route.params.id, hard:true});
-      }) 
+    cancelJoin() {
+      this.axios
+        .get("/V1/conferences/cancel/" + this.conferenceData.conference.id)
+        .then(() => {
+          this.$store.dispatch("setCurrentConferenceData", {
+            id: this.$route.params.id,
+            hard: true,
+          });
+        });
     },
-    joinConf(){
-      this.axios.get("/V1/conferences/join/" + this.conferenceData.conference.id).then(() => {
-        this.$store.dispatch("setCurrentConferenceData", {id: this.$route.params.id, hard:true});
-      });
+    joinConf() {
+      this.axios
+        .get("/V1/conferences/join/" + this.conferenceData.conference.id)
+        .then(() => {
+          this.$store.dispatch("setCurrentConferenceData", {
+            id: this.$route.params.id,
+            hard: true,
+          });
+        });
     },
-
   },
   components: { AppHeader },
 };
@@ -164,5 +202,17 @@ export default {
 
 .v-text-field {
   max-width: 300px;
+}
+
+.share-network-facebook,
+.share-network-twitter,
+.share-network-twitter img {
+  width: 30px;
+  height: 30px;
+}
+
+.share-network-facebook {
+  margin-left: 5px;
+  margin-right: 5px;
 }
 </style>
