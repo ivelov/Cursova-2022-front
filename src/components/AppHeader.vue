@@ -21,7 +21,7 @@
       <span class="mr-2">Log in</span>
     </v-btn>
     <v-btn
-      @click="logout"
+      @click="$_logout"
       text
       :disabled="logoutDisable"
       :loading="logoutDisable"
@@ -30,14 +30,14 @@
       <span class="mr-2">Log out</span>
     </v-btn>
     <v-btn
-      @click="back"
+      @click="$_back"
       text
       v-if="typeof buttons['back'] != undefined ? buttons['back'] : false"
     >
       <span class="mr-2">Back</span>
     </v-btn>
     <v-btn
-      @click="gotoAdd"
+      @click="$_gotoAdd"
       text
       v-if="typeof buttons['add'] != undefined ? buttons['add'] : false"
     >
@@ -68,7 +68,7 @@
       <span class="mr-2">Log in</span>
     </v-btn>
     <v-btn
-      @click="logout"
+      @click="$_logout"
       :disabled="logoutDisable"
       :loading="logoutDisable"
       outlined
@@ -77,14 +77,14 @@
       <span class="mr-2">Log out</span>
     </v-btn>
     <v-btn
-      @click="back"
+      @click="$_back"
       outlined
       v-if="typeof buttons['back'] != undefined ? buttons['back'] : false"
     >
       <span class="mr-2">Back</span>
     </v-btn>
     <v-btn
-      @click="gotoAdd"
+      @click="$_gotoAdd"
       outlined
       v-if="typeof buttons['add'] != undefined ? buttons['add'] : false"
     >
@@ -119,7 +119,7 @@ export default {
   },
 
   methods: {
-    logout() {
+    $_logout() {
       this.logoutDisable = true;
       this.axios
         .post("/V1/logout")
@@ -131,11 +131,11 @@ export default {
           console.log(e);
         });
     },
-    back() {
+    $_back() {
       this.$store.commit("setLoading", true);
       this.$router.push("/");
     },
-    gotoAdd() {
+    $_gotoAdd() {
       this.$store.commit("clearCurrentConferenceData");
       this.$router.push("/add");
     },

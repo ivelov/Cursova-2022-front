@@ -27,7 +27,7 @@
               item-text="state"
               item-value="value"
               :rules="[rules.required]"
-              @change="countryChange"
+              @change="$_countryChange"
             ></v-select>
           </v-row>
           <v-row>
@@ -130,7 +130,7 @@
                   lng: parseFloat(conferenceData.conference.longitude),
                 }"
                 :draggable="true"
-                @dragend="markerUpdate"
+                @dragend="$_markerUpdate"
               />
             </GmapMap>
           </v-row>
@@ -138,7 +138,7 @@
           <v-btn
             class="btn"
             color="success"
-            @click="saveConf"
+            @click="$_saveConf"
             :disabled="!valid || btnsLoading"
             :loading="btnsLoading"
           >
@@ -191,17 +191,17 @@ export default {
     this.$store.commit("setLoading", false);
   },
   methods: {
-    markerUpdate(event) {
+    $_markerUpdate(event) {
       this.conferenceData.conference.latitude = event.latLng.lat();
       this.conferenceData.conference.longitude = event.latLng.lng();
     },
-    countryChange(event) {
+    $_countryChange(event) {
       this.conferenceData.conference.latitude =
         this.countriesLocations[event].lat;
       this.conferenceData.conference.longitude =
         this.countriesLocations[event].lng;
     },
-    saveConf() {
+    $_saveConf() {
       if (
         isNaN(parseFloat(this.conferenceData.conference.longitude)) ||
         isNaN(parseFloat(this.conferenceData.conference.latitude))

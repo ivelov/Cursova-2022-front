@@ -34,7 +34,7 @@
               item-text="state"
               item-value="value"
               :rules="[rules.required]"
-              @change="countryChange"
+              @change="$_countryChange"
             ></v-select>
           </v-row>
           <v-row>
@@ -135,7 +135,7 @@
                   lng: parseFloat(conferenceData.conference.longitude),
                 }"
                 :draggable="true"
-                @dragend="markerUpdate"
+                @dragend="$_markerUpdate"
               />
             </GmapMap>
           </v-row>
@@ -145,7 +145,7 @@
             color="success"
             :disabled="!valid || btnsLoading"
             :loading="btnsLoading"
-            @click="saveConf"
+            @click="$_saveConf"
           >
             <span>Save</span>
           </v-btn>
@@ -160,7 +160,7 @@
             class="btn"
             color="error"
             :loading="btnsLoading"
-            @click="deleteConf"
+            @click="$_deleteConf"
           >
             <span>Delete</span>
           </v-btn>
@@ -210,17 +210,17 @@ export default {
     });
   },
   methods: {
-    markerUpdate(event) {
+    $_markerUpdate(event) {
       this.conferenceData.conference.latitude = event.latLng.lat();
       this.conferenceData.conference.longitude = event.latLng.lng();
     },
-    countryChange(event) {
+    $_countryChange(event) {
       this.conferenceData.conference.latitude =
         this.countriesLocations[event].lat;
       this.conferenceData.conference.longitude =
         this.countriesLocations[event].lng;
     },
-    saveConf() {
+    $_saveConf() {
       if (
         isNaN(parseFloat(this.conferenceData.conference.longitude)) ||
         isNaN(parseFloat(this.conferenceData.conference.latitude))
@@ -241,7 +241,12 @@ export default {
           console.error(e);
         });
     },
-    deleteConf() {},
+    $_deleteConf() {
+      this.loading = true;
+      this.axios.post("/V1/conferences/delete/" + this.conferenceData.conference.id).then(() => {
+        this.$router.push('/');
+      });
+    },
   },
   components: { AppHeader },
 };

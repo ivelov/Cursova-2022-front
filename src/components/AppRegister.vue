@@ -18,7 +18,7 @@
                     label="E-mail"
                     outlined
                     :error-messages="errors.email"
-                    @blur="errors.email=null"
+                    @update="errors.email=null"
                 ></v-text-field>
             </v-row>
             <v-row>
@@ -29,7 +29,7 @@
                     label="Password"
                     outlined
                     :error-messages="errors.password"
-                    @blur="errors.password=null"
+                    @update="errors.password=null"
                 ></v-text-field>
             </v-row>
             <v-row>
@@ -39,7 +39,7 @@
                     label="Firstname"
                     outlined
                     :error-messages="errors.firstname"
-                    @blur="errors.firstname=null"
+                    @update="errors.firstname=null"
                 ></v-text-field>
             </v-row>
             <v-row>
@@ -49,7 +49,7 @@
                     label="Lastname"
                     outlined
                     :error-messages="errors.lastname"
-                    @blur="errors.lastname=null"
+                    @update="errors.lastname=null"
                 ></v-text-field>
             </v-row>
             <v-row>
@@ -63,7 +63,7 @@
                 item-text="state"
                 item-value="value"
                 :error-messages="errors.country"
-                @blur="errors.country=null"
+                @update="errors.country=null"
                 ></v-autocomplete>
             </v-row>
             <v-row>
@@ -77,7 +77,7 @@
                 item-text="state"
                 item-value="value"
                 :error-messages="errors.role"
-                @blur="errors.role=null"
+                @update="errors.role=null"
                 ></v-autocomplete>
             </v-row>
             <v-row>
@@ -87,7 +87,7 @@
                 :only-countries="['UA', 'US', 'RU', 'GB']"
                 required
                 class="form-input"
-                @update="phoneChange"
+                @update="$_phoneChange"
                 :error-messages="errors.phone"
                 @blur="errors.phone=null"
             />
@@ -112,7 +112,7 @@
                         :rules="[rules.required]"
                         outlined
                         :error-messages="errors.birthdate"
-                        @blur="errors.birthdate=null"
+                        @update="errors.birthdate=null"
                         ></v-text-field>
                     </template>
                     <v-date-picker
@@ -124,7 +124,7 @@
             </v-row>
             <br>
             <v-btn
-                @click="register"
+                @click="$_register"
                 class="btn"
                 :disabled="!valid||!phoneValid"
                 color="success"
@@ -193,7 +193,7 @@ import 'maz-ui/lib/css/base.css'
         this.$store.dispatch('setCSRF');
     },
     methods:{
-        register(){
+        $_register(){
             for(let errorKey in this.errors){
                 this.errors[errorKey] = null; 
             }
@@ -213,7 +213,7 @@ import 'maz-ui/lib/css/base.css'
                 }
             });
         },
-        phoneChange(event){
+        $_phoneChange(event){
             this.phoneValid = event.isValid;
         }
     },

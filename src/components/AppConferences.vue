@@ -20,7 +20,7 @@
           <v-col>{{ conference.date }}</v-col>
           <v-col>
             <v-row class="share-row" v-if="conference.participant">
-              <v-btn class="conf-btn" @click="cancelJoin(conference.id)" color="primary">
+              <v-btn class="conf-btn" @click="$_cancelJoin(conference.id)" color="primary">
                 <span>Cancel join</span>
               </v-btn>
               <ShareNetwork
@@ -49,18 +49,18 @@
 
             <v-btn
               class="conf-btn"
-              @click="deleteConf(conference.id)"
+              @click="$_deleteConf(conference.id)"
               color="error"
               v-else-if="conference.canEdit"
             >
               <span>Delete</span>
             </v-btn>
-            <v-btn class="conf-btn" @click="joinConf(conference.id)" color="primary" v-else>
+            <v-btn class="conf-btn" @click="$_joinConf(conference.id)" color="primary" v-else>
               <span>Join</span>
             </v-btn>
           </v-col>
           <v-col>
-            <v-btn class="conf-btn" @click="details(conference.id)" color="primary">
+            <v-btn class="conf-btn" @click="$_details(conference.id)" color="primary">
               <span>Details</span>
             </v-btn>
           </v-col>
@@ -71,10 +71,10 @@
       </v-container>
       <p width="100%" class="text-center">
           Page {{ curPage }} of {{ pageInfo.maxPage }}
-          <v-btn @click="prevPage" text :disabled="prevBtnDisabled">
+          <v-btn @click="$_prevPage" text :disabled="prevBtnDisabled">
             <span>Prev</span>
           </v-btn>
-          <v-btn @click="nextPage" text :disabled="nextBtnDisabled">
+          <v-btn @click="$_nextPage" text :disabled="nextBtnDisabled">
             <span>Next</span>
           </v-btn>
         </p>
@@ -118,7 +118,7 @@ export default {
     this.$store.dispatch("setConferences", this.curPage);
   },
   methods: {
-    joinConf(id) {
+    $_joinConf(id) {
       if (!this.$store.getters.isAuth) {
         this.$store.commit("setLoading", true);
         this.$router.push("/login");
@@ -128,19 +128,19 @@ export default {
         });
       }
     },
-    deleteConf(id) {
+    $_deleteConf(id) {
       this.$store.commit("setLoading", true);
       this.axios.post("/V1/conferences/delete/" + id).then(() => {
         this.$store.dispatch("setConferences", this.curPage);
       });
     },
-    cancelJoin(id) {
+    $_cancelJoin(id) {
       this.$store.commit("setLoading", true);
       this.axios.post("/V1/conferences/cancel/" + id).then(() => {
         this.$store.dispatch("setConferences", this.curPage);
       });
     },
-    details(id) {
+    $_details(id) {
       if (!this.$store.getters.isAuth) {
         this.$store.commit("setLoading", true);
         this.$router.push("/login");
@@ -149,12 +149,12 @@ export default {
         this.$router.push("/conference/" + id);
       }
     },
-    nextPage() {
+    $_nextPage() {
       this.curPage = parseInt(this.curPage) + 1;
       this.$store.dispatch("setConferences", this.curPage);
       this.$router.push("/conferences/" + this.curPage);
     },
-    prevPage() {
+    $_prevPage() {
       this.curPage = parseInt(this.curPage) - 1;
       this.$store.dispatch("setConferences", this.curPage);
       this.$router.push("/conferences/" + this.curPage);

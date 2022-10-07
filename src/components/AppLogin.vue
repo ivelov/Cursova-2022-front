@@ -13,7 +13,7 @@
               label="E-mail"
               outlined
               :error-messages="emailErrors"
-              @blur="removeErrors"
+              @update="$_removeErrors"
             ></v-text-field>
           </v-row>
           <v-row>
@@ -24,11 +24,11 @@
               label="Password"
               outlined
               :error-messages="passErrors"
-              @blur="removeErrors"
+              @update="$_removeErrors"
             ></v-text-field>
           </v-row>
           <br />
-          <v-btn @click="enter" class="btn" :disabled="!valid" color="success">
+          <v-btn @click="$_enter" class="btn" :disabled="!valid" color="success">
             <span>Enter</span>
           </v-btn>
           <br /><br />
@@ -67,7 +67,7 @@ export default {
     this.$store.dispatch("setCSRF");
   },
   methods: {
-    enter() {
+    $_enter() {
       this.emailErrors = null;
       this.passErrors = null;
       this.axios
@@ -92,7 +92,7 @@ export default {
           }
         });
     },
-    removeErrors() {
+    $_removeErrors() {
       this.emailErrors = null;
       this.passErrors = null;
     },

@@ -107,12 +107,12 @@
             class="btn"
             v-if="conferenceData.canUpdate"
             color="error"
-            @click="deleteConf"
+            @click="$_deleteConf"
           >
             <span>Delete</span>
           </v-btn>
           <v-row class="share-row" v-else-if="conferenceData.participant">
-            <v-btn class="mb-1" @click="cancelJoin" color="primary">
+            <v-btn class="mb-1" @click="$_cancelJoin" color="primary">
               <span>Cancel join</span>
             </v-btn>
             <ShareNetwork
@@ -142,7 +142,7 @@
               <img src="../assets/twitter.svg" alt="twitter" />
             </ShareNetwork>
           </v-row>
-          <v-btn v-else color="primary" @click="joinConf">
+          <v-btn v-else color="primary" @click="$_joinConf">
             <span>Join</span>
           </v-btn>
         </v-container>
@@ -178,7 +178,7 @@ export default {
     });
   },
   methods: {
-    cancelJoin() {
+    $_cancelJoin() {
       this.loading = true;
       this.axios
         .post("/V1/conferences/cancel/" + this.conferenceData.conference.id)
@@ -189,7 +189,7 @@ export default {
           });
         });
     },
-    joinConf() {
+    $_joinConf() {
       this.loading = true;
       this.axios
         .post("/V1/conferences/join/" + this.conferenceData.conference.id)
@@ -200,7 +200,7 @@ export default {
           });
         });
     },
-    deleteConf() {
+    $_deleteConf() {
       this.loading = true;
       this.axios.post("/V1/conferences/delete/" + this.conferenceData.conference.id).then(() => {
         this.$router.push('/');
