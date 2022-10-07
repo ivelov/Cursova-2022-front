@@ -87,7 +87,19 @@ export default new Vuex.Store({
         state.csrf = "";
         state.canAdd = false;
         state.isAuth = false;
-        this.clearCurrentConferenceData();
+        state.currentConferenceData = {
+            conference: {
+              id: null,
+              title: "",
+              country: "",
+              date: "",
+              time: "",
+              latitude: 0,
+              longitude: 0,
+            },
+            participant: false,
+            canUpdate: false,
+          };
     }
   },
   actions: {
