@@ -24,6 +24,7 @@
       @click="logout"
       text
       :disabled="logoutDisable"
+      :loading="logoutDisable"
       v-if="typeof buttons['logout'] != undefined ? buttons['logout'] : false"
     >
       <span class="mr-2">Log out</span>
@@ -69,6 +70,7 @@
     <v-btn
       @click="logout"
       :disabled="logoutDisable"
+      :loading="logoutDisable"
       outlined
       v-if="typeof buttons['logout'] != undefined ? buttons['logout'] : false"
     >

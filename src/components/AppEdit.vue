@@ -22,6 +22,7 @@
               v-model="conferenceData.conference.title"
               label="Title"
               outlined
+              :rules="[rules.required, rules.counterMax]"
             ></v-text-field>
           </v-row>
           <v-row>
@@ -32,6 +33,7 @@
               :items="countries"
               item-text="state"
               item-value="value"
+              :rules="[rules.required]"
               @change="countryChange"
             ></v-select>
           </v-row>
@@ -53,6 +55,7 @@
                   v-bind="attrs"
                   v-on="on"
                   outlined
+                  :rules="[rules.required]"
                 ></v-text-field>
               </template>
               <v-date-picker

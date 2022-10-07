@@ -14,7 +14,7 @@
               v-model="conferenceData.conference.title"
               label="Title"
               outlined
-              :rules="[rules.required]"
+              :rules="[rules.required, rules.counterMax]"
             >
             </v-text-field>
           </v-row>
