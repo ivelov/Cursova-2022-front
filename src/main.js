@@ -21,6 +21,38 @@ Vue.use(VueGoogleMaps, {
   },
 })
 
+router.beforeEach((to, from, next) => {
+
+  if (to.meta.hideForAuth) {
+      if (store.getters.isAuth) {
+        next({ path: '/' });
+      } else {
+        next();
+      }
+
+  } else if (to.meta.requireAuth){
+    if (store.getters.isAuth) {
+        next();
+    } else {
+        next({ path: '/' });
+    }
+
+  } else if (to.meta.requireEdit){
+    if (store.getters.getCurrentConferenceData.canUpdate) {
+        next();
+    } else {
+        next({ path: '/' });
+    }
+  } else if (to.meta.requireAdd){
+    if (store.getters.canAdd) {
+      next();
+    } else {
+        next({ path: '/' });
+    }
+  }
+  next();
+});
+
 new Vue({
   el:'#app',
   vuetify,

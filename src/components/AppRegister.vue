@@ -242,6 +242,7 @@ export default {
   border-color: rgba(0, 0, 0, 0.38);
 }
 .form-input {
+  position: sticky;
   max-height: 46px;
 }
 </style>

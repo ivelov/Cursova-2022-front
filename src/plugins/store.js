@@ -34,15 +34,24 @@ export default new Vuex.Store({
       participant: false,
       canUpdate: false,
     },
-    conferences: null,
+    conferencesPageInfo: {
+        maxPage:1,
+        buttons:{}
+    },
     loading: true,
     csrf: "",
     isAuth: false,
+    canAdd: false,
   },
   mutations: {
     //sync
-    setConferences(state, conferences) {
-      state.conferences = conferences;
+    setConferencesPageInfo(state, conferencesPageInfo) {
+      state.conferencesPageInfo = conferencesPageInfo;
+      let buttonsArray = state.conferencesPageInfo.buttons;
+      state.conferencesPageInfo.buttons = {};
+      for (let buttonName of buttonsArray) {
+        state.conferencesPageInfo.buttons[buttonName] = true;
+      }
     },
     setLoading(state, loading) {
       state.loading = loading;
@@ -52,6 +61,9 @@ export default new Vuex.Store({
     },
     setAuth(state, isAuth) {
       state.isAuth = isAuth;
+    },
+    setAdd(state, canAdd) {
+        state.canAdd = canAdd;
     },
     setCurrentConferenceData(state, currentConferenceData) {
       state.currentConferenceData = currentConferenceData;
@@ -71,13 +83,19 @@ export default new Vuex.Store({
         canUpdate: false,
       };
     },
+    clearAuthData(state){
+        state.csrf = "";
+        state.canAdd = false;
+        state.isAuth = false;
+        this.clearCurrentConferenceData();
+    }
   },
   actions: {
     //async
     async setConferences(state, page = 1) {
       state.commit("setLoading", true);
-      axios.get("/V1/conferences/" + page).then((response) => {
-        state.commit("setConferences", response.data);
+      axios.get("/V1/conferences/"+page).then((response) => {
+        state.commit("setConferencesPageInfo", response.data);
         state.commit("setLoading", false);
       });
     },
@@ -89,6 +107,11 @@ export default new Vuex.Store({
     async setAuth(state) {
       axios.get("/V1/isAuth").then((response) => {
         state.commit("setAuth", response.data);
+      });
+    },
+    async setAddPerk(state) {
+      axios.get("/V1/canAdd").then((response) => {
+        state.commit("setAdd", response.data==1 ? true : false);
       });
     },
     /**
@@ -111,6 +134,7 @@ export default new Vuex.Store({
         state.commit("setLoading", false);
       });
     },
+
   },
   getters: {
     getCountries(state) {
@@ -120,7 +144,10 @@ export default new Vuex.Store({
       return state.rules;
     },
     getConferences(state) {
-      return state.conferences;
+      return state.conferencesPageInfo.conferences;
+    },
+    getConferencesPageInfo(state){
+        return state.conferencesPageInfo;
     },
     isLoading(state) {
       return state.loading;

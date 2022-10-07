@@ -23,22 +23,35 @@ export default new VueRouter({
     {
       path: "/login",
       component: AppLogin,
+      meta:{
+        hideForAuth:true
+      }
     },
     {
       path: "/register",
       component: AppRegister,
+      meta:{
+        hideForAuth:true
+      }
     },
     {
       path: "/conference/:id",
       component: AppDetails,
+      meta:{
+        requireAuth:true
+      }
     },
     {
       path: "/conference/:id/edit",
       component: AppEdit,
+      meta:{
+        requireEdit:true
+      }
     },
     {
       path: "/add",
       component: AppAdd,
+      requireAdd:true
     },
   ],
   mode: "history",
