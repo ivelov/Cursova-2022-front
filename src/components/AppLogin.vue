@@ -67,7 +67,9 @@ export default {
     $_enter() {
       this.emailErrors = null;
       this.passErrors = null;
-      this.axios
+      this.axios.get('/sanctum/csrf-cookie').then(response1 => {
+        console.log(response1);
+        this.axios
         .post("http://ivelov-vm-api.groupbwt.com/login", {
           email: this.email,
           password: this.password,
@@ -87,6 +89,8 @@ export default {
             this.passErrors = errors.password;
           }
         });
+      });
+      
     },
     $_removeErrors() {
       this.emailErrors = null;
