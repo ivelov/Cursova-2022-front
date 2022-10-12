@@ -71,7 +71,7 @@ export default {
       this.emailErrors = null;
       this.passErrors = null;
       this.axios
-        .post("/V1/login", {
+        .post("http://ivelov-vm-api.groupbwt.com/login", {
           csrfToken: this.$store.getters.getCSRF,
           email: this.email,
           password: this.password,

@@ -199,7 +199,7 @@ import 'maz-ui/lib/css/base.css'
             }
 
             this.values.csrfToken = this.$store.getters.getCSRF;
-            this.axios.post("/V1/register",this.values).then((response) => {
+            this.axios.post("http://ivelov-vm-api.groupbwt.com/register",this.values).then((response) => {
                 if(response.data == 1){
                     this.$router.push('/');
                 }

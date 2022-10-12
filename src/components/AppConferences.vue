@@ -123,20 +123,20 @@ export default {
         this.$store.commit("setLoading", true);
         this.$router.push("/login");
       } else {
-        this.axios.post("/V1/conferences/join/" + id).then(() => {
+        this.axios.post("http://ivelov-vm-api.groupbwt.com/conferences/join/" + id).then(() => {
           this.$store.dispatch("setConferences", this.curPage);
         });
       }
     },
     $_deleteConf(id) {
       this.$store.commit("setLoading", true);
-      this.axios.post("/V1/conferences/delete/" + id).then(() => {
+      this.axios.post("http://ivelov-vm-api.groupbwt.com/conferences/delete/" + id).then(() => {
         this.$store.dispatch("setConferences", this.curPage);
       });
     },
     $_cancelJoin(id) {
       this.$store.commit("setLoading", true);
-      this.axios.post("/V1/conferences/cancel/" + id).then(() => {
+      this.axios.post("http://ivelov-vm-api.groupbwt.com/conferences/cancel/" + id).then(() => {
         this.$store.dispatch("setConferences", this.curPage);
       });
     },

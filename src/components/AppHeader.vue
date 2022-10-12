@@ -122,7 +122,7 @@ export default {
     $_logout() {
       this.logoutDisable = true;
       this.axios
-        .post("/V1/logout")
+        .post("http://ivelov-vm-api.groupbwt.com/logout")
         .then(() => {
           this.$store.commit('clearAuthData');
           this.$router.go();

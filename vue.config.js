@@ -14,7 +14,7 @@ module.exports = defineConfig({
     },
     proxy: {
       '/V1': {
-        target: 'http://localhost:8000',
+        target: 'http://ivelov-vm-api.groupbwt.com',
         changeOrigin: true,
         pathRewrite: {
             '^/V1': ''

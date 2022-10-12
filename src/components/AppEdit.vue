@@ -232,7 +232,7 @@ export default {
 
       let id = this.conferenceData.conference.id;
       this.axios
-        .post("/V1/conference/" + id + "/save", this.conferenceData.conference)
+        .post("http://ivelov-vm-api.groupbwt.com/conference/" + id + "/save", this.conferenceData.conference)
         .then((response) => {
           console.log(response);
           this.btnsLoading = false;
@@ -243,7 +243,7 @@ export default {
     },
     $_deleteConf() {
       this.loading = true;
-      this.axios.post("/V1/conferences/delete/" + this.conferenceData.conference.id).then(() => {
+      this.axios.post("http://ivelov-vm-api.groupbwt.com/conferences/delete/" + this.conferenceData.conference.id).then(() => {
         this.$router.push('/');
       });
     },
