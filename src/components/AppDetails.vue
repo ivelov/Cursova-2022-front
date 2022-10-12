@@ -109,7 +109,7 @@
             </v-btn>
             <ShareNetwork
               network="facebook"
-              :url="'http://ivelov-vm.groupbwt.com/conference/'+conferenceData.conference.id"
+              :url="'http://ivelov-vm.groupbwt.com/register'"
               title="Facebook share!"
               :description="
                 'Title:' +
@@ -122,7 +122,7 @@
             </ShareNetwork>
             <ShareNetwork
               network="twitter"
-              :url="'http://ivelov-vm.groupbwt.com/conference/'+conferenceData.conference.id"
+              :url="'http://ivelov-vm.groupbwt.com/register'"
               title="Twitter share!"
               :description="
                 'Title:' +
