@@ -69,8 +69,6 @@ export default {
       this.emailErrors = null;
       this.passErrors = null;
       this.axios.get('http://ivelov-vm-api.groupbwt.com/sanctum/csrf-cookie').then(() => {
-        //console.log(response1);
-        //Cookies.get('XSRF-TOKEN')
         this.axios
         .post("http://ivelov-vm-api.groupbwt.com/login", {
           email: this.email,
