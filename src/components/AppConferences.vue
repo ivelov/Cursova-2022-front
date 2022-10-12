@@ -26,7 +26,7 @@
               <ShareNetwork
                 class="conf-btn"
                 network="facebook"
-                :url="'http://google.com'"
+                :url="'http://ivelov-vm.groupbwt.com/conference/'+conference.id"
                 title="Facebook share!"
                 :description="
                   'Title:' + conference.title + '\nDate:' + conference.date
@@ -37,7 +37,7 @@
               <ShareNetwork
                 class="conf-btn"
                 network="twitter"
-                :url="'http://google.com'"
+                :url="'http://ivelov-vm.groupbwt.com/conference/'+conference.id"
                 title="Twitter share!"
                 :description="
                   'Title:' + conference.title + '\nDate:' + conference.date
