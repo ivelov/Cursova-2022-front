@@ -44,6 +44,7 @@
 
 <script>
 import AppHeader from "./AppHeader.vue";
+import Cookies from 'js-cookie';
 
 export default {
   name: "AppLogin",
@@ -67,14 +68,18 @@ export default {
     $_enter() {
       this.emailErrors = null;
       this.passErrors = null;
-      this.axios.get('/sanctum/csrf-cookie').then(response1 => {
-        console.log(response1);
+      this.axios.get('http://ivelov-vm-api.groupbwt.com/sanctum/csrf-cookie').then(() => {
+        //console.log(response1);
+        //Cookies.get('XSRF-TOKEN')
         this.axios
         .post("http://ivelov-vm-api.groupbwt.com/login", {
           email: this.email,
           password: this.password,
-        })
-        .then((response) => {
+        },{
+          headers: {
+            'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN'),
+          }
+        }).then((response) => {
           if (response.data == 1) {
             this.$router.push("/");
           }
