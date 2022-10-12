@@ -8,7 +8,11 @@ import axios from 'axios';
 import VueSocialSharing from 'vue-social-sharing'
 import * as VueGoogleMaps from 'vue2-google-maps';
 
-
+axios.defaults.headers.common = {
+    'X-Requested-With': 'XMLHttpRequest'
+};
+axios.defaults.withCredentials = 'true';
+axios.defaults.headers.post['Content-Type'] = 'application/json';
 Vue.use(VueAxios, axios)
 Vue.use(VueSocialSharing)
 

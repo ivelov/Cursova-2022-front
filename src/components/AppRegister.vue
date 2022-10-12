@@ -163,7 +163,6 @@ import 'maz-ui/lib/css/base.css'
             country:null
         },
         values:{
-            csrfToken:'',
             email:'',
             password:'',
             firstname:'',
@@ -189,16 +188,12 @@ import 'maz-ui/lib/css/base.css'
             return this.$store.getters.getRules;
         }
     },
-    mounted(){
-        this.$store.dispatch('setCSRF');
-    },
     methods:{
         $_register(){
             for(let errorKey in this.errors){
                 this.errors[errorKey] = null; 
             }
 
-            this.values.csrfToken = this.$store.getters.getCSRF;
             this.axios.post("http://ivelov-vm-api.groupbwt.com/register",this.values).then((response) => {
                 if(response.data == 1){
                     this.$router.push('/');

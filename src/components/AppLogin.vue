@@ -63,16 +63,12 @@ export default {
       return this.$store.getters.getRules;
     },
   },
-  mounted() {
-    this.$store.dispatch("setCSRF");
-  },
   methods: {
     $_enter() {
       this.emailErrors = null;
       this.passErrors = null;
       this.axios
         .post("http://ivelov-vm-api.groupbwt.com/login", {
-          csrfToken: this.$store.getters.getCSRF,
           email: this.email,
           password: this.password,
         })

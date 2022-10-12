@@ -39,7 +39,6 @@ export default new Vuex.Store({
         buttons:{}
     },
     loading: true,
-    csrf: "",
     isAuth: false,
     canAdd: false,
   },
@@ -55,9 +54,6 @@ export default new Vuex.Store({
     },
     setLoading(state, loading) {
       state.loading = loading;
-    },
-    setCSRF(state, csrf) {
-      state.csrf = csrf;
     },
     setAuth(state, isAuth) {
       state.isAuth = isAuth;
@@ -84,7 +80,6 @@ export default new Vuex.Store({
       };
     },
     clearAuthData(state){
-        state.csrf = "";
         state.canAdd = false;
         state.isAuth = false;
         state.currentConferenceData = {
@@ -109,11 +104,6 @@ export default new Vuex.Store({
       axios.get("http://ivelov-vm-api.groupbwt.com/conferences/"+page).then((response) => {
         state.commit("setConferencesPageInfo", response.data);
         state.commit("setLoading", false);
-      });
-    },
-    async setCSRF(state) {
-      axios.get("http://ivelov-vm-api.groupbwt.com/getCSRF").then((response) => {
-        state.commit("setCSRF", response.data);
       });
     },
     async setAuth(state) {
@@ -163,9 +153,6 @@ export default new Vuex.Store({
     },
     isLoading(state) {
       return state.loading;
-    },
-    getCSRF(state) {
-      return state.csrf;
     },
     isAuth(state) {
       return state.isAuth;
