@@ -11,14 +11,6 @@
         <v-container>
           <v-row>
             <v-text-field
-              v-model="conferenceData.conference.id"
-              label="Id"
-              outlined
-              disabled
-            ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
               v-model="conferenceData.conference.title"
               label="Title"
               outlined

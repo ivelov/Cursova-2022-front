@@ -14,8 +14,8 @@
           <v-col></v-col>
           <v-col></v-col>
         </v-row>
-        <v-row class="conf-row" v-for="conference in pageInfo.conferences" :key="conference.id">
-          <v-col>{{ conference.id }}</v-col>
+        <v-row class="conf-row" v-for="(conference, index) in pageInfo.conferences" :key="conference.id">
+          <v-col>{{ index }}</v-col>
           <v-col>{{ conference.title }}</v-col>
           <v-col>{{ conference.date }}</v-col>
           <v-col>
