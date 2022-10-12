@@ -44,7 +44,7 @@
 
 <script>
 import AppHeader from "./AppHeader.vue";
-import Cookies from 'js-cookie';
+import VueCookies from 'vue-cookies'
 
 export default {
   name: "AppLogin",
@@ -77,7 +77,7 @@ export default {
           password: this.password,
         },{
           headers: {
-            'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN'),
+            'X-XSRF-TOKEN': VueCookies.get('XSRF-TOKEN'),
           }
         }).then((response) => {
           if (response.data == 1) {
