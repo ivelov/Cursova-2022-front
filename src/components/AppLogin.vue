@@ -13,7 +13,7 @@
               label="E-mail"
               outlined
               :error-messages="emailErrors"
-              @update="$_removeErrors"
+              @change="$_removeErrors"
             ></v-text-field>
           </v-row>
           <v-row>
@@ -24,11 +24,14 @@
               label="Password"
               outlined
               :error-messages="passErrors"
-              @update="$_removeErrors"
+              @change="$_removeErrors"
             ></v-text-field>
           </v-row>
           <br />
-          <v-btn @click="$_enter" class="btn" :disabled="!valid" color="success">
+          <v-btn @click="$_enter" class="btn" 
+          :disabled="!valid || btnsLoading"
+          :loading="btnsLoading"
+          color="success">
             <span>Enter</span>
           </v-btn>
           <br /><br />
@@ -44,6 +47,7 @@
 
 <script>
 import AppHeader from "./AppHeader.vue";
+import VueCookies from 'vue-cookies'
 
 export default {
   name: "AppLogin",
@@ -54,6 +58,7 @@ export default {
     passErrors: null,
     email: "",
     password: "",
+    btnsLoading: false,
     buttons: {
       view: true,
     },
@@ -65,19 +70,26 @@ export default {
   },
   methods: {
     $_enter() {
+      this.btnsLoading = true;
       this.emailErrors = null;
       this.passErrors = null;
-      this.axios
+      this.axios.get('http://ivelov-vm-api.groupbwt.com/sanctum/csrf-cookie').then(() => {
+        this.axios
         .post("http://ivelov-vm-api.groupbwt.com/login", {
           email: this.email,
           password: this.password,
-        })
-        .then((response) => {
+        },{
+          headers: {
+            'X-XSRF-TOKEN': VueCookies.get('XSRF-TOKEN'),
+          }
+        }).then((response) => {
+          this.btnsLoading = false;
           if (response.data == 1) {
             this.$router.push("/");
           }
         })
         .catch((e) => {
+          this.btnsLoading = false;
           console.log(e);
           let errors = e.response.data.errors;
           if (typeof errors.email != undefined) {
@@ -87,6 +99,8 @@ export default {
             this.passErrors = errors.password;
           }
         });
+      });
+      
     },
     $_removeErrors() {
       this.emailErrors = null;

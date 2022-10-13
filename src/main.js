@@ -21,7 +21,7 @@ Vue.config.productionTip = false
 Vue.use(VueGoogleMaps, {
   load: {
     key: 'AIzaSyDvKC-wRgTVGX1cu1h7PKlfqb6eF4SIDp0',
-    libraries: 'places', // This is required if you use the Autocomplete plugin
+    libraries: 'places', 
   },
 })
 
