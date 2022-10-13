@@ -126,12 +126,6 @@ export default new Vuex.Store({
         state.commit("setAdd", response.data==1 ? true : false);
       });
     },
-    /**
-     * Set current conference data
-     * @param payload Object: id - id of conference, [hard - ignore stored data]
-     *
-     * @return void
-     */
     async setCurrentConferenceData(state, payload) {
       if (
         payload.id == state.getters.getCurrentConferenceData.conference.id &&
