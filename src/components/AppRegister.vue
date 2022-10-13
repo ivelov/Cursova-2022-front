@@ -25,7 +25,7 @@
               label="Password"
               outlined
               :error-messages="errors.password"
-              @change="errors.password = null"
+              @update="errors.password = null"
             ></v-text-field>
           </v-row>
           <v-row>
@@ -35,7 +35,7 @@
               label="Firstname"
               outlined
               :error-messages="errors.firstname"
-              @change="errors.firstname = null"
+              @update="errors.firstname = null"
             ></v-text-field>
           </v-row>
           <v-row>
@@ -45,7 +45,7 @@
               label="Lastname"
               outlined
               :error-messages="errors.lastname"
-              @change="errors.lastname = null"
+              @update="errors.lastname = null"
             ></v-text-field>
           </v-row>
           <v-row>
@@ -59,7 +59,7 @@
               item-text="state"
               item-value="value"
               :error-messages="errors.country"
-              @change="errors.country = null"
+              @update="errors.country = null"
             ></v-autocomplete>
           </v-row>
           <v-row>
@@ -73,7 +73,7 @@
               item-text="state"
               item-value="value"
               :error-messages="errors.role"
-              @change="errors.role = null"
+              @update="errors.role = null"
             ></v-autocomplete>
           </v-row>
           <v-row>
@@ -83,7 +83,7 @@
               :only-countries="['UA', 'US', 'RU', 'GB']"
               required
               class="form-input"
-              @change="$_phoneChange"
+              @update="$_phoneChange"
               :error-messages="errors.phone"
               @blur="errors.phone = null"
             />
@@ -108,7 +108,7 @@
                   :rules="[rules.required]"
                   outlined
                   :error-messages="errors.birthdate"
-                  @change="errors.birthdate = null"
+                  @update="errors.birthdate = null"
                 ></v-text-field>
               </template>
               <v-date-picker
