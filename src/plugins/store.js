@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
+import VueCookies from 'vue-cookies'
 
 Vue.use(Vuex);
 
@@ -107,8 +108,17 @@ export default new Vuex.Store({
       });
     },
     async setAuth(state) {
-      axios.get("http://ivelov-vm-api.groupbwt.com/isAuth").then((response) => {
-        state.commit("setAuth", response.data);
+      axios.get("http://ivelov-vm-api.groupbwt.com/isAuth",{},{
+        headers: {
+          'X-XSRF-TOKEN': VueCookies.get('XSRF-TOKEN'),
+        }
+      }).then((response) => {
+        if(response.status == 200){
+          state.commit("setAuth", response.data);
+        }else{
+          state.commit("setAuth", false);
+        }
+        
       });
     },
     async setAddPerk(state) {
