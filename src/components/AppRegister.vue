@@ -14,7 +14,7 @@
               label="E-mail"
               outlined
               :error-messages="errors.email"
-              @update="errors.email = null"
+              @change="errors.email = null"
             ></v-text-field>
           </v-row>
           <v-row>
@@ -25,7 +25,7 @@
               label="Password"
               outlined
               :error-messages="errors.password"
-              @update="errors.password = null"
+              @change="errors.password = null"
             ></v-text-field>
           </v-row>
           <v-row>
@@ -35,7 +35,7 @@
               label="Firstname"
               outlined
               :error-messages="errors.firstname"
-              @update="errors.firstname = null"
+              @change="errors.firstname = null"
             ></v-text-field>
           </v-row>
           <v-row>
@@ -45,7 +45,7 @@
               label="Lastname"
               outlined
               :error-messages="errors.lastname"
-              @update="errors.lastname = null"
+              @change="errors.lastname = null"
             ></v-text-field>
           </v-row>
           <v-row>
@@ -59,7 +59,7 @@
               item-text="state"
               item-value="value"
               :error-messages="errors.country"
-              @update="errors.country = null"
+              @change="errors.country = null"
             ></v-autocomplete>
           </v-row>
           <v-row>
@@ -73,7 +73,7 @@
               item-text="state"
               item-value="value"
               :error-messages="errors.role"
-              @update="errors.role = null"
+              @change="errors.role = null"
             ></v-autocomplete>
           </v-row>
           <v-row>
@@ -83,7 +83,7 @@
               :only-countries="['UA', 'US', 'RU', 'GB']"
               required
               class="form-input"
-              @update="$_phoneChange"
+              @change="$_phoneChange"
               :error-messages="errors.phone"
               @blur="errors.phone = null"
             />
@@ -108,7 +108,7 @@
                   :rules="[rules.required]"
                   outlined
                   :error-messages="errors.birthdate"
-                  @update="errors.birthdate = null"
+                  @change="errors.birthdate = null"
                 ></v-text-field>
               </template>
               <v-date-picker

@@ -13,7 +13,7 @@
               label="E-mail"
               outlined
               :error-messages="emailErrors"
-              @update="$_removeErrors"
+              @change="$_removeErrors"
             ></v-text-field>
           </v-row>
           <v-row>
@@ -24,7 +24,7 @@
               label="Password"
               outlined
               :error-messages="passErrors"
-              @update="$_removeErrors"
+              @change="$_removeErrors"
             ></v-text-field>
           </v-row>
           <br />
