@@ -28,7 +28,10 @@
             ></v-text-field>
           </v-row>
           <br />
-          <v-btn @click="$_enter" class="btn" :disabled="!valid" color="success">
+          <v-btn @click="$_enter" class="btn" 
+          :disabled="!valid || btnsLoading"
+          :loading="btnsLoading"
+          color="success">
             <span>Enter</span>
           </v-btn>
           <br /><br />
@@ -55,6 +58,7 @@ export default {
     passErrors: null,
     email: "",
     password: "",
+    btnsLoading: false,
     buttons: {
       view: true,
     },
@@ -66,6 +70,7 @@ export default {
   },
   methods: {
     $_enter() {
+      this.btnsLoading = true;
       this.emailErrors = null;
       this.passErrors = null;
       this.axios.get('http://ivelov-vm-api.groupbwt.com/sanctum/csrf-cookie').then(() => {
@@ -78,11 +83,13 @@ export default {
             'X-XSRF-TOKEN': VueCookies.get('XSRF-TOKEN'),
           }
         }).then((response) => {
+          this.btnsLoading = false;
           if (response.data == 1) {
             this.$router.push("/");
           }
         })
         .catch((e) => {
+          this.btnsLoading = false;
           console.log(e);
           let errors = e.response.data.errors;
           if (typeof errors.email != undefined) {

@@ -126,7 +126,8 @@
           <v-btn
             @click="$_register"
             class="btn"
-            :disabled="!valid || !phoneValid"
+            :disabled="!valid || !phoneValid || btnsLoading"
+            :loading="btnsLoading"
             color="success"
           >
             <span>Register</span>
@@ -152,6 +153,7 @@ export default {
     dateMenu: false,
     valid: true,
     phoneValid: false,
+    btnsLoading: false,
     errors: {
       email: null,
       password: null,
@@ -189,6 +191,7 @@ export default {
   },
   methods: {
     $_register() {
+      this.btnsLoading = true;
       for (let errorKey in this.errors) {
         this.errors[errorKey] = null;
       }
@@ -203,11 +206,13 @@ export default {
               },
             })
             .then((response) => {
+              this.btnsLoading = false;
               if (response.data == 1) {
                 this.$router.push("/");
               }
             })
             .catch((e) => {
+              this.btnsLoading = false;
               console.log(e);
               let errors = e.response.data.errors;
               if (typeof errors != undefined) {
