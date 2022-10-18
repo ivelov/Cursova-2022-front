@@ -8,6 +8,10 @@ import AppRegister from "../components/AppRegister";
 import AppDetails from "../components/AppDetails";
 import AppEdit from "../components/AppEdit";
 import AppAdd from "../components/AppAdd";
+import AppReportAdd from "../components/AppReportAdd";
+import AppReports from "../components/AppReports";
+import AppReportDetails from "../components/AppReportDetails";
+import AppReportEdit from "../components/AppReportEdit";
 
 Vue.use(VueRouter);
 export default new VueRouter({
@@ -52,6 +56,22 @@ export default new VueRouter({
       path: "/add",
       component: AppAdd,
       requireAdd:true
+    },
+    {
+      path: "/reports/:page",
+      component: AppReports,
+    },
+    {
+      path: "/addReport/:confId",
+      component: AppReportAdd,
+    },
+    {
+      path: "/report/:repId",
+      component: AppReportDetails,
+    },
+    {
+      path: "/report/:repId/edit",
+      component: AppReportEdit,
     },
   ],
   mode: "history",

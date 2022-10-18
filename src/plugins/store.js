@@ -16,11 +16,12 @@ export default new Vuex.Store({
     rules: {
       required: (value) => !!value || "Required.",
       counter: (value) => value.length >= 6 || "Min 6 characters",
-      counterMax: (value) => value.length <= 50 || "Max 50 characters",
+      counterMax: (value) => value.length <= 254 || "Max 255 characters",
       email: (value) => {
         const pattern = new RegExp("\\w@\\w");
         return pattern.test(value) || "Invalid e-mail.";
       },
+      size: (value) => !value || value.size > 10000000 || "Max 10 MB file",
     },
     currentConferenceData: {
       conference: {
@@ -42,6 +43,25 @@ export default new Vuex.Store({
     loading: true,
     isAuth: false,
     canAdd: false,
+    currentReportData:{
+      report:{
+        id:null,
+        conferenceId:null,
+        title:'',
+        description:'',
+        startTime:'',
+        endTime:'',
+        presentation:null,
+      },
+      canUpdate:false,
+      busyStartTimes:[],
+      busyEndTimes:[]
+    },
+    reportsPageInfo: {
+      maxPage:1,
+      buttons:{'back':true}
+  },
+  comments:[],
   },
   mutations: {
     //sync
@@ -96,19 +116,50 @@ export default new Vuex.Store({
             participant: false,
             canUpdate: false,
           };
-    }
+    },
+    setReportBusyTimes(state, busyTimes) {
+      state.currentReportData.busyStartTimes = [];
+      state.currentReportData.busyEndTimes = [];
+
+      for (let i = 0; i < busyTimes.startTimes.length; i++) {
+        state.currentReportData.busyStartTimes.push(busyTimes.startTimes[i]);  
+        state.currentReportData.busyEndTimes.push(busyTimes.endTimes[i]);  
+      }
+    },
+    setReportError(state, error){
+      state.currentReportData.error = error;
+    },
+    setReportsPageInfo(state, reportsPageInfo) {
+      state.reportsPageInfo = reportsPageInfo;
+      for (let i = 0; i < reportsPageInfo.reports.length; i++) {
+        state.reportsPageInfo.reports[i].readMore = false;
+      }
+      let buttonsArray = state.reportsPageInfo.buttons;
+      state.reportsPageInfo.buttons = {};
+      for (let buttonName of buttonsArray) {
+        state.reportsPageInfo.buttons[buttonName] = true;
+      }
+    },
+    setCurrentReportData(state, currentReportData) {
+      state.currentReportData = currentReportData;
+    },
+    setComments(state, comments) {
+      for (const comment in comments) {
+          state.comments.push(comment);
+      }
+    },
   },
   actions: {
     //async
     async setConferences(state, page = 1) {
       state.commit("setLoading", true);
-      axios.get("http://ivelov-vm-api.groupbwt.com/conferences/"+page).then((response) => {
+      axios.get("/conferences/"+page).then((response) => {
         state.commit("setConferencesPageInfo", response.data);
         state.commit("setLoading", false);
       });
     },
     async setAuth(state) {
-      axios.get("http://ivelov-vm-api.groupbwt.com/isAuth",{},{
+      axios.get("/isAuth",{},{
         headers: {
           'X-XSRF-TOKEN': VueCookies.get('XSRF-TOKEN'),
         }
@@ -122,7 +173,7 @@ export default new Vuex.Store({
       });
     },
     async setAddPerk(state) {
-      axios.get("http://ivelov-vm-api.groupbwt.com/canAdd").then((response) => {
+      axios.get("/canAdd").then((response) => {
         state.commit("setAdd", response.data==1 ? true : false);
       });
     },
@@ -135,12 +186,51 @@ export default new Vuex.Store({
         return;
       }
       state.commit("setLoading", true);
-      axios.get("http://ivelov-vm-api.groupbwt.com/conference/" + payload.id).then((response) => {
+      axios.get("/conference/" + payload.id).then((response) => {
         state.commit("setCurrentConferenceData", response.data);
         state.commit("setLoading", false);
       });
     },
-
+    async setReportBusyTimes(state, payload) {
+      state.commit("setLoading", true);
+      axios.get("/conference/"+payload.id+'/getBusyTimes',
+        {repId: payload.edit? state.currentReportData.report.id : false}
+      ).then((response) => {
+        state.commit("setReportBusyTimes", response.data);
+        state.commit("setLoading", false);
+      }).catch((e)=>{
+        console.log(e);
+        state.commit("setReportError", true);
+      });
+    },
+    async setReports(state, page = 1) {
+      state.commit("setLoading", true);
+      axios.get("/reports/"+page).then((response) => {
+        state.commit("setReportsPageInfo", response.data);
+        state.commit("setLoading", false);
+      });
+    },
+    async setCurrentReportData(state, payload) {
+      if (
+        payload.id == state.getters.currentReportData.id &&
+        payload["hard"] == undefined
+      ) {
+        state.commit("setLoading", false);
+        return;
+      }
+      state.commit("setLoading", true);
+      axios.get("/report/" + payload.id).then((response) => {
+        state.commit("setCurrentReportData", response.data);
+        state.commit("setLoading", false);
+      });
+    },
+    async setComments(state, payload) {
+      state.commit("setLoading", true);
+      axios.get("/report/" + payload.id+'/comments/'+payload.comment).then((response) => {
+        state.commit("setComments", response.data);
+        state.commit("setLoading", false);
+      });
+    },
   },
   getters: {
     getCountries(state) {
@@ -163,6 +253,15 @@ export default new Vuex.Store({
     },
     getCurrentConferenceData(state) {
       return state.currentConferenceData;
+    },
+    getCurrentReportData(state){
+      return state.currentReportData;
+    },
+    getReportsPageInfo(state) {
+      return state.reportsPageInfo;
+    },
+    getComments(state) {
+      return state.comments;
     },
   },
 });

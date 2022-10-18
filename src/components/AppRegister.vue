@@ -178,7 +178,7 @@ export default {
       { state: "Announcer", value: "announcer" },
     ],
     buttons: {
-      view: true,
+      conferences: true,
     },
   }),
   computed: {
@@ -197,10 +197,10 @@ export default {
       }
 
       this.axios
-        .get("http://ivelov-vm-api.groupbwt.com/sanctum/csrf-cookie")
+        .get("/sanctum/csrf-cookie")
         .then(() => {
           this.axios
-            .post("http://ivelov-vm-api.groupbwt.com/register", this.values, {
+            .post("/register", this.values, {
               headers: {
                 "X-XSRF-TOKEN": VueCookies.get("XSRF-TOKEN"),
               },
