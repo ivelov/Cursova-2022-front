@@ -60,7 +60,8 @@ export default new Vuex.Store({
       },
       canUpdate:false,
       busyStartTimes:[],
-      busyEndTimes:[]
+      busyEndTimes:[],
+      confStartTime:'07:00'
     },
     reportsPageInfo: {
       maxPage:1,
@@ -125,7 +126,7 @@ export default new Vuex.Store({
     setReportBusyTimes(state, busyTimes) {
       state.currentReportData.busyStartTimes = [];
       state.currentReportData.busyEndTimes = [];
-
+      //console.log(busyTimes);
       for (let i = 0; i < busyTimes.startTimes.length; i++) {
         state.currentReportData.busyStartTimes.push(busyTimes.startTimes[i]);  
         state.currentReportData.busyEndTimes.push(busyTimes.endTimes[i]);  

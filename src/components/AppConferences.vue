@@ -55,7 +55,7 @@
             >
               <span>Delete</span>
             </v-btn>
-            <v-btn class="conf-btn" @click="$_joinConf(conference.id)" color="primary" v-else>
+            <v-btn class="conf-btn" @click="$_joinConf(conference.id)" color="primary" v-if="!conference.participant">
               <span>Join</span>
             </v-btn>
           </v-col>
@@ -184,8 +184,7 @@ export default {
 }
 
 .conf-btn{
-  margin-top: 2px;
-  margin-bottom: 2px;
+  margin: 2px;
 }
 
 .share-row {

@@ -14,7 +14,7 @@
         <v-card-title>{{report.title}}</v-card-title>
         <v-card-text>
           <p>Time: {{report.startTime}}-{{report.endTime}}</p>
-          <p v-if="!report.readMore">{{report.description.slice(0,100)}}
+          <p v-if="!report.readMore && report.description">{{report.description.slice(0,100)}}
             <span 
               v-if="!report.readMore && report.description.length > 100" 
               @click="report.readMore = !report.readMore">
