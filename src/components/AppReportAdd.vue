@@ -160,22 +160,22 @@ export default {
     calcAllowedHours(){
       var allowedHoursArr = [];
 
-      for (let i = 7; i < 21; i++) {
+      var confStartHour =  parseInt(this.currentReportData.confStartTime.substring(0,2));
+      for (let i = confStartHour; i < 21; i++) {
         var freeTime = 60;
         for (let j = 0; j < this.currentReportData.busyStartTimes.length; j++) {
           var startHour = parseInt(this.currentReportData.busyStartTimes[j].substring(0,2));
           var endHour = parseInt(this.currentReportData.busyEndTimes[j].substring(0,2));
           var startMinute = parseInt(this.currentReportData.busyStartTimes[j].substring(3,5));
           var endMinute = parseInt(this.currentReportData.busyEndTimes[j].substring(3,5));
-          if(j == startHour){
-            if(j == endHour)
+          if(i == startHour){
+            if(i == endHour)
               freeTime -= endMinute - startMinute;
             else
               freeTime -= 60 - startMinute;
-          }else if(j == startHour - 1 && j == endHour){
+          }else if(i == startHour + 1 && i == endHour){
             freeTime -= endMinute;
           }
-          
         }
         if(freeTime >= 5){
           allowedHoursArr.push(i);
@@ -264,7 +264,7 @@ export default {
         var startHour = parseInt(this.currentReportData.busyStartTimes[i].substring(0,2));
         var startMinute = parseInt(this.currentReportData.busyStartTimes[i].substring(3,5));
         
-        if((curHour == startHour && curMinute < startMinute) || curHour == startHour + 1){
+        if((curHour == startHour && curMinute < startMinute) || curHour == startHour - 1){
           if(this.$_timeIsBigger(maxEndTimeBufHour, maxEndTimeBufMinute, startHour, startMinute)){
             maxEndTimeBufHour = startHour;
             maxEndTimeBufMinute = startMinute;

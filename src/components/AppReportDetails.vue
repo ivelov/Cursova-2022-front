@@ -43,16 +43,17 @@
               v-model="currentReportData.report.presentation"
               accept=".ppt,.pptx"
               label="Presentation"
+              outlined
               disabled
             ></v-file-input>
           </v-row>
           
-          <br /><br />
+          <br />
           <v-btn
             v-if="currentReportData.canUpdate"
             class="btn"
             color="success"
-            @click="$router.push('/report/'+currentReportData.report.id+'/edit')"
+            @click="$router.push('/report/'+$route.params.repId+'/edit')"
             :disabled="btnsLoading"
             :loading="btnsLoading"
           >
@@ -94,7 +95,7 @@ export default {
     },
   },
   mounted() {
-    this.$store.dispatch("setCurrentReportData", this.$route.params.confId);
+    this.$store.dispatch("setCurrentReportData", {id: this.$route.params.repId});
   },
   methods: {
     $_cancelPart(){

@@ -201,8 +201,8 @@ export default new Vuex.Store({
     },
     async setReportBusyTimes(state, payload) {
       state.commit("setLoading", true);
-      axios.get("/conference/"+payload.id+'/getBusyTimes',
-        {repId: payload.edit? state.currentReportData.report.id : false}
+      await axios.get("/conference/"+payload.id+'/getBusyTimes',
+        {repId: payload.edit? state.getters.getCurrentReportData.report.id : false}
       ).then((response) => {
         state.commit("setReportBusyTimes", response.data);
         state.commit("setLoading", false);
@@ -220,7 +220,7 @@ export default new Vuex.Store({
     },
     async setCurrentReportData(state, payload) {
       if (
-        payload.id == state.getters.currentReportData.id &&
+        payload.id == state.getters.getCurrentReportData.report.id &&
         payload["hard"] == undefined
       ) {
         state.commit("setLoading", false);
@@ -230,6 +230,9 @@ export default new Vuex.Store({
       axios.get("/report/" + payload.id).then((response) => {
         state.commit("setCurrentReportData", response.data);
         state.commit("setLoading", false);
+        if(payload.edit){
+          state.dispatch("setReportBusyTimes", {id: state.getters.getCurrentReportData.report.conferenceId, edit: true});
+        }
       });
     },
     async setComments(state, payload) {

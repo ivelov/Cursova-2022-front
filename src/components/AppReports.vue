@@ -109,11 +109,17 @@ export default {
       this.curPage = parseInt(this.curPage) + 1;
       this.$store.dispatch("setReports", this.curPage);
       this.$router.push("/reports/" + this.curPage);
+      for (let i = 0; i < 15; i++) {
+        this.readMore.push(false);
+      }
     },
     $_prevPage() {
       this.curPage = parseInt(this.curPage) - 1;
       this.$store.dispatch("setReports", this.curPage);
       this.$router.push("/reports/" + this.curPage);
+      for (let i = 0; i < 15; i++) {
+        this.readMore.push(false);
+      }
     },
     $_readMore(index){
       this.$set(this.readMore,index,!this.readMore[index]);
