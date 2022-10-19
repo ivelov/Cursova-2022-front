@@ -21,7 +21,12 @@ export default new Vuex.Store({
         const pattern = new RegExp("\\w@\\w");
         return pattern.test(value) || "Invalid e-mail.";
       },
-      size: (value) => !value || value.size > 10000000 || "Max 10 MB file",
+      size: (value) => {
+        if(!value) return true;
+        if(value.size > 10000000) 
+          return "Max 10 MB file"
+        return true;
+      },
     },
     currentConferenceData: {
       conference: {

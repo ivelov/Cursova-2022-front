@@ -192,8 +192,8 @@ export default {
     }
   },
   mounted() {
-    this.currentReportData.report.conferenceID = this.$route.params.confId;
-    this.$store.dispatch("setReportBusyTimes", {id: this.currentReportData.report.conferenceID, edit: false});
+    this.currentReportData.report.conferenceId = this.$route.params.confId;
+    this.$store.dispatch("setReportBusyTimes", {id: this.currentReportData.report.conferenceId, edit: false});
   },
   methods: {
     $_saveReport() {
