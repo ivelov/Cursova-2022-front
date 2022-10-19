@@ -53,6 +53,7 @@
                 format="24hr"
                 :allowed-hours="allowedHours"
                 :allowed-minutes="allowedMinutes"
+                :min="currentReportData.confStartTime"
                 @click:hour="$_hourClick"
                 @click:minute="
                   $refs.timeMenuStart.save(currentReportData.report.startTime);

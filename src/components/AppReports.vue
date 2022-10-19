@@ -3,41 +3,53 @@
     <AppHeader :buttons="buttons"></AppHeader>
     <br /><br />
     <v-main>
-      <v-container v-if="loading">
+      <v-container v-if="loading">join
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
       <v-container class="container-conferences" v-else>
-        <v-card
-          elevation="2"
-          v-for="report in pageInfo.reports" :key="report.id"
-        >
-        <v-card-title>{{report.title}}</v-card-title>
-        <v-card-text>
-          <p>Time: {{report.startTime}}-{{report.endTime}}</p>
-          <p v-if="!report.readMore && report.description">{{report.description.slice(0,100)}}
-            <span 
-              v-if="!report.readMore && report.description.length > 100" 
-              @click="report.readMore = !report.readMore">
-              ..read more
-            </span>
-          </p>
-          <p v-if="report.readMore">{{report.description}}
-            <span 
-              @click="report.readMore = !report.readMore">
-              ..hide
-            </span>
-          </p> 
-        </v-card-text>
-        <v-card-actions>
-          <v-btn
-            color="deep-purple lighten-2"
-            text
-            @click="$router.push('/report/'+report.id)"
+        <v-row>
+          <v-col
+            class="report"
+            v-for="(report, index) in pageInfo.reports" 
+            :key="report.id"
+            cols="12"
+            sm="4"
           >
-            Details
-          </v-btn>
-        </v-card-actions>
-        </v-card>
+            <v-card
+              class="report-card"
+              elevation="2"
+            >
+            <v-card-title>{{report.title}}</v-card-title>
+            <v-card-text>
+              <p>Time: {{report.startTime}}-{{report.endTime}}</p>
+              <p class="report-space" v-if="!readMore[index] && report.description">{{report.description.slice(0,100)}}
+                <span 
+                  v-if="!readMore[index] && report.description.length > 100" 
+                  @click="$_readMore(index)">
+                  ..read more
+                </span>
+              </p>
+              <p class="report-space" v-else-if="!report.description"></p>
+              <p class="report-space" v-if="readMore[index]">{{report.description}}
+                <span 
+                  @click="$_readMore(index)">
+                  ..hide
+                </span>
+              </p> 
+            </v-card-text>
+            <v-card-actions>
+              <v-btn
+                color="deep-purple lighten-2"
+                text
+                @click="$router.push('/report/'+report.id)"
+              >
+                Details
+              </v-btn>
+            </v-card-actions>
+            </v-card>
+          </v-col>
+        </v-row>
+        
         <br />
         <br />
         
@@ -64,6 +76,7 @@ export default {
   data: () => ({
     curPage: 1,
     btnsLoading: false,
+    readMore:[]
   }),
   computed: {
     pageInfo() {
@@ -83,10 +96,13 @@ export default {
     },
   },
   mounted() {
-
     this.curPage = this.$route.params.page;
 
     this.$store.dispatch("setReports", this.curPage);
+
+    for (let i = 0; i < 15; i++) {
+      this.readMore.push(false);
+    }
   },
   methods: {
     $_nextPage() {
@@ -99,54 +115,19 @@ export default {
       this.$store.dispatch("setReports", this.curPage);
       this.$router.push("/reports/" + this.curPage);
     },
+    $_readMore(index){
+      this.$set(this.readMore,index,!this.readMore[index]);
+    }
   },
   components: { AppHeader },
 };
 </script>
 
 <style scoped>
-.container-conferences {
-  
-  overflow-x: auto;
-}
-
-.conf-row {
-  min-width: 620px;
-  outline: 3px solid #ced4da;
-  align-items: center;
-}
-
-
-.row:nth-child(n + 2) {
-  margin-top: 16px;
-}
-
-.pageBtn {
-  margin-left: 5px;
-}
-
-.conf-btn{
-  margin-top: 2px;
-  margin-bottom: 2px;
-}
-
-.share-row {
-  align-items: center;
-}
-
-.share-row {
-  align-items: center;
-}
-
-.share-network-facebook,
-.share-network-twitter,
-.share-network-twitter img {
-  width: 30px;
-  height: 30px;
-}
-
-.share-network-facebook {
-  margin-left: 5px;
-  margin-right: 5px;
-}
+  .report-card{
+    min-height: 276px;
+  }
+  .report-space{
+    min-height: 66px;
+  }
 </style>

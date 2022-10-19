@@ -64,6 +64,7 @@ export default new Vuex.Store({
       confStartTime:'07:00'
     },
     reportsPageInfo: {
+      reports:[],
       maxPage:1,
       buttons:{'back':true}
   },
@@ -124,6 +125,7 @@ export default new Vuex.Store({
           };
     },
     setReportBusyTimes(state, busyTimes) {
+      state.currentReportData.confStartTime = busyTimes.confStartTime;
       state.currentReportData.busyStartTimes = [];
       state.currentReportData.busyEndTimes = [];
       //console.log(busyTimes);
@@ -137,14 +139,14 @@ export default new Vuex.Store({
     },
     setReportsPageInfo(state, reportsPageInfo) {
       state.reportsPageInfo = reportsPageInfo;
-      for (let i = 0; i < reportsPageInfo.reports.length; i++) {
-        state.reportsPageInfo.reports[i].readMore = false;
-      }
       let buttonsArray = state.reportsPageInfo.buttons;
       state.reportsPageInfo.buttons = {};
       for (let buttonName of buttonsArray) {
         state.reportsPageInfo.buttons[buttonName] = true;
       }
+    },
+    setReportReadMore(state, index){
+      state.reportsPageInfo.reports[index].readMore = !state.reportsPageInfo.reports[index].readMore; 
     },
     setCurrentReportData(state, currentReportData) {
       state.currentReportData = currentReportData;
