@@ -4,7 +4,10 @@
 
     <v-main>
       <br /><br />
-      <v-form v-model="valid">
+      <v-container v-if="loading">
+        <v-text-field color="success" loading disabled></v-text-field>
+      </v-container>
+      <v-form v-model="valid" v-else>
         <v-container>
           <v-row>
             <v-text-field
@@ -229,6 +232,7 @@ export default {
         .then((response) => {
           console.log(response);
           this.btnsLoading = false;
+          this.$router.push('/reports/1');
         })
         .catch((e) => {
           console.error(e);

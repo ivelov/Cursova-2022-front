@@ -4,7 +4,10 @@
 
     <v-main>
       <br /><br />
-      <v-form>
+      <v-container v-if="loading">
+        <v-text-field color="success" loading disabled></v-text-field>
+      </v-container>
+      <v-form  v-else>
         <v-container>
           <v-row>
             <v-text-field
@@ -99,7 +102,7 @@ export default {
   },
   methods: {
     $_cancelPart(){
-      this.loading = true;
+      this.btnsLoading = true;
       this.axios.post("/reports/delete/" + this.currentReportData.report.id).then(() => {
         this.$router.push('/reports/1');
       });

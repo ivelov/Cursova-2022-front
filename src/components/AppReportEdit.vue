@@ -4,7 +4,10 @@
 
     <v-main>
       <br /><br />
-      <v-form v-model="valid">
+      <v-container v-if="loading">
+        <v-text-field color="success" loading disabled></v-text-field>
+      </v-container>
+      <v-form v-model="valid" v-else>
         <v-container>
           <v-row>
             <v-text-field
