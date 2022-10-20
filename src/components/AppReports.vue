@@ -19,8 +19,9 @@
               class="report-card"
               elevation="2"
             >
-            <v-card-title>{{report.title}}</v-card-title>
+            <v-card-title><a @click="$router.push('/report/'+report.id)">{{report.title}}</a></v-card-title>
             <v-card-text>
+              <p>Conference: {{report.conferenceTitle}}</p>
               <p>Time: {{report.startTime}}-{{report.endTime}}</p>
               <p class="report-space" v-if="!readMore[index] && report.description">{{report.description.slice(0,100)}}
                 <span 
@@ -36,12 +37,14 @@
                   ..hide
                 </span>
               </p> 
+              <p>Comments: {{report.commentsCount}}</p>
             </v-card-text>
             <v-card-actions>
               <v-btn
                 color="deep-purple lighten-2"
                 text
-                @click="$router.push('/report/'+report.id)"
+                @click="$store.commit('clearCommentsInfo');
+                $router.push('/report/'+report.id)"
               >
                 Details
               </v-btn>

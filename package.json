@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@babel/preset-env": "^7.19.3",
+    "@tinymce/tinymce-vue": "^3.2.8",
     "babel-plugin-component": "^1.1.1",
     "core-js": "^3.8.3",
     "maz-ui": "^2.3.13",

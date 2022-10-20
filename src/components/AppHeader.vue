@@ -146,7 +146,8 @@ export default {
         .post("/logout")
         .then(() => {
           this.$store.commit('clearAuthData');
-          this.$router.go();
+          //this.$store.commit('clearCommentsInfo');
+          this.$router.go('/login');
         })
         .catch((e) => {
           console.log(e);

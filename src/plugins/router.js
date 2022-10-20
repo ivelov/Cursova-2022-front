@@ -60,18 +60,30 @@ export default new VueRouter({
     {
       path: "/reports/:page",
       component: AppReports,
+      meta:{
+        requireAuth:true
+      }
     },
     {
       path: "/addReport/:confId",
       component: AppReportAdd,
+      meta:{
+        requireAuth:true
+      }
     },
     {
       path: "/report/:repId",
       component: AppReportDetails,
+      meta:{
+        requireAuth:true
+      }
     },
     {
       path: "/report/:repId/edit",
       component: AppReportEdit,
+      meta:{
+        requireAuth:true
+      }
     },
   ],
   mode: "history",

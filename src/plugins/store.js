@@ -23,6 +23,7 @@ export default new Vuex.Store({
       },
       size: (value) => {
         if(!value) return true;
+        if(typeof(value)=='string') return false;
         if(value.size > 10000000) 
           return "Max 10 MB file"
         return true;
@@ -68,7 +69,12 @@ export default new Vuex.Store({
       maxPage:1,
       buttons:{'back':true}
   },
-  comments:[],
+  commentsInfo:{
+    comments:[],
+    maxPage:1,
+    curPage:0,
+    loading:false
+  },
   },
   mutations: {
     //sync
@@ -128,7 +134,7 @@ export default new Vuex.Store({
       state.currentReportData.confStartTime = busyTimes.confStartTime;
       state.currentReportData.busyStartTimes = [];
       state.currentReportData.busyEndTimes = [];
-      //console.log(busyTimes);
+      console.log(busyTimes);
       for (let i = 0; i < busyTimes.startTimes.length; i++) {
         state.currentReportData.busyStartTimes.push(busyTimes.startTimes[i]);  
         state.currentReportData.busyEndTimes.push(busyTimes.endTimes[i]);  
@@ -150,12 +156,47 @@ export default new Vuex.Store({
     },
     setCurrentReportData(state, currentReportData) {
       state.currentReportData = currentReportData;
+      currentReportData.report.presentation = new File([currentReportData.report.presentation], "presentation");
     },
-    setComments(state, comments) {
-      for (const comment in comments) {
-          state.comments.push(comment);
+    setComments(state, commentsInfo) {//TODO: change this
+      var commentsJson = commentsInfo.comments;
+      commentsInfo.comments = [];
+      for (let i = 0; i < state.commentsInfo.comments.length; i++) {
+        commentsInfo.comments.push(state.commentsInfo.comments[i]);
       }
+      for (let i = 0; i < commentsJson.length; i++) {
+        commentsInfo.comments.push(commentsJson[i]);
+      }
+      commentsInfo.curPage = state.commentsInfo.curPage + 1;
+      state.commentsInfo = commentsInfo;
+      state.commentsInfo.loading = false;
     },
+    setCommentsLoading(state, loading) {
+      state.commentsInfo.loading = loading;
+    },
+    clearCurrentReportData(state) {
+      state.currentReportData = {
+        report:{ id:null,
+          conferenceId:null,
+          title:'',
+          description:'',
+          startTime:'',
+          endTime:'',
+          presentation:null,},
+        canUpdate:false,
+        busyStartTimes:[],
+        busyEndTimes:[],
+        confStartTime:'07:00'
+      };
+    },
+    clearCommentsInfo(state){
+      state.commentsInfo = {
+        comments:[],
+        maxPage:1,
+        curPage:0,
+        loading:false
+      }; 
+    }
   },
   actions: {
     //async
@@ -236,11 +277,25 @@ export default new Vuex.Store({
       });
     },
     async setComments(state, payload) {
-      state.commit("setLoading", true);
-      axios.get("/report/" + payload.id+'/comments/'+payload.comment).then((response) => {
-        state.commit("setComments", response.data);
-        state.commit("setLoading", false);
-      });
+      if(state.getters.getCommentsInfo.loading) return;
+      if(state.getters.getCommentsInfo.curPage >= state.getters.getCommentsInfo.maxPage) return;
+
+      state.commit("setCommentsLoading", true);
+      if(payload.page){
+        axios.get("/report/" + payload.id+'/comments',{
+          page: payload.page
+        }).then((response) => {
+          state.getters.getCommentsInfo.curPage = payload.page;
+          state.commit("setComments", response.data);
+        });
+      }else{
+        axios.get("/report/" + payload.id+'/comments',{
+          page: state.getters.getCommentsInfo.curPage + 1
+        }).then((response) => {
+          state.commit("setComments", response.data);
+        });
+      }
+      
     },
   },
   getters: {
@@ -271,8 +326,8 @@ export default new Vuex.Store({
     getReportsPageInfo(state) {
       return state.reportsPageInfo;
     },
-    getComments(state) {
-      return state.comments;
+    getCommentsInfo(state) {
+      return state.commentsInfo;
     },
   },
 });

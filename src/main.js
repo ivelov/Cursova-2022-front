@@ -9,6 +9,7 @@ import VueSocialSharing from 'vue-social-sharing'
 import * as VueGoogleMaps from 'vue2-google-maps';
 import wysiwyg from "vue-wysiwyg";
 
+
 axios.defaults.baseURL='/V1';
 //axios.defaults.baseURL='http://ivelov-vm-api.groupbwt.com';
 axios.defaults.headers.common = {

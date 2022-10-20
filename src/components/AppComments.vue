@@ -1,16 +1,17 @@
 <template>
-  <div>
+  <v-container>
     <br>
-    <h2>Leave comment</h2>
+    <h2>Leave comment</h2>  
     <br>
-    <v-form v-model="valid">
-      <wysiwyg v-model="commentMessage" 
-        :rules="[rules.required]"
-      />
+    <v-form class="new-form">
+      <div class="editor-div">
+        <wysiwyg v-model="commentMessage" />
+      </div>
+      <br>
       <v-btn 
         color="success"
-        @click="$_saveComment" 
-        :disabled="!valid || btnsLoading"
+        @click="$_addComment" 
+        :disabled="btnsLoading"
         :loading="btnsLoading"
       >
         <span>Submit</span>
@@ -19,74 +20,152 @@
     <br>
     <h2>Comments</h2>
     <br>
-    <v-container>
-      <div v-for="comment in comments" :key="comment.id">
-        <p>{{comment.username}} <span class="text--disabled">Created:{{comment.created}} Updated:{{comment.updated}}</span></p>
-        <wysiwyg 
-        :disabled="!comment.isEditing"
+    <v-container v-if="loading">
+        <v-text-field color="success" loading disabled></v-text-field>
+      </v-container>
+    <v-container v-else>
+      <v-card v-for="(comment, index) in commentsInfo.comments" :key="comment.id">
+        <p>
+          {{comment.lastname+' '+comment.firstname}} 
+          <span class="text--disabled">Created:{{comment.createdAt}} Updated:{{comment.updatedAt}}</span>
+          <v-btn
+            v-if="comment.canUpdate && !editing[index]"
+            class="upd-btn"
+            color="success"
+            @click="$_changeEdit(index)" 
+            :disabled="btnsLoading"
+            :loading="btnsLoading"
+          >
+            <span>Edit</span>
+          </v-btn>
+          <v-btn 
+            v-else-if="comment.canUpdate"
+            class="upd-btn"
+            color="success"
+            @click="$_saveComment(index)" 
+            :disabled="btnsLoading"
+            :loading="btnsLoading"
+          >
+            <span>Save</span>
+          </v-btn>
+        </p>
+        <wysiwyg v-if="editing[index]"
         v-model="comment.text" 
-        :rules="[rules.required]"
       />
-        <p>{{comment.text}}</p>
-
-      </div>
+        <p v-else v-html="comment.text"></p>
+        
+      </v-card>
+      <v-btn 
+        class="load-more"
+        v-if="canLoadMore"
+        color="success"
+        @click="$store.dispatch('setComments', {id:reportId})" 
+        :disabled="btnsLoading"
+        :loading="btnsLoading"
+      >
+        <span>Load more</span>
+      </v-btn>
+      
     </v-container>
-  </div>
+  </v-container>
 </template>
 
 <script>
+
 export default {
   name: "AppComments",
 
   data: function () {
     return {
-      valid:false,
       btnsLoading: false,
-      commentMessage:''
+      commentMessage:'',
+      editing:[]
     };
   },
   computed:{
     loading(){
-      return this.$store.getters.isLoading;
+      return this.commentsInfo.loading;
     },
     rules(){
       return this.$store.getters.getRules;
     },
-    comments(){
-      return this.$store.getters.getComments;
+    commentsInfo(){
+      return this.$store.getters.getCommentsInfo;
     },
+    commentsCount(){
+      return this.commentsInfo.commentsCount;
+    },
+    canLoadMore(){
+      return this.commentsInfo.maxPage > this.commentsInfo.curPage;
+    }
   },
   props: {
-    reportId: Object,
+    reportId: Number,
   },
-
+  created(){
+    this.editing = [];
+    if(this.reportId){
+      this.$store.dispatch('setComments', {id:this.reportId, page:0});
+    }
+  },
+  watch:{
+    reportId:function (val){
+      this.$store.dispatch('setComments', {id:val, page:0});
+    },
+    commentsCount:function (val){
+      this.editing = [];
+      for (let i = 0; i < val; i++) {
+        this.editing.push(false);
+      }
+    }
+  },
   methods: {
-    $_saveComment(){
+    $_addComment(){
       this.btnsLoading = true;
-
+      
       this.axios
-        .post("/report/"+this.reportId+"/addComment", this.commentMessage)
+        .post("/report/"+this.reportId+"/addComment", {text: this.commentMessage, reportId: this.reportId})
         .then(() => {
           this.btnsLoading = false;
+          this.$store.dispatch('setComments', {id:this.reportId, page:0});
         })
-        .catch((e) => {
-          console.error(e);
-        });
+    },
+    $_saveComment(index){
+      this.btnsLoading = true;
+      
+      this.axios
+        .post("/report/"+this.reportId+"/updateComment", {
+          id: this.commentsInfo.comments[index].id, 
+          text: this.commentsInfo.comments[index].text, 
+        })
+        .then(() => {
+          this.btnsLoading = false;
+          this.$_changeEdit(index);
+        })
+    },
+    $_changeEdit(index){
+      this.$set(this.editing,index,!this.editing[index]);
     }
   },
 };
 </script>
 
 <style scoped>
-  .v-navigation-drawer{
-    position: fixed;
-    padding: 10% 10px;
-    max-width: 230px;
-    width: 230px;
+@import "~vue-wysiwyg/dist/vueWysiwyg.css";
+  .editr{
+    width: 520px;
   }
-  .v-navigation-drawer .v-btn{
-    
-    width: 180px;
-    margin: 0 15px 20px 15px;
+  .v-card{
+    padding: 5px;
+    margin-top: 10px;
+  }
+  .editor-div{
+    overflow: auto;
+  }
+  .upd-btn{
+    margin: 5px;
+  }
+  .load-more{
+    margin: 10px;
   }
 </style>

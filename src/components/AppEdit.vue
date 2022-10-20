@@ -85,7 +85,7 @@
                 full-width
                 format="24hr"
                 min="07:00"
-                max="21:00"
+                max="20:00"
                 @click:minute="
                   $refs.timeMenu.save(conferenceData.conference.time)
                 "

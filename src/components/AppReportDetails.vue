@@ -9,6 +9,15 @@
       </v-container>
       <v-form  v-else>
         <v-container>
+          <v-btn
+            class="btn"
+            color="primary"
+            @click="$router.push('/conference/'+currentReportData.report.conferenceId)"
+            :disabled="btnsLoading"
+            :loading="btnsLoading"
+          >
+            <span>Go to conference</span>
+          </v-btn><br><br>
           <v-row>
             <v-text-field
               v-model="currentReportData.report.title"
@@ -74,12 +83,14 @@
           </v-btn>
         </v-container>
       </v-form>
+      <AppComments :reportId="currentReportData.report.id"></AppComments>
     </v-main>
   </div>
 </template>
 
 <script>
 import AppHeader from "./AppHeader.vue";
+import AppComments from "./AppComments.vue";
 export default {
   name: "AppReportsDetails",
 
@@ -103,12 +114,12 @@ export default {
   methods: {
     $_cancelPart(){
       this.btnsLoading = true;
-      this.axios.post("/reports/delete/" + this.currentReportData.report.id).then(() => {
+      this.axios.post("/reports/delete/" + this.currentReportData.report.conferenceId).then(() => {
         this.$router.push('/reports/1');
       });
     }
   },
-  components: { AppHeader },
+  components: { AppHeader, AppComments },
 };
 </script>
 

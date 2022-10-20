@@ -226,15 +226,31 @@ export default {
     $_saveReport() {
       this.btnsLoading = true;
 
-      this.axios
+      if(this.currentReportData.report.presentation){
+        var reader = new FileReader();
+        reader.readAsBinaryString(this.currentReportData.report.presentation);
+
+        reader.onload = (res) => {
+          var presBuf = this.currentReportData.report.presentation;
+          this.currentReportData.report.presentation = res.currentTarget.result;
+
+          this.axios
+          .post("/report/"+this.currentReportData.report.id+'/save', this.currentReportData.report)
+          .then((response) => {
+            console.log(response);
+            this.currentReportData.report.presentation = presBuf;
+            this.btnsLoading = false;
+          })
+        }
+      }else{
+        this.axios
         .post("/report/"+this.currentReportData.report.id+'/save', this.currentReportData.report)
         .then((response) => {
           console.log(response);
           this.btnsLoading = false;
         })
-        .catch((e) => {
-          console.error(e);
-        });
+      }
+      
     },
     $_allowedHours(v){
       return this.calcAllowedHours.includes(v);

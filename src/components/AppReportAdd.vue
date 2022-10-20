@@ -220,23 +220,38 @@ export default {
     }
   },
   mounted() {
+    this.$store.commit('clearCurrentReportData');
     this.currentReportData.report.conferenceId = this.$route.params.confId;
     this.$store.dispatch("setReportBusyTimes", {id: this.currentReportData.report.conferenceId, edit: false});
   },
   methods: {
     $_saveReport() {
       this.btnsLoading = true;
-
-      this.axios
+      if(this.currentReportData.report.presentation){
+        var reader = new FileReader();
+        reader.readAsBinaryString(this.currentReportData.report.presentation);
+        reader.onload = (res) => {
+          this.currentReportData.report.presentation = res.currentTarget.result;
+          this.axios
+          .post("/reports/add", this.currentReportData.report)
+          .then((response) => {
+            console.log(response);
+            this.btnsLoading = false;
+            this.$store.commit('clearCurrentReportData');
+            this.$router.push('/reports/1');
+          })
+        }
+      }else{
+        this.axios
         .post("/reports/add", this.currentReportData.report)
         .then((response) => {
           console.log(response);
           this.btnsLoading = false;
+          this.$store.commit('clearCurrentReportData');
           this.$router.push('/reports/1');
         })
-        .catch((e) => {
-          console.error(e);
-        });
+      }
+      
     },
     allowedHours(v){
       return this.calcAllowedHours.includes(v);

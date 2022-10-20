@@ -134,7 +134,7 @@ export default {
     },
     $_cancelJoin(id) {
       this.$store.commit("setLoading", true);
-      this.axios.post("/conferences/cancel/" + id).then(() => {
+      this.axios.post("/reports/delete/" + id).then(() => {
         this.$store.dispatch("setConferences", this.curPage);
       });
     },
