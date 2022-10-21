@@ -83,28 +83,41 @@
             </GmapMap>
           </v-row>
           <br /><br />
-          <v-btn
+          <v-row v-if="conferenceData.canUpdate">
+            <v-btn
             class="btn"
-            v-if="conferenceData.canUpdate"
             color="warning"
             @click="
               $router.push(
                 '/conference/' + conferenceData.conference.id + '/edit'
               )
             "
+            :disabled="btnsLoading"
+            :loading="btnsLoading"
           >
             <span>Update</span>
           </v-btn>
           <v-btn
             class="btn"
-            v-if="conferenceData.canUpdate"
             color="error"
             @click="$_deleteConf"
+            :disabled="btnsLoading"
+            :loading="btnsLoading"
           >
             <span>Delete</span>
           </v-btn>
-          <v-row class="share-row" v-else-if="conferenceData.participant">
-            <v-btn class="mb-1" @click="$_cancelJoin" color="primary">
+          <br><br>
+          </v-row>
+          
+          <v-row class="share-row" v-if="conferenceData.participant">
+            
+            <v-btn
+              class="mb-1"
+              :disabled="btnsLoading"
+              :loading="btnsLoading"
+              @click="$_cancelJoin"
+              color="primary"
+            >
               <span>Cancel join</span>
             </v-btn>
             <ShareNetwork
@@ -134,9 +147,17 @@
               <img src="../assets/twitter.svg" alt="twitter" />
             </ShareNetwork>
           </v-row>
-          <v-btn v-else color="primary" @click="$_joinConf">
+          <v-row v-else>
+            <v-btn
+            color="primary"
+            @click="$_joinConf"
+            :disabled="btnsLoading"
+            :loading="btnsLoading"
+          >
             <span>Join</span>
           </v-btn>
+          </v-row>
+          <br>
         </v-container>
       </v-form>
     </v-main>
@@ -152,6 +173,7 @@ export default {
     buttons: {
       back: true,
     },
+    btnsLoading: false,
   }),
   computed: {
     conferenceData() {
@@ -171,32 +193,25 @@ export default {
   },
   methods: {
     $_cancelJoin() {
-      this.loading = true;
-      this.axios
-        .post("/conferences/cancel/" + this.conferenceData.conference.id)
-        .then(() => {
-          this.$store.dispatch("setCurrentConferenceData", {
-            id: this.$route.params.id,
-            hard: true,
-          });
+      this.btnsLoading = true;
+      this.axios.post("/reports/delete/" + this.$route.params.id).then(() => {
+        this.$store.dispatch("setCurrentConferenceData", {
+          id: this.$route.params.id,
+          hard: true,
         });
+        this.btnsLoading = false;
+      });
     },
     $_joinConf() {
-      this.loading = true;
-      this.axios
-        .post("/conferences/join/" + this.conferenceData.conference.id)
-        .then(() => {
-          this.$store.dispatch("setCurrentConferenceData", {
-            id: this.$route.params.id,
-            hard: true,
-          });
-        });
+      this.$router.push("/addReport/" + this.$route.params.id);
     },
     $_deleteConf() {
-      this.loading = true;
-      this.axios.post("/conferences/delete/" + this.conferenceData.conference.id).then(() => {
-        this.$router.push('/');
-      });
+      this.btnsLoading = true;
+      this.axios
+        .post("/conferences/delete/" + this.conferenceData.conference.id)
+        .then(() => {
+          this.$router.push("/");
+        });
     },
   },
   components: { AppHeader },
@@ -225,7 +240,7 @@ export default {
   margin-right: 5px;
 }
 
-.btn{
+.btn {
   margin-left: 5px;
   margin-bottom: 5px;
 }

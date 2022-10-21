@@ -112,9 +112,13 @@
               :rules="[rules.size]"
             ></v-file-input>
           </v-row>
-          <v-card v-if="fullBusy">
-            <p>Sorry, the conference is busy all the time</p>
-          </v-card>
+          <v-alert
+          v-if="fullBusy"
+            color="red"
+            type="warning"
+          >
+          Sorry, the conference is busy all the time
+          </v-alert>
           <br />
           <v-btn
             class="btn"
@@ -334,5 +338,9 @@ export default {
 .btn {
   margin-right: 5px;
   margin-bottom: 5px;
+}
+
+.v-alert{
+  max-width: 300px;
 }
 </style>

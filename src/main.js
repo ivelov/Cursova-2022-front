@@ -11,8 +11,8 @@ import wysiwyg from "vue-wysiwyg";
 import VueCookies from 'vue-cookies'
 
 
-axios.defaults.baseURL='/V1';
-//axios.defaults.baseURL='http://ivelov-vm-api.groupbwt.com';
+//axios.defaults.baseURL='/V1';
+axios.defaults.baseURL='http://ivelov-vm-api.groupbwt.com';
 axios.defaults.headers.common = {
     'X-Requested-With': 'XMLHttpRequest'
 };

@@ -146,7 +146,13 @@
           >
             <span>Save</span>
           </v-btn>
-          <v-btn class="btn" color="primary" @click="$router.push('/')">
+          <v-btn
+            class="btn"
+            color="primary"
+            :disabled="btnsLoading"
+            :loading="btnsLoading"
+            @click="$router.push('/')"
+          >
             <span>Cancel</span>
           </v-btn>
         </v-container>
@@ -185,9 +191,9 @@ export default {
     countries() {
       return this.$store.getters.getCountries;
     },
-    rules(){
+    rules() {
       return this.$store.getters.getRules;
-    }
+    },
   },
   mounted() {
     this.$store.commit("setLoading", false);
