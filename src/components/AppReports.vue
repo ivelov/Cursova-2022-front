@@ -3,7 +3,7 @@
     <AppHeader :buttons="buttons"></AppHeader>
     <br /><br />
     <v-main>
-      <v-container v-if="loading">join
+      <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
       <v-container class="container-conferences" v-else>

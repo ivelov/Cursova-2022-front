@@ -55,16 +55,6 @@
         <p v-else v-html="comment.text"></p>
         
       </v-card>
-      <v-btn 
-        class="load-more"
-        v-if="canLoadMore"
-        color="success"
-        @click="$store.dispatch('setComments', {id:reportId})" 
-        :disabled="btnsLoading"
-        :loading="btnsLoading"
-      >
-        <span>Load more</span>
-      </v-btn>
       
     </v-container>
   </v-container>
@@ -97,6 +87,9 @@ export default {
     },
     canLoadMore(){
       return this.commentsInfo.maxPage > this.commentsInfo.curPage;
+    },
+    maxScroll(){
+      return document.documentElement.scrollHeight - document.documentElement.clientHeight;
     }
   },
   props: {
@@ -107,6 +100,10 @@ export default {
     if(this.reportId){
       this.$store.dispatch('setComments', {id:this.reportId, page:0});
     }
+    window.addEventListener('scroll', this.$_onScroll);
+  },
+  destroyed () {
+    window.removeEventListener('scroll', this.$_onScroll);
   },
   watch:{
     reportId:function (val){
@@ -145,6 +142,12 @@ export default {
     },
     $_changeEdit(index){
       this.$set(this.editing,index,!this.editing[index]);
+    },
+    $_onScroll(){
+      if(this.canLoadMore && window.scrollY >= this.maxScroll - 10){
+        this.$store.dispatch('setComments', {id:this.reportId});
+      }
+        
     }
   },
 };

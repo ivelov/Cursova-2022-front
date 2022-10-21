@@ -16,7 +16,7 @@ axios.defaults.headers.common = {
     'X-Requested-With': 'XMLHttpRequest'
 };
 axios.defaults.withCredentials = 'true';
-axios.defaults.headers.post['Content-Type'] = 'application/json';
+axios.defaults.headers.common['Content-Type'] = 'application/json';
 Vue.use(VueAxios, axios)
 Vue.use(VueSocialSharing)
 

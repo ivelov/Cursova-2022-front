@@ -158,7 +158,7 @@ export default new Vuex.Store({
       state.currentReportData = currentReportData;
       currentReportData.report.presentation = new File([currentReportData.report.presentation], "presentation");
     },
-    setComments(state, commentsInfo) {//TODO: change this
+    setComments(state, commentsInfo) {
       var commentsJson = commentsInfo.comments;
       commentsInfo.comments = [];
       for (let i = 0; i < state.commentsInfo.comments.length; i++) {
@@ -281,17 +281,14 @@ export default new Vuex.Store({
       if(state.getters.getCommentsInfo.curPage >= state.getters.getCommentsInfo.maxPage) return;
 
       state.commit("setCommentsLoading", true);
-      if(payload.page){
-        axios.get("/report/" + payload.id+'/comments',{
-          page: payload.page
-        }).then((response) => {
+      if(payload.page !== undefined){
+        axios.get("/report/" + payload.id+'/comments/'+payload.page).then((response) => {
           state.getters.getCommentsInfo.curPage = payload.page;
           state.commit("setComments", response.data);
         });
       }else{
-        axios.get("/report/" + payload.id+'/comments',{
-          page: state.getters.getCommentsInfo.curPage + 1
-        }).then((response) => {
+        var page = state.getters.getCommentsInfo.curPage + 1; 
+        axios.get("/report/" + payload.id+'/comments/'+page).then((response) => {
           state.commit("setComments", response.data);
         });
       }
