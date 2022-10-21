@@ -288,17 +288,24 @@ export default new Vuex.Store({
     },
     async setComments(state, payload) {
       if(state.getters.getCommentsInfo.loading) return;
-      if(state.getters.getCommentsInfo.curPage >= state.getters.getCommentsInfo.maxPage) return;
+      if(payload.id == null) return;
 
       state.commit("setCommentsLoading", true);
+      
       if(payload.page !== undefined){
         axios.get("/report/" + payload.id+'/comments/'+payload.page).then((response) => {
+          if(payload.page == 0){
+            state.commit('clearCommentsInfo');
+          }
           state.getters.getCommentsInfo.curPage = payload.page;
           state.commit("setComments", response.data);
         });
       }else{
+        if(state.getters.getCommentsInfo.curPage >= state.getters.getCommentsInfo.maxPage) return;
+
         var page = state.getters.getCommentsInfo.curPage + 1; 
         axios.get("/report/" + payload.id+'/comments/'+page).then((response) => {
+          console.log(response);
           state.commit("setComments", response.data);
         });
       }
