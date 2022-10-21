@@ -85,7 +85,8 @@ export default {
         }).then((response) => {
           this.btnsLoading = false;
           if (response.data == 1) {
-            this.$router.push("/");
+            this.$store.commit('setAuth',true)
+            this.$router.go();
           }
         })
         .catch((e) => {

@@ -112,7 +112,9 @@
               :rules="[rules.size]"
             ></v-file-input>
           </v-row>
-          
+          <v-card v-if="fullBusy">
+            <p>Sorry, the conference is busy all the time</p>
+          </v-card>
           <br />
           <v-btn
             class="btn"
@@ -186,6 +188,9 @@ export default {
       }
       return allowedHoursArr;
     },
+    fullBusy(){
+      return this.calcAllowedHours.length == 0 ? true:false;
+    }, 
     calcAllowedMinutes(){
       var curHour = this.hoursBuf;
       var allowedMinutesArr = [];

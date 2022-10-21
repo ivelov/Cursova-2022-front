@@ -8,6 +8,7 @@ import axios from 'axios';
 import VueSocialSharing from 'vue-social-sharing'
 import * as VueGoogleMaps from 'vue2-google-maps';
 import wysiwyg from "vue-wysiwyg";
+import VueCookies from 'vue-cookies'
 
 
 axios.defaults.baseURL='/V1';
@@ -31,6 +32,8 @@ Vue.use(VueGoogleMaps, {
 
 Vue.use(wysiwyg, {hideModules: { "image": true }});
 
+Vue.use(VueCookies);
+
 router.beforeEach((to, from, next) => {
 
   if (to.meta.hideForAuth) {
@@ -44,7 +47,7 @@ router.beforeEach((to, from, next) => {
     if (store.getters.isAuth) {
         next();
     } else {
-        next({ path: '/' });
+        next({ path: '/login' });
     }
 
   } else if (to.meta.requireEdit){

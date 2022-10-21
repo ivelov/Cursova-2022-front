@@ -47,8 +47,6 @@ export default new Vuex.Store({
         buttons:{}
     },
     loading: true,
-    isAuth: false,
-    canAdd: false,
     currentReportData:{
       report:{
         id:null,
@@ -90,10 +88,18 @@ export default new Vuex.Store({
       state.loading = loading;
     },
     setAuth(state, isAuth) {
-      state.isAuth = isAuth;
+      if(isAuth == true){
+        VueCookies.set('isAuth', isAuth);
+      }else{
+        VueCookies.remove('isAuth');
+      }
     },
     setAdd(state, canAdd) {
-        state.canAdd = canAdd;
+      if(canAdd == true){
+        VueCookies.set('canAdd', canAdd);
+      }else{
+        VueCookies.remove('canAdd');
+      }
     },
     setCurrentConferenceData(state, currentConferenceData) {
       state.currentConferenceData = currentConferenceData;
@@ -114,27 +120,27 @@ export default new Vuex.Store({
       };
     },
     clearAuthData(state){
-        state.canAdd = false;
-        state.isAuth = false;
-        state.currentConferenceData = {
-            conference: {
-              id: null,
-              title: "",
-              country: "",
-              date: "",
-              time: "",
-              latitude: 0,
-              longitude: 0,
-            },
-            participant: false,
-            canUpdate: false,
-          };
+      VueCookies.remove('isAuth');
+      VueCookies.remove('canAdd');
+      state.currentConferenceData = {
+          conference: {
+            id: null,
+            title: "",
+            country: "",
+            date: "",
+            time: "",
+            latitude: 0,
+            longitude: 0,
+          },
+          participant: false,
+          canUpdate: false,
+        };
     },
     setReportBusyTimes(state, busyTimes) {
       state.currentReportData.confStartTime = busyTimes.confStartTime;
       state.currentReportData.busyStartTimes = [];
       state.currentReportData.busyEndTimes = [];
-      console.log(busyTimes);
+      //console.log(busyTimes);
       for (let i = 0; i < busyTimes.startTimes.length; i++) {
         state.currentReportData.busyStartTimes.push(busyTimes.startTimes[i]);  
         state.currentReportData.busyEndTimes.push(busyTimes.endTimes[i]);  
@@ -213,17 +219,21 @@ export default new Vuex.Store({
           'X-XSRF-TOKEN': VueCookies.get('XSRF-TOKEN'),
         }
       }).then((response) => {
-        if(response.status == 200){
-          state.commit("setAuth", response.data);
+        if(response.status == 200 && response.data == 1){
+          state.commit("setAuth", true);
         }else{
           state.commit("setAuth", false);
         }
         
+      }).catch(()=>{
+        state.commit("setAuth", false);
       });
     },
     async setAddPerk(state) {
       axios.get("/canAdd").then((response) => {
         state.commit("setAdd", response.data==1 ? true : false);
+      }).catch(()=>{
+        state.commit("setAdd", false);
       });
     },
     async setCurrentConferenceData(state, payload) {
@@ -311,8 +321,11 @@ export default new Vuex.Store({
     isLoading(state) {
       return state.loading;
     },
-    isAuth(state) {
-      return state.isAuth;
+    isAuth() {
+      return VueCookies.get('isAuth');
+    },
+    canAdd(){
+      return VueCookies.get('canAdd');
     },
     getCurrentConferenceData(state) {
       return state.currentConferenceData;
