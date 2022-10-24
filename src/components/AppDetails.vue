@@ -18,6 +18,14 @@
             ></v-text-field>
           </v-row>
           <v-row>
+            <v-text-field
+              v-model="conferenceData.conference.category_id"
+              label="Category"
+              outlined
+              disabled
+            ></v-text-field>
+          </v-row>
+          <v-row>
             <v-select
               v-model="conferenceData.conference.country"
               label="Country"

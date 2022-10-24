@@ -19,6 +19,37 @@
             </v-text-field>
           </v-row>
           <v-row>
+            <br /><br />
+            <v-menu
+              ref="catMenu"
+              v-model="catMenu"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-x
+              min-width="200"
+              min-height="50"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  :value="selectedCategory ? selectedCategory.name : ''"
+                  label="Category"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  outlined
+                ></v-text-field>
+              </template>
+              <template>
+                <v-treeview
+                  @update:active="(v)=>{selectedCategory = v[0]}"
+                  activatable
+                  return-object
+                  :items="categories"
+                ></v-treeview>
+              </template>
+            </v-menu>
+          </v-row>
+          <v-row>
             <v-select
               v-model="conferenceData.conference.country"
               label="Country"
@@ -170,6 +201,7 @@ export default {
     valid: false,
     dateMenu: false,
     timeMenu: false,
+    catMenu:false,
     btnsLoading: false,
     buttons: {
       back: true,
@@ -180,10 +212,14 @@ export default {
       usa: { lat: 38.897029, lng: -77.071906 },
       uk: { lat: 51.504263, lng: -0.13515 },
     },
+    selectedCategory:undefined,
   }),
   computed: {
     conferenceData() {
       return this.$store.getters.getCurrentConferenceData;
+    },
+    categoryId(){
+      return this.conferenceData.conference.categoryId;
     },
     loading() {
       return this.$store.getters.isLoading;
@@ -194,9 +230,18 @@ export default {
     rules() {
       return this.$store.getters.getRules;
     },
+    categories(){
+      return this.$store.getters.getCategories;
+    },
   },
   mounted() {
+    this.$store.dispatch("setCategories");
     this.$store.commit("setLoading", false);
+  },
+  watch:{
+    categoryId(val){
+      this.selectedCategory.id = val;
+    }
   },
   methods: {
     $_markerUpdate(event) {
@@ -218,7 +263,8 @@ export default {
         return;
       }
       this.btnsLoading = true;
-
+      
+      this.conferenceData.conference.categoryId = this.selectedCategory ? this.selectedCategory.id : null;
       let values = this.conferenceData.conference;
       values.id = null;
       this.axios

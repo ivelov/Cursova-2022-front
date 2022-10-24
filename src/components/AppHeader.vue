@@ -40,6 +40,14 @@
     </v-btn>
 
     <v-btn
+      @click="$router.push('/addCategory')"
+      text
+      v-if="typeof buttons['addCategory'] != undefined ? buttons['addCategory'] : false"
+    >
+      <span class="mr-2">Add category</span>
+    </v-btn>
+
+    <v-btn
       @click="$_gotoAdd"
       text
       v-if="typeof buttons['add'] != undefined ? buttons['add'] : false"
@@ -96,6 +104,15 @@
     >
       <span class="mr-2">Back</span>
     </v-btn>
+
+    <v-btn
+      @click="$router.push('/addCategory')"
+      outlined
+      v-if="typeof buttons['addCategory'] != undefined ? buttons['addCategory'] : false"
+    >
+      <span class="mr-2">Add category</span>
+    </v-btn>
+
     <v-btn
       @click="$_gotoAdd"
       outlined

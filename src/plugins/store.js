@@ -33,6 +33,7 @@ export default new Vuex.Store({
       conference: {
         id: null,
         title: "",
+        category_id:null,
         country: "",
         date: "",
         time: "",
@@ -73,6 +74,7 @@ export default new Vuex.Store({
     curPage:0,
     loading:false
   },
+  categories:[],
   },
   mutations: {
     //sync
@@ -202,7 +204,10 @@ export default new Vuex.Store({
         curPage:0,
         loading:false
       }; 
-    }
+    },
+    setCategories(state, categories){
+      state.categories = categories;
+    },
   },
   actions: {
     //async
@@ -305,11 +310,17 @@ export default new Vuex.Store({
 
         var page = state.getters.getCommentsInfo.curPage + 1; 
         axios.get("/report/" + payload.id+'/comments/'+page).then((response) => {
-          console.log(response);
           state.commit("setComments", response.data);
         });
       }
-      
+    },
+    async setCategories(state, hard = false) {
+      if(state.categories && !hard) return;
+
+      axios.get("/categories").then((response) => {
+        state.commit("setCategories", response.data);
+        state.commit("setLoading", false);
+      });
     },
   },
   getters: {
@@ -345,6 +356,9 @@ export default new Vuex.Store({
     },
     getCommentsInfo(state) {
       return state.commentsInfo;
+    },
+    getCategories(state) {
+      return state.categories;
     },
   },
 });

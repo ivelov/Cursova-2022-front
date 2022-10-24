@@ -12,6 +12,7 @@ import AppReportAdd from "../components/AppReportAdd";
 import AppReports from "../components/AppReports";
 import AppReportDetails from "../components/AppReportDetails";
 import AppReportEdit from "../components/AppReportEdit";
+import AppCategoryAdd from "../components/AppCategoryAdd";
 
 Vue.use(VueRouter);
 export default new VueRouter({
@@ -81,6 +82,13 @@ export default new VueRouter({
     {
       path: "/report/:repId/edit",
       component: AppReportEdit,
+      meta:{
+        requireAuth:true
+      }
+    },
+    {
+      path: "/addCategory",
+      component: AppCategoryAdd,
       meta:{
         requireAuth:true
       }
