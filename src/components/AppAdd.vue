@@ -85,6 +85,8 @@
                 v-model="conferenceData.conference.time"
                 full-width
                 format="24hr"
+                min="07:00"
+                max="20:00"
                 @click:minute="
                   $refs.timeMenu.save(conferenceData.conference.time)
                 "
@@ -144,7 +146,13 @@
           >
             <span>Save</span>
           </v-btn>
-          <v-btn class="btn" color="primary" @click="$router.push('/')">
+          <v-btn
+            class="btn"
+            color="primary"
+            :disabled="btnsLoading"
+            :loading="btnsLoading"
+            @click="$router.push('/')"
+          >
             <span>Cancel</span>
           </v-btn>
         </v-container>
@@ -183,9 +191,9 @@ export default {
     countries() {
       return this.$store.getters.getCountries;
     },
-    rules(){
+    rules() {
       return this.$store.getters.getRules;
-    }
+    },
   },
   mounted() {
     this.$store.commit("setLoading", false);
@@ -214,7 +222,7 @@ export default {
       let values = this.conferenceData.conference;
       values.id = null;
       this.axios
-        .post("http://ivelov-vm-api.groupbwt.com/add", values)
+        .post("/add", values)
         .then((response) => {
           console.log(response);
           this.btnsLoading = false;

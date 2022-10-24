@@ -1,0 +1,346 @@
+<template>
+  <div>
+    <AppHeader :buttons="buttons"></AppHeader>
+
+    <v-main>
+      <br /><br />
+      <v-container v-if="loading">
+        <v-text-field color="success" loading disabled></v-text-field>
+      </v-container>
+      <v-form v-model="valid" v-else>
+        <v-container>
+          <v-row>
+            <v-text-field
+              v-model="currentReportData.report.title"
+              :rules="[rules.required, rules.counterMax]"
+              min="2"
+              label="Title"
+              outlined
+            ></v-text-field>
+          </v-row>
+          <v-row>
+            <v-textarea
+              v-model="currentReportData.report.description"
+              outlined
+              label="Description"
+            ></v-textarea>
+          </v-row>
+          <v-row>
+            <br /><br />
+            <v-menu
+              ref="timeMenuStart"
+              v-model="timeMenuStart"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              :return-value.sync="currentReportData.report.startTime"
+              transition="scale-transition"
+              offset-y
+              max-width="290px"
+              min-width="290px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="currentReportData.report.startTime"
+                  label="Start time"
+                  readonly
+                  outlined
+                  v-bind="attrs"
+                  v-on="on"
+                  :rules="[rules.required]"
+                ></v-text-field>
+              </template>
+              <v-time-picker
+                v-if="timeMenuStart"
+                v-model="currentReportData.report.startTime"
+                full-width
+                format="24hr"
+                :allowed-hours="allowedHours"
+                :allowed-minutes="allowedMinutes"
+                :min="currentReportData.confStartTime"
+                @click:hour="$_hourClick"
+                @click:minute="
+                  $refs.timeMenuStart.save(currentReportData.report.startTime);
+                  $_startTimeClick();
+                "
+              ></v-time-picker>
+            </v-menu>
+          </v-row>
+          <v-row>
+            <br /><br />
+            <v-menu
+              ref="timeMenuEnd"
+              v-model="timeMenuEnd"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              :return-value.sync="currentReportData.report.endTime"
+              transition="scale-transition"
+              offset-y
+              max-width="290px"
+              min-width="290px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="currentReportData.report.endTime"
+                  label="End time"
+                  readonly
+                  outlined
+                  v-bind="attrs"
+                  v-on="on"
+                  :disabled="currentReportData.report.startTime.length == 0"
+                  :rules="[rules.required]"
+                ></v-text-field>
+              </template>
+              <v-time-picker
+                v-if="timeMenuEnd"
+                v-model="currentReportData.report.endTime"
+                full-width
+                format="24hr"
+                :min="minEndTime"
+                :max="maxEndTime"
+                @click:minute="
+                  $refs.timeMenuEnd.save(currentReportData.report.endTime);
+                "
+              ></v-time-picker>
+            </v-menu>
+          </v-row>
+          <v-row>
+            <v-file-input
+              accept=".ppt,.pptx"
+              label="Presentation"
+              outlined
+              v-model="currentReportData.report.presentation"
+              :rules="[rules.size]"
+            ></v-file-input>
+          </v-row>
+          <v-alert
+          v-if="fullBusy"
+            color="red"
+            type="warning"
+          >
+          Sorry, the conference is busy all the time
+          </v-alert>
+          <br />
+          <v-btn
+            class="btn"
+            color="success"
+            @click="$_saveReport"
+            :disabled="!valid || btnsLoading"
+            :loading="btnsLoading"
+          >
+            <span>Save</span>
+          </v-btn>
+          <v-btn class="btn" color="primary" @click="$router.push('/')">
+            <span>Cancel</span>
+          </v-btn>
+        </v-container>
+      </v-form>
+    </v-main>
+  </div>
+</template>
+
+<script>
+import AppHeader from "./AppHeader.vue";
+export default {
+  name: "AppReportsAdd",
+
+  data: () => ({
+    valid: false,
+    timeMenuStart: false,
+    timeMenuEnd: false,
+    btnsLoading: false,
+    buttons: {
+      back: true,
+    },
+    allowedMinutesArr:[],
+    hoursBuf:0,
+    minEndTime:'',
+    maxEndTime:'',
+  }),
+  computed: {
+    rules(){
+      return this.$store.getters.getRules;
+    },
+    loading(){
+      return this.$store.getters.isLoading;
+    },
+    currentReportData(){
+      return this.$store.getters.getCurrentReportData;
+    },
+    calcAllowedHours(){
+      var allowedHoursArr = [];
+
+      var confStartHour =  parseInt(this.currentReportData.confStartTime.substring(0,2));
+      for (let i = confStartHour; i < 21; i++) {
+        var freeTime = 60;
+        for (let j = 0; j < this.currentReportData.busyStartTimes.length; j++) {
+          var startHour = parseInt(this.currentReportData.busyStartTimes[j].substring(0,2));
+          var endHour = parseInt(this.currentReportData.busyEndTimes[j].substring(0,2));
+          var startMinute = parseInt(this.currentReportData.busyStartTimes[j].substring(3,5));
+          var endMinute = parseInt(this.currentReportData.busyEndTimes[j].substring(3,5));
+          if(i == startHour){
+            if(i == endHour)
+              freeTime -= endMinute - startMinute;
+            else
+              freeTime -= 60 - startMinute;
+          }else if(i == startHour + 1 && i == endHour){
+            freeTime -= endMinute;
+          }
+        }
+        if(freeTime >= 5){
+          allowedHoursArr.push(i);
+        }
+      }
+      return allowedHoursArr;
+    },
+    fullBusy(){
+      return this.calcAllowedHours.length == 0 ? true:false;
+    }, 
+    calcAllowedMinutes(){
+      var curHour = this.hoursBuf;
+      var allowedMinutesArr = [];
+      var isMinuteAllowed;
+      for (let minute = 0; minute < 60; minute++) {
+        isMinuteAllowed = true;
+        for (let i = 0; (i < this.currentReportData.busyStartTimes.length) && isMinuteAllowed; i++) {
+          var startHour = parseInt(this.currentReportData.busyStartTimes[i].substring(0,2));
+          var endHour = parseInt(this.currentReportData.busyEndTimes[i].substring(0,2));
+          var startMinute = parseInt(this.currentReportData.busyStartTimes[i].substring(3,5));
+          var endMinute = parseInt(this.currentReportData.busyEndTimes[i].substring(3,5));
+          if(curHour == startHour){
+            if(curHour == endHour){
+              if(minute > startMinute - 5 && minute < endMinute){
+                isMinuteAllowed = false;
+              }
+            }else{
+              if(minute > startMinute - 5 && minute <= 60){
+                isMinuteAllowed = false;
+              }
+            }
+          }else if(curHour == startHour + 1 && curHour == endHour){
+            if(minute < endMinute){
+              isMinuteAllowed = false;
+            }
+          }
+        }
+        if(isMinuteAllowed)
+          allowedMinutesArr.push(minute);
+      }
+      return allowedMinutesArr;
+    }
+  },
+  mounted() {
+    this.$store.commit('clearCurrentReportData');
+    this.currentReportData.report.conferenceId = this.$route.params.confId;
+    this.$store.dispatch("setReportBusyTimes", {id: this.currentReportData.report.conferenceId, edit: false});
+  },
+  methods: {
+    $_saveReport() {
+      this.btnsLoading = true;
+      if(this.currentReportData.report.presentation){
+        var reader = new FileReader();
+        reader.readAsBinaryString(this.currentReportData.report.presentation);
+        reader.onload = (res) => {
+          this.currentReportData.report.presentation = res.currentTarget.result;
+          this.axios
+          .post("/reports/add", this.currentReportData.report)
+          .then((response) => {
+            console.log(response);
+            this.btnsLoading = false;
+            this.$store.commit('clearCurrentReportData');
+            this.$router.push('/reports/1');
+          })
+        }
+      }else{
+        this.axios
+        .post("/reports/add", this.currentReportData.report)
+        .then((response) => {
+          console.log(response);
+          this.btnsLoading = false;
+          this.$store.commit('clearCurrentReportData');
+          this.$router.push('/reports/1');
+        })
+      }
+      
+    },
+    allowedHours(v){
+      return this.calcAllowedHours.includes(v);
+    },
+    allowedMinutes(v){
+      return this.calcAllowedMinutes.includes(v);
+    },
+    $_hourClick(v){
+      this.hoursBuf = v;
+    },
+    $_startTimeClick(){
+      this.currentReportData.report.endTime = '';
+
+      var curHour = parseInt(this.currentReportData.report.startTime.substring(0,2));
+      var curMinute = parseInt(this.currentReportData.report.startTime.substring(3,5));
+
+      //Setting minimal end time to (startTime + 5 min)
+      if(curMinute >= 55){
+        this.minEndTime = '' + (curHour+1) + ':' + (curMinute + 5 - 60);
+      }else{
+        this.minEndTime = '' + curHour + ':' + (curMinute + 5);
+      }
+      //Maximal maxEndTime is start time + 1 hour
+      var maxEndTimeBufHour = curHour+1;
+      var maxEndTimeBufMinute = curMinute;
+
+      //Checking if any reports starts soon and setting maxEndTime to report start time
+      for (let i = 0; i < this.currentReportData.busyStartTimes.length; i++) {
+        var startHour = parseInt(this.currentReportData.busyStartTimes[i].substring(0,2));
+        var startMinute = parseInt(this.currentReportData.busyStartTimes[i].substring(3,5));
+        
+        if((curHour == startHour && curMinute < startMinute) || curHour == startHour - 1){
+          if(this.$_timeIsBigger(maxEndTimeBufHour, maxEndTimeBufMinute, startHour, startMinute)){
+            maxEndTimeBufHour = startHour;
+            maxEndTimeBufMinute = startMinute;
+          }
+        }
+      }
+      this.maxEndTime = '' + maxEndTimeBufHour + ':' + maxEndTimeBufMinute;
+    },
+    /**
+     * Determines is time1 is bigger than time2
+     *
+     * @param int time1Hour
+     * @param int time1Minute
+     * @param int time2Hour
+     * @param int time2Minute
+     * 
+     * @return bool
+     */
+    $_timeIsBigger(time1Hour, time1Minute, time2Hour, time2Minute){
+      if(time1Hour > time2Hour){
+        return true;
+      }else if(time1Hour < time2Hour){
+        return false;
+      }else{
+        return time1Minute > time2Minute ? true : false;
+      }
+    }
+  },
+  components: { AppHeader },
+};
+</script>
+
+<style scoped>
+.v-form {
+  width: 90%;
+  margin: auto;
+}
+
+.v-text-field {
+  max-width: 300px;
+}
+
+.btn {
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.v-alert{
+  max-width: 300px;
+}
+</style>

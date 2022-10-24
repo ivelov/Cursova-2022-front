@@ -20,6 +20,7 @@
     >
       <span class="mr-2">Log in</span>
     </v-btn>
+
     <v-btn
       @click="$_logout"
       text
@@ -29,6 +30,7 @@
     >
       <span class="mr-2">Log out</span>
     </v-btn>
+
     <v-btn
       @click="$_back"
       text
@@ -36,6 +38,7 @@
     >
       <span class="mr-2">Back</span>
     </v-btn>
+
     <v-btn
       @click="$_gotoAdd"
       text
@@ -47,9 +50,17 @@
     <v-btn
       @click="$router.push('/')"
       text
-      v-if="typeof buttons['view'] != undefined ? buttons['view'] : false"
+      v-if="typeof buttons['conferences'] != undefined ? buttons['conferences'] : false"
     >
       <span class="mr-2">View conferences</span>
+    </v-btn>
+
+    <v-btn
+      @click="$router.push('/reports/1')"
+      text
+      v-if="typeof buttons['reports'] != undefined ? buttons['reports'] : false"
+    >
+      <span class="mr-2">View reports</span>
     </v-btn>
     </div>
     
@@ -67,6 +78,7 @@
     >
       <span class="mr-2">Log in</span>
     </v-btn>
+
     <v-btn
       @click="$_logout"
       :disabled="logoutDisable"
@@ -76,6 +88,7 @@
     >
       <span class="mr-2">Log out</span>
     </v-btn>
+
     <v-btn
       @click="$_back"
       outlined
@@ -94,9 +107,17 @@
     <v-btn
       @click="$router.push('/')"
       outlined
-      v-if="typeof buttons['view'] != undefined ? buttons['view'] : false"
+      v-if="typeof buttons['conferences'] != undefined ? buttons['conferences'] : false"
     >
       <span class="mr-2">View conferences</span>
+    </v-btn>
+
+    <v-btn
+      @click="$router.push('/reports/1')"
+      outlined
+      v-if="typeof buttons['reports'] != undefined ? buttons['reports'] : false"
+    >
+      <span class="mr-2">View reports</span>
     </v-btn>
     </v-navigation-drawer>
   </div>
@@ -122,10 +143,11 @@ export default {
     $_logout() {
       this.logoutDisable = true;
       this.axios
-        .post("http://ivelov-vm-api.groupbwt.com/logout")
+        .post("/logout")
         .then(() => {
           this.$store.commit('clearAuthData');
-          this.$router.go();
+          //this.$store.commit('clearCommentsInfo');
+          this.$router.go('/login');
         })
         .catch((e) => {
           console.log(e);

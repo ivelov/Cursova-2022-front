@@ -7,12 +7,17 @@ import VueAxios from 'vue-axios';
 import axios from 'axios';
 import VueSocialSharing from 'vue-social-sharing'
 import * as VueGoogleMaps from 'vue2-google-maps';
+import wysiwyg from "vue-wysiwyg";
+import VueCookies from 'vue-cookies'
 
+
+//axios.defaults.baseURL='/V1';
+axios.defaults.baseURL='http://ivelov-vm-api.groupbwt.com';
 axios.defaults.headers.common = {
     'X-Requested-With': 'XMLHttpRequest'
 };
 axios.defaults.withCredentials = 'true';
-axios.defaults.headers.post['Content-Type'] = 'application/json';
+axios.defaults.headers.common['Content-Type'] = 'application/json';
 Vue.use(VueAxios, axios)
 Vue.use(VueSocialSharing)
 
@@ -24,6 +29,10 @@ Vue.use(VueGoogleMaps, {
     libraries: 'places', 
   },
 })
+
+Vue.use(wysiwyg, {hideModules: { "image": true }});
+
+Vue.use(VueCookies);
 
 router.beforeEach((to, from, next) => {
 
@@ -38,7 +47,7 @@ router.beforeEach((to, from, next) => {
     if (store.getters.isAuth) {
         next();
     } else {
-        next({ path: '/' });
+        next({ path: '/login' });
     }
 
   } else if (to.meta.requireEdit){

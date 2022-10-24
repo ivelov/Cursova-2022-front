@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@babel/preset-env": "^7.19.3",
+    "@tinymce/tinymce-vue": "^3.2.8",
     "babel-plugin-component": "^1.1.1",
     "core-js": "^3.8.3",
     "maz-ui": "^2.3.13",
@@ -17,6 +18,7 @@
     "vue-cookies": "^1.8.1",
     "vue-router": "^3.6.5",
     "vue-social-sharing": "^3.0.9",
+    "vue-wysiwyg": "^1.7.2",
     "vue2-google-maps": "^0.10.7",
     "vuetify": "^2.6.0",
     "vuex": "^3.6.2"

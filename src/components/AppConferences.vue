@@ -55,7 +55,7 @@
             >
               <span>Delete</span>
             </v-btn>
-            <v-btn class="conf-btn" @click="$_joinConf(conference.id)" color="primary" v-else>
+            <v-btn class="conf-btn" @click="$_joinConf(conference.id)" color="primary" v-if="!conference.participant">
               <span>Join</span>
             </v-btn>
           </v-col>
@@ -123,20 +123,18 @@ export default {
         this.$store.commit("setLoading", true);
         this.$router.push("/login");
       } else {
-        this.axios.post("http://ivelov-vm-api.groupbwt.com/conferences/join/" + id).then(() => {
-          this.$store.dispatch("setConferences", this.curPage);
-        });
+        this.$router.push("/addReport/"+id);
       }
     },
     $_deleteConf(id) {
       this.$store.commit("setLoading", true);
-      this.axios.post("http://ivelov-vm-api.groupbwt.com/conferences/delete/" + id).then(() => {
+      this.axios.post("/conferences/delete/" + id).then(() => {
         this.$store.dispatch("setConferences", this.curPage);
       });
     },
     $_cancelJoin(id) {
       this.$store.commit("setLoading", true);
-      this.axios.post("http://ivelov-vm-api.groupbwt.com/conferences/cancel/" + id).then(() => {
+      this.axios.post("/reports/delete/" + id).then(() => {
         this.$store.dispatch("setConferences", this.curPage);
       });
     },
@@ -186,8 +184,7 @@ export default {
 }
 
 .conf-btn{
-  margin-top: 2px;
-  margin-bottom: 2px;
+  margin: 2px;
 }
 
 .share-row {
