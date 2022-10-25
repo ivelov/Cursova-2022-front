@@ -224,8 +224,8 @@ export default {
     conferenceData() {
       return this.$store.getters.getCurrentConferenceData;
     },
-    category_id(){
-      return this.conferenceData.conference.category_id;
+    categoryId(){
+      return this.conferenceData.conference.categoryId;
     },
     loading() {
       return this.$store.getters.isLoading;
@@ -245,7 +245,7 @@ export default {
     this.$store.dispatch("setCurrentConferenceData", {
       id: this.$route.params.id,
     }).then(() => {
-      this.selectedCategory = {id:this.category_id, name:this.category_id};
+      this.selectedCategory = {id:this.categoryId, name:this.categoryId};
         });
     this.$store.dispatch("setCategories");
   },
@@ -270,7 +270,7 @@ export default {
       }
       this.btnsLoading = true;
 
-      this.conferenceData.conference.category_id = this.selectedCategory ? this.selectedCategory.id : null;
+      this.conferenceData.conference.categoryId = this.selectedCategory ? this.selectedCategory.id : null;
       let id = this.conferenceData.conference.id;
       this.axios
         .post("/conference/" + id + "/save", this.conferenceData.conference)

@@ -13,6 +13,8 @@ import AppReports from "../components/AppReports";
 import AppReportDetails from "../components/AppReportDetails";
 import AppReportEdit from "../components/AppReportEdit";
 import AppCategoryAdd from "../components/AppCategoryAdd";
+import AppCategoryEdit from "../components/AppCategoryEdit";
+
 
 Vue.use(VueRouter);
 export default new VueRouter({
@@ -92,6 +94,17 @@ export default new VueRouter({
       meta:{
         requireAuth:true
       }
+    },
+    {
+      path: "/editCategory",
+      component: AppCategoryEdit,
+      meta:{
+        requireAuth:true
+      }
+    },
+    {
+      path: "/conferences/:page/:category",
+      component: AppConferences,
     },
   ],
   mode: "history",

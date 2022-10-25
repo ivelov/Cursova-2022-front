@@ -318,6 +318,7 @@ export default new Vuex.Store({
       if(state.categories && !hard) return;
 
       axios.get("/categories").then((response) => {
+        console.log(response.data);
         state.commit("setCategories", response.data);
         state.commit("setLoading", false);
       });

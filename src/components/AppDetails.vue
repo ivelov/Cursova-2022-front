@@ -19,7 +19,7 @@
           </v-row>
           <v-row>
             <v-text-field
-              v-model="conferenceData.conference.category_id"
+              v-model="conferenceData.conference.categoryTitle"
               label="Category"
               outlined
               disabled

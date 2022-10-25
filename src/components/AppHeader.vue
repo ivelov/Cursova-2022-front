@@ -40,11 +40,11 @@
     </v-btn>
 
     <v-btn
-      @click="$router.push('/addCategory')"
+      @click="$router.push('/editCategory')"
       text
-      v-if="typeof buttons['addCategory'] != undefined ? buttons['addCategory'] : false"
+      v-if="typeof buttons['editCategory'] != undefined ? buttons['editCategory'] : false"
     >
-      <span class="mr-2">Add category</span>
+      <span class="mr-2">Edit category</span>
     </v-btn>
 
     <v-btn
@@ -106,11 +106,11 @@
     </v-btn>
 
     <v-btn
-      @click="$router.push('/addCategory')"
+      @click="$router.push('/editCategory')"
       outlined
-      v-if="typeof buttons['addCategory'] != undefined ? buttons['addCategory'] : false"
+      v-if="typeof buttons['editCategory'] != undefined ? buttons['editCategory'] : false"
     >
-      <span class="mr-2">Add category</span>
+      <span class="mr-2">Edit category</span>
     </v-btn>
 
     <v-btn
