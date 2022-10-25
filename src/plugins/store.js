@@ -166,6 +166,9 @@ export default new Vuex.Store({
       state.currentReportData = currentReportData;
       currentReportData.report.presentation = new File([currentReportData.report.presentation], "presentation");
     },
+    setReportConferenceCategory(state, reportConferenceCategory) {
+      state.currentReportData.conferenceCategory = reportConferenceCategory;
+    },
     setComments(state, commentsInfo) {
       var commentsJson = commentsInfo.comments;
       commentsInfo.comments = [];
@@ -265,7 +268,7 @@ export default new Vuex.Store({
     },
     async setReportBusyTimes(state, payload) {
       state.commit("setLoading", true);
-      await axios.get("/conference/"+payload.id+'/getBusyTimes',
+      await axios.post("/conference/"+payload.id+'/getBusyTimes',
         {repId: payload.edit? state.getters.getCurrentReportData.report.id : false}
       ).then((response) => {
         state.commit("setReportBusyTimes", response.data);
@@ -275,12 +278,20 @@ export default new Vuex.Store({
         state.commit("setReportError", true);
       });
     },
-    async setReports(state, page = 1) {
+    async setReports(state, payload = {page: 1, category: false}) {
       state.commit("setLoading", true);
-      axios.get("/reports/"+page).then((response) => {
-        state.commit("setReportsPageInfo", response.data);
-        state.commit("setLoading", false);
-      });
+      if(payload.category){
+        axios.get("/reports/"+payload.page+'/'+payload.category).then((response) => {
+          state.commit("setReportsPageInfo", response.data);
+          state.commit("setLoading", false);
+        });
+      }else{
+        axios.get("/reports/"+payload.page).then((response) => {
+          state.commit("setReportsPageInfo", response.data);
+          state.commit("setLoading", false);
+        });
+      }
+      
     },
     async setCurrentReportData(state, payload) {
       if (
@@ -290,13 +301,23 @@ export default new Vuex.Store({
         state.commit("setLoading", false);
         return;
       }
-      state.commit("setLoading", true);
-      axios.get("/report/" + payload.id).then((response) => {
-        state.commit("setCurrentReportData", response.data);
-        state.commit("setLoading", false);
-        if(payload.edit){
-          state.dispatch("setReportBusyTimes", {id: state.getters.getCurrentReportData.report.conferenceId, edit: true});
-        }
+      return new Promise((resolve, reject) => {
+        state.commit("setLoading", true);
+        axios.get("/report/" + payload.id).then((response) => {
+          state.commit("setCurrentReportData", response.data);
+          state.commit("setLoading", false);
+          if(payload.edit){
+            state.dispatch("setReportBusyTimes", {id: state.getters.getCurrentReportData.report.conferenceId, edit: true});
+          }
+          resolve();
+        }).catch((er)=>reject(er));
+      });
+      
+    },
+    async setReportConferenceCategory(state, conferenceId) {
+      axios.get("/conference/"+conferenceId+'/getCategory').then((response) => {
+        state.commit("setReportConferenceCategory", response.data);
+        state.dispatch("setCategories", {parentId:response.data, hard:true})
       });
     },
     async setComments(state, payload) {
@@ -322,14 +343,22 @@ export default new Vuex.Store({
         });
       }
     },
-    async setCategories(state, hard = false) {
-      if(state.categories && !hard) return;
-
-      axios.get("/categories").then((response) => {
-        state.commit("setCategories", response.data);
-        state.commit("setLoading", false);
-      });
+    async setCategories(state, payload = {parentId: false, hard: false}) {
+      if(state.categories && !payload.hard) return;
+      if(payload.parentId){
+        axios.get("/categories/"+payload.parentId).then((response) => {
+          state.commit("setCategories", response.data);
+          state.commit("setLoading", false);
+        });
+      }else{
+        axios.get("/categories").then((response) => {
+          state.commit("setCategories", response.data);
+          state.commit("setLoading", false);
+        });
+      }
+      
     },
+    
   },
   getters: {
     getCountries(state) {

@@ -29,6 +29,10 @@ export default new VueRouter({
       component: AppConferences,
     },
     {
+      path: "/conferences/:page/:category",
+      component: AppConferences,
+    },
+    {
       path: "/login",
       component: AppLogin,
       meta:{
@@ -63,6 +67,13 @@ export default new VueRouter({
     },
     {
       path: "/reports/:page",
+      component: AppReports,
+      meta:{
+        requireAuth:true
+      }
+    },
+    {
+      path: "/reports/:page/:category",
       component: AppReports,
       meta:{
         requireAuth:true
@@ -110,10 +121,7 @@ export default new VueRouter({
         requireAuth:true
       }
     },
-    {
-      path: "/conferences/:page/:category",
-      component: AppConferences,
-    },
+    
     
   ],
   mode: "history",

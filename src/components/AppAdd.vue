@@ -218,9 +218,9 @@ export default {
     conferenceData() {
       return this.$store.getters.getCurrentConferenceData;
     },
-    categoryId(){
+    /*categoryId(){
       return this.conferenceData.conference.categoryId;
-    },
+    },*/
     loading() {
       return this.$store.getters.isLoading;
     },
@@ -238,11 +238,11 @@ export default {
     this.$store.dispatch("setCategories");
     this.$store.commit("setLoading", false);
   },
-  watch:{
+  /*watch:{
     categoryId(val){
       this.selectedCategory.id = val;
     }
-  },
+  },*/
   methods: {
     $_markerUpdate(event) {
       this.conferenceData.conference.latitude = event.latLng.lat();

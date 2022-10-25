@@ -7,6 +7,39 @@
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
       <v-container class="container-conferences" v-else>
+        <v-menu
+          ref="catMenu"
+          v-model="catMenu"
+          :close-on-content-click="false"
+          transition="scale-transition"
+          offset-x
+          min-width="200"
+          min-height="50"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field
+              class="category-field"
+              label="Select category"
+              :value="pageInfo.categoryName"
+              readonly
+              clearable
+              @click:clear="$_clearCategory"
+              v-bind="attrs"
+              v-on="on"
+              outlined
+            ></v-text-field>
+          </template>
+          <template>
+            <v-container style="background-color: white;">
+              <v-treeview
+              @update:active="$_selectCategory"
+              activatable
+              return-object
+              :items="categories"
+            ></v-treeview>
+            </v-container>
+          </template>
+        </v-menu>
         <v-row>
           <v-col
             class="report"
@@ -79,7 +112,8 @@ export default {
   data: () => ({
     curPage: 1,
     btnsLoading: false,
-    readMore:[]
+    readMore:[],
+    catMenu:false
   }),
   computed: {
     pageInfo() {
@@ -97,11 +131,15 @@ export default {
     prevBtnDisabled() {
       return this.curPage <= 1;
     },
+    categories(){
+      return this.$store.getters.getCategories;
+    },
   },
   mounted() {
     this.curPage = this.$route.params.page;
 
-    this.$store.dispatch("setReports", this.curPage);
+    this.$store.dispatch("setReports", {page:this.curPage, category: this.$route.params.category});
+    this.$store.dispatch("setCategories");
 
     for (let i = 0; i < 15; i++) {
       this.readMore.push(false);
@@ -110,7 +148,7 @@ export default {
   methods: {
     $_nextPage() {
       this.curPage = parseInt(this.curPage) + 1;
-      this.$store.dispatch("setReports", this.curPage);
+      this.$store.dispatch("setReports", {page:this.curPage});
       this.$router.push("/reports/" + this.curPage);
       for (let i = 0; i < 15; i++) {
         this.readMore.push(false);
@@ -118,7 +156,7 @@ export default {
     },
     $_prevPage() {
       this.curPage = parseInt(this.curPage) - 1;
-      this.$store.dispatch("setReports", this.curPage);
+      this.$store.dispatch("setReports", {page:this.curPage});
       this.$router.push("/reports/" + this.curPage);
       for (let i = 0; i < 15; i++) {
         this.readMore.push(false);
@@ -126,6 +164,15 @@ export default {
     },
     $_readMore(index){
       this.$set(this.readMore,index,!this.readMore[index]);
+    },
+    $_selectCategory(val){
+      this.catMenu = false;
+      this.$router.push('/reports/1/'+val[0].id);
+      this.$store.dispatch("setReports", {page:this.curPage, category: this.$route.params.category});
+    },
+    $_clearCategory(){
+      this.$router.push('/reports/1');
+      this.$store.dispatch("setReports", {page:this.curPage});
     }
   },
   components: { AppHeader },
@@ -139,4 +186,8 @@ export default {
   .report-space{
     min-height: 66px;
   }
+
+  .category-field {
+  max-width: 300px;
+}
 </style>

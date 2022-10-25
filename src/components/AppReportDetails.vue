@@ -27,6 +27,14 @@
             ></v-text-field>
           </v-row>
           <v-row>
+            <v-text-field
+              v-model="currentReportData.report.categoryTitle"
+              label="Category"
+              outlined
+              disabled
+            ></v-text-field>
+          </v-row>
+          <v-row>
             <v-textarea
               v-model="currentReportData.report.description"
               outlined
