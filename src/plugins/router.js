@@ -14,6 +14,7 @@ import AppReportDetails from "../components/AppReportDetails";
 import AppReportEdit from "../components/AppReportEdit";
 import AppCategoryAdd from "../components/AppCategoryAdd";
 import AppCategoryEdit from "../components/AppCategoryEdit";
+import AppCategories from "../components/AppCategories";
 
 
 Vue.use(VueRouter);
@@ -89,6 +90,13 @@ export default new VueRouter({
       }
     },
     {
+      path: "/categories",
+      component: AppCategories,
+      meta:{
+        requireAuth:true
+      }
+    },
+    {
       path: "/addCategory",
       component: AppCategoryAdd,
       meta:{
@@ -96,7 +104,7 @@ export default new VueRouter({
       }
     },
     {
-      path: "/editCategory",
+      path: "/editCategory/:id",
       component: AppCategoryEdit,
       meta:{
         requireAuth:true
@@ -106,6 +114,7 @@ export default new VueRouter({
       path: "/conferences/:page/:category",
       component: AppConferences,
     },
+    
   ],
   mode: "history",
 });

@@ -65,7 +65,7 @@
             color="primary"
             :disabled="btnsLoading"
             :loading="btnsLoading"
-            @click="$router.push('/')"
+            @click="$router.push('/categories')"
           >
             <span>Cancel</span>
           </v-btn>

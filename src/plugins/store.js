@@ -211,12 +211,20 @@ export default new Vuex.Store({
   },
   actions: {
     //async
-    async setConferences(state, page = 1) {
+    async setConferences(state, payload = {page:1}) {
       state.commit("setLoading", true);
-      axios.get("/conferences/"+page).then((response) => {
-        state.commit("setConferencesPageInfo", response.data);
-        state.commit("setLoading", false);
-      });
+      if(payload.category !== undefined){
+        axios.get("/conferences/"+payload.page+'/'+payload.category).then((response) => {
+          state.commit("setConferencesPageInfo", response.data);
+          state.commit("setLoading", false);
+        });
+      }else{
+        axios.get("/conferences/"+payload.page).then((response) => {
+          state.commit("setConferencesPageInfo", response.data);
+          state.commit("setLoading", false);
+        });
+      }
+      
     },
     async setAuth(state) {
       axios.get("/isAuth",{},{
@@ -318,7 +326,6 @@ export default new Vuex.Store({
       if(state.categories && !hard) return;
 
       axios.get("/categories").then((response) => {
-        console.log(response.data);
         state.commit("setCategories", response.data);
         state.commit("setLoading", false);
       });

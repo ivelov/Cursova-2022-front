@@ -10,43 +10,15 @@
       <v-form v-else v-model="valid">
         <v-container>
           <v-row>
-            <br /><br />
-            <v-menu
-              ref="catMenu"
-              v-model="catMenu"
-              :close-on-content-click="false"
-              transition="scale-transition"
-              offset-x
-              min-width="200"
-              min-height="50"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  :value="selectedCategory ? selectedCategory.name : ''"
-                  label="Select category"
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
-                  outlined
-                  :rules="[rules.required]"
-                  :error-messages="errors"
-                ></v-text-field>
-              </template>
-              <template>
-                <v-container style="background-color: white;">
-                  <v-treeview
-                  @update:active="$_onCategoryClick"
-                  activatable
-                  return-object
-                  :items="categories"
-                ></v-treeview>
-                </v-container>
-              </template>
-            </v-menu>
+            <p>Conferences in this category:{{categoryInfo.conferencesCount}}</p>
           </v-row>
           <v-row>
+            <p>Reports in this category:{{categoryInfo.reportsCount}}</p>
+          </v-row>
+          <br><br>
+          <v-row>
             <v-text-field
-              v-model="title"
+              v-model="categoryInfo.category.title"
               label="New title"
               outlined
               :rules="[rules.required, rules.counterMax]"
@@ -68,7 +40,7 @@
             color="primary"
             :disabled="btnsLoading"
             :loading="btnsLoading"
-            @click="$router.push('/')"
+            @click="$router.push('/categories')"
           >
             <span>Cancel</span>
           </v-btn>
@@ -80,15 +52,6 @@
             @click="$_deleteCategory"
           >
             <span>Delete</span>
-          </v-btn>
-          <v-btn
-            class="btn"
-            color="success"
-            :disabled="btnsLoading"
-            :loading="btnsLoading"
-            @click="$router.push('/addCategory')"
-          >
-            <span>Add new</span>
           </v-btn>
         </v-container>
       </v-form>
@@ -108,9 +71,9 @@ export default {
     buttons: {
       back: true,
     },
-    selectedCategory:undefined,
     title:'',
-    errors:null
+    errors:null,
+    categoryInfo:{category:{title:''}}
   }),
   computed: {
     loading() {
@@ -119,20 +82,22 @@ export default {
     rules() {
       return this.$store.getters.getRules;
     },
-    categories(){
-      return this.$store.getters.getCategories;
-    },
   },
   mounted() {
     this.$store.commit("setLoading", true);
-    this.$store.dispatch("setCategories");
+    this.axios
+        .get("/category/"+this.$route.params.id)
+        .then((response) => {
+          this.categoryInfo = response.data;
+          this.$store.commit("setLoading", false);
+        })
   },
   methods: {
     $_saveCategory() {
       this.btnsLoading = true;
       
       this.axios
-        .post("/category/"+this.selectedCategory.id+'/save', {title: this.title})
+        .post("/category/"+this.categoryInfo.category.id+'/save', {title: this.categoryInfo.category.title})
         .then((response) => {
           console.log(response);
           this.$router.go();
@@ -147,16 +112,12 @@ export default {
       
       this.btnsLoading = true;
       this.axios
-        .post("/category/"+this.selectedCategory.id+'/destroy')
+        .post("/category/"+this.categoryInfo.category.id+'/destroy')
         .then((response) => {
           console.log(response);
           this.$router.go();
           this.btnsLoading = false;
         })
-    },
-    $_onCategoryClick(val) {
-      this.selectedCategory = val[0];
-      this.errors=null;
     },
   },
   components: { AppHeader },
