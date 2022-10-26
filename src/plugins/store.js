@@ -15,7 +15,7 @@ export default new Vuex.Store({
     ],
     rules: {
       required: (value) => !!value || "Required.",
-      counter: (value) => value.length >= 6 || "Min 6 characters",
+      counter: (value) => (value.length >= 6 || value.length == 0) || "Min 6 characters",
       counterMax: (value) => value.length <= 254 || "Max 255 characters",
       email: (value) => {
         const pattern = new RegExp("\\w@\\w");

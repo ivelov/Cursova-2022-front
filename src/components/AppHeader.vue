@@ -22,16 +22,6 @@
     </v-btn>
 
     <v-btn
-      @click="$_logout"
-      text
-      :disabled="logoutDisable"
-      :loading="logoutDisable"
-      v-if="typeof buttons['logout'] != undefined ? buttons['logout'] : false"
-    >
-      <span class="mr-2">Log out</span>
-    </v-btn>
-
-    <v-btn
       @click="$_back"
       text
       v-if="typeof buttons['back'] != undefined ? buttons['back'] : false"
@@ -72,6 +62,47 @@
     </v-btn>
     </div>
     
+    <v-menu
+      v-if="typeof buttons['logout'] != undefined ? buttons['logout'] : false"
+      open-on-hover
+      offset-y
+    >
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+          v-bind="attrs"
+          v-on="on"
+          text
+        >
+          Account
+        </v-btn>
+      </template>
+
+      <v-list>
+        <v-list-item
+        >
+        <v-btn
+          @click="$router.push('/account/edit')"
+          text
+          :disabled="logoutDisable"
+          :loading="logoutDisable"
+        >
+          <span>Edit account</span>
+        </v-btn>
+        </v-list-item>
+        <v-list-item
+        >
+        <v-btn
+          @click="$_logout"
+          text
+          :disabled="logoutDisable"
+          :loading="logoutDisable"
+        >
+          <span>Log out</span>
+        </v-btn>
+        </v-list-item>
+      </v-list>
+    </v-menu>
+
   </v-app-bar>
   <v-navigation-drawer
       v-model="drawer"
@@ -79,22 +110,54 @@
       temporary
       color="primary"
     >
+
+    <v-menu
+      v-if="typeof buttons['logout'] != undefined ? buttons['logout'] : false"
+      open-on-hover
+      offset-y
+    >
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+          v-bind="attrs"
+          v-on="on"
+          outlined
+        >
+          Account
+        </v-btn>
+      </template>
+
+      <v-list>
+        <v-list-item
+        >
+        <v-btn
+          @click="$router.push('/account/edit')"
+          text
+          :disabled="logoutDisable"
+          :loading="logoutDisable"
+        >
+          <span>Edit account</span>
+        </v-btn>
+        </v-list-item>
+        <v-list-item
+        >
+        <v-btn
+          @click="$_logout"
+          text
+          :disabled="logoutDisable"
+          :loading="logoutDisable"
+        >
+          <span>Log out</span>
+        </v-btn>
+        </v-list-item>
+      </v-list>
+    </v-menu>
+
     <v-btn
       @click="$router.push('/login')"
       outlined
       v-if="typeof buttons['login'] != undefined ? buttons['login'] : false"
     >
       <span class="mr-2">Log in</span>
-    </v-btn>
-
-    <v-btn
-      @click="$_logout"
-      :disabled="logoutDisable"
-      :loading="logoutDisable"
-      outlined
-      v-if="typeof buttons['logout'] != undefined ? buttons['logout'] : false"
-    >
-      <span class="mr-2">Log out</span>
     </v-btn>
 
     <v-btn
@@ -136,6 +199,7 @@
     >
       <span class="mr-2">View reports</span>
     </v-btn>
+
     </v-navigation-drawer>
   </div>
   

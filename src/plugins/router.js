@@ -15,7 +15,7 @@ import AppReportEdit from "../components/AppReportEdit";
 import AppCategoryAdd from "../components/AppCategoryAdd";
 import AppCategoryEdit from "../components/AppCategoryEdit";
 import AppCategories from "../components/AppCategories";
-
+import AppAccountEdit from "../components/AppAccountEdit";
 
 Vue.use(VueRouter);
 export default new VueRouter({
@@ -121,7 +121,13 @@ export default new VueRouter({
         requireAuth:true
       }
     },
-    
+    {
+      path: "/account/edit",
+      component: AppAccountEdit,
+      meta:{
+        requireAuth:true
+      }
+    },
     
   ],
   mode: "history",

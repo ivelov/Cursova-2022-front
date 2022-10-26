@@ -1,7 +1,7 @@
 <template>
   <div>
     <AppHeader :buttons="buttons"></AppHeader>
-    <br /><br />
+    <br />
     <v-main>
       <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
