@@ -262,6 +262,7 @@ export default new Vuex.Store({
       }
       state.commit("setLoading", true);
       axios.get("/conference/" + payload.id).then((response) => {
+        console.log(response.data);
         state.commit("setCurrentConferenceData", response.data);
         state.commit("setLoading", false);
       });

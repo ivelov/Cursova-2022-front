@@ -3,12 +3,20 @@
     <AppHeader :buttons="buttons"></AppHeader>
 
     <v-main>
-      <br /><br />
+      <br />
       <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
       <v-form v-else v-model="valid">
         <v-container>
+          <v-row>
+            <v-breadcrumbs
+            :items="conferenceData.breadcrumbs"
+            divider="/"
+            large
+          ></v-breadcrumbs>
+          </v-row>
+          <br>
           <v-row>
             <v-text-field
               v-model="conferenceData.conference.title"
@@ -276,10 +284,8 @@ export default {
         .post("/conference/" + id + "/save", this.conferenceData.conference)
         .then((response) => {
           console.log(response);
+          this.$router.go();
           this.btnsLoading = false;
-        })
-        .catch((e) => {
-          console.error(e);
         });
     },
     $_deleteConf() {

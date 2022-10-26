@@ -10,6 +10,14 @@
       <v-form v-else>
         <v-container>
           <v-row>
+            <v-breadcrumbs
+            :items="conferenceData.breadcrumbs"
+            divider="/"
+            large
+          ></v-breadcrumbs>
+          </v-row>
+          <br><br>
+          <v-row>
             <v-text-field
               v-model="conferenceData.conference.title"
               label="Title"
@@ -251,5 +259,9 @@ export default {
 .btn {
   margin-left: 5px;
   margin-bottom: 5px;
+}
+
+.v-breadcrumbs{
+  padding: 0;
 }
 </style>

@@ -3,12 +3,19 @@
     <AppHeader :buttons="buttons"></AppHeader>
 
     <v-main>
-      <br /><br />
+      <br>
       <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
       <v-form  v-else>
         <v-container>
+          <v-row>
+            <v-breadcrumbs
+              :items="currentReportData.breadcrumbs"
+              divider="/"
+              large
+            ></v-breadcrumbs>
+          </v-row><br>
           <v-btn
             class="btn"
             color="primary"

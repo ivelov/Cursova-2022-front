@@ -3,12 +3,19 @@
     <AppHeader :buttons="buttons"></AppHeader>
 
     <v-main>
-      <br /><br />
+      <br />
       <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
       <v-form v-model="valid" v-else>
         <v-container>
+          <v-row>
+            <v-breadcrumbs
+              :items="currentReportData.breadcrumbs"
+              divider="/"
+              large
+            ></v-breadcrumbs>
+          </v-row><br>
           <v-row>
             <v-text-field
               v-model="currentReportData.report.title"
@@ -269,26 +276,29 @@ export default {
   methods: {
     $_saveReport() {
       this.btnsLoading = true;
+      var report = Object.assign({}, this.currentReportData.report);
+      if(this.selectedCategory)
+        report.categoryId = this.selectedCategory.id;
 
-      if(this.currentReportData.report.presentation){
+      if(report.presentation){
         var reader = new FileReader();
-        reader.readAsBinaryString(this.currentReportData.report.presentation);
+        reader.readAsBinaryString(report.presentation);
 
         reader.onload = (res) => {
-          var presBuf = this.currentReportData.report.presentation;
-          this.currentReportData.report.presentation = res.currentTarget.result;
+          //var presBuf = report.presentation;
+          report.presentation = res.currentTarget.result;
 
           this.axios
-          .post("/report/"+this.currentReportData.report.id+'/save', this.currentReportData.report)
+          .post("/report/"+report.id+'/save', report)
           .then((response) => {
             console.log(response);
-            this.currentReportData.report.presentation = presBuf;
+            //report.presentation = presBuf;
             this.btnsLoading = false;
           })
         }
       }else{
         this.axios
-        .post("/report/"+this.currentReportData.report.id+'/save', this.currentReportData.report)
+        .post("/report/"+report.id+'/save', report)
         .then((response) => {
           console.log(response);
           this.btnsLoading = false;
