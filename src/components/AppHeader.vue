@@ -16,7 +16,7 @@
       <v-btn
       @click="$router.push('/login')"
       text
-      v-if="typeof buttons['login'] != undefined ? buttons['login'] : false"
+      v-if="!$store.getters.isAuth"
     >
       <span class="mr-2">Log in</span>
     </v-btn>
@@ -60,10 +60,9 @@
     >
       <span class="mr-2">View reports</span>
     </v-btn>
-    </div>
-    
+
     <v-menu
-      v-if="typeof buttons['logout'] != undefined ? buttons['logout'] : false"
+      v-if="$store.getters.isAuth"
       open-on-hover
       offset-y
     >
@@ -74,12 +73,18 @@
           text
         >
           Account
+          <span 
+            v-if="!favLoading" 
+            :class="{'gray-fav': favCount==0, 'red-fav':favCount>0}"
+          >
+            ❤
+            <div class="fav-count" v-if="favCount>0">{{favCount}}</div>
+          </span>
         </v-btn>
       </template>
 
       <v-list>
-        <v-list-item
-        >
+        <v-list-item>
         <v-btn
           @click="$router.push('/account/edit')"
           text
@@ -89,8 +94,7 @@
           <span>Edit account</span>
         </v-btn>
         </v-list-item>
-        <v-list-item
-        >
+        <v-list-item>
         <v-btn
           @click="$_logout"
           text
@@ -100,9 +104,18 @@
           <span>Log out</span>
         </v-btn>
         </v-list-item>
+        <v-list-item v-if="favCount>0">
+        <v-btn
+          @click="$router.push('/account/favorites/reports/1')"
+          text
+        >
+          <span>View favorites</span>
+        </v-btn>
+        </v-list-item>
       </v-list>
     </v-menu>
 
+    </div>
   </v-app-bar>
   <v-navigation-drawer
       v-model="drawer"
@@ -112,7 +125,7 @@
     >
 
     <v-menu
-      v-if="typeof buttons['logout'] != undefined ? buttons['logout'] : false"
+      v-if="$store.getters.isAuth"
       open-on-hover
       offset-y
     >
@@ -122,13 +135,19 @@
           v-on="on"
           outlined
         >
-          Account
+          Account 
+          <span 
+            v-if="!favLoading" 
+            :class="{'gray-fav': favCount==0, 'red-fav':favCount>0}"
+          >
+            ❤
+            <span class="fav-count" v-if="favCount>0">{{favCount}}</span>
+          </span>
         </v-btn>
       </template>
 
       <v-list>
-        <v-list-item
-        >
+        <v-list-item>
         <v-btn
           @click="$router.push('/account/edit')"
           text
@@ -138,8 +157,7 @@
           <span>Edit account</span>
         </v-btn>
         </v-list-item>
-        <v-list-item
-        >
+        <v-list-item>
         <v-btn
           @click="$_logout"
           text
@@ -149,13 +167,21 @@
           <span>Log out</span>
         </v-btn>
         </v-list-item>
+        <v-list-item v-if="favCount>0">
+        <v-btn
+          @click="$router.push('/account/favorites/reports/1')"
+          text
+        >
+          <span>View favorites</span>
+        </v-btn>
+        </v-list-item>
       </v-list>
     </v-menu>
 
     <v-btn
       @click="$router.push('/login')"
       outlined
-      v-if="typeof buttons['login'] != undefined ? buttons['login'] : false"
+      v-if="!$store.getters.isAuth"
     >
       <span class="mr-2">Log in</span>
     </v-btn>
@@ -213,13 +239,25 @@ export default {
     return {
       logoutDisable: false,
       drawer:false,
+      favLoading:true,
+      favCount:0
     };
   },
 
   props: {
     buttons: Object,
   },
-
+  mounted(){
+    if(this.$store.getters.isAuth){
+      this.favLoading = true;
+    this.axios
+      .get("/account/favorites")
+      .then((response) => {
+        this.favCount = response.data;
+        this.favLoading = false;
+      })
+    }
+  },
   methods: {
     $_logout() {
       this.logoutDisable = true;
@@ -257,5 +295,29 @@ export default {
     
     width: 180px;
     margin: 0 15px 20px 15px;
+  }
+  .red-fav,.gray-fav{
+    position: relative;
+    font-size: 20px;
+  }
+  .red-fav{
+    color: red;
+  }
+  .gray-fav{
+    color: gray;
+  }
+  .fav-count{
+    position: absolute;
+    display: inline-block;
+    background-color: white;
+    border: 2px solid white;
+    border-radius: 10px;
+    color: black;
+    font-size: 12px;
+    left: 15px;
+    top: -3px;
+    width: min-content;
+    max-width: 27px;
+    height: 15px;
   }
 </style>

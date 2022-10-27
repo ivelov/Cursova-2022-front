@@ -66,7 +66,6 @@ export default new Vuex.Store({
     reportsPageInfo: {
       reports:[],
       maxPage:1,
-      buttons:{'back':true}
   },
   commentsInfo:{
     comments:[],
@@ -153,11 +152,6 @@ export default new Vuex.Store({
     },
     setReportsPageInfo(state, reportsPageInfo) {
       state.reportsPageInfo = reportsPageInfo;
-      let buttonsArray = state.reportsPageInfo.buttons;
-      state.reportsPageInfo.buttons = {};
-      for (let buttonName of buttonsArray) {
-        state.reportsPageInfo.buttons[buttonName] = true;
-      }
     },
     setReportReadMore(state, index){
       state.reportsPageInfo.reports[index].readMore = !state.reportsPageInfo.reports[index].readMore; 
@@ -292,6 +286,14 @@ export default new Vuex.Store({
           state.commit("setLoading", false);
         });
       }
+      
+    },
+    async setFavoriteReports(state, payload = {page: 1}) {
+      state.commit("setLoading", true);
+      axios.get("/account/favorites/reports/"+payload.page).then((response) => {
+        state.commit("setReportsPageInfo", response.data);
+        state.commit("setLoading", false);
+      });
       
     },
     async setCurrentReportData(state, payload) {

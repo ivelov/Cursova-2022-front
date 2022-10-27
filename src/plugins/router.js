@@ -68,12 +68,13 @@ export default new VueRouter({
     {
       path: "/reports/:page",
       component: AppReports,
-      meta:{
-        requireAuth:true
-      }
     },
     {
       path: "/reports/:page/:category",
+      component: AppReports,
+    },
+    {
+      path: "/account/favorites/reports/:favPage",
       component: AppReports,
       meta:{
         requireAuth:true
