@@ -232,9 +232,6 @@ export default {
     conferenceData() {
       return this.$store.getters.getCurrentConferenceData;
     },
-    categoryId(){
-      return this.conferenceData.conference.categoryId;
-    },
     loading() {
       return this.$store.getters.isLoading;
     },
@@ -253,7 +250,7 @@ export default {
     this.$store.dispatch("setCurrentConferenceData", {
       id: this.$route.params.id,
     }).then(() => {
-      this.selectedCategory = {id:this.categoryId, name:this.categoryId};
+      this.selectedCategory = {id:this.conferenceData.conference.categoryId, name:this.conferenceData.conference.categoryTitle};
         });
     this.$store.dispatch("setCategories");
   },
