@@ -8,6 +8,7 @@ import axios from 'axios';
 import VueSocialSharing from 'vue-social-sharing'
 import * as VueGoogleMaps from 'vue2-google-maps';
 
+axios.defaults.baseURL='/V1';
 axios.defaults.headers.common = {
     'X-Requested-With': 'XMLHttpRequest'
 };

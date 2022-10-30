@@ -73,9 +73,9 @@ export default {
       this.btnsLoading = true;
       this.emailErrors = null;
       this.passErrors = null;
-      this.axios.get('http://ivelov-vm-api.groupbwt.com/sanctum/csrf-cookie').then(() => {
+      this.axios.get('/sanctum/csrf-cookie').then(() => {
         this.axios
-        .post("http://ivelov-vm-api.groupbwt.com/login", {
+        .post("/login", {
           email: this.email,
           password: this.password,
         },{

@@ -173,7 +173,7 @@ export default {
     $_cancelJoin() {
       this.loading = true;
       this.axios
-        .post("http://ivelov-vm-api.groupbwt.com/conferences/cancel/" + this.conferenceData.conference.id)
+        .post("/conferences/cancel/" + this.conferenceData.conference.id)
         .then(() => {
           this.$store.dispatch("setCurrentConferenceData", {
             id: this.$route.params.id,
@@ -184,7 +184,7 @@ export default {
     $_joinConf() {
       this.loading = true;
       this.axios
-        .post("http://ivelov-vm-api.groupbwt.com/conferences/join/" + this.conferenceData.conference.id)
+        .post("/conferences/join/" + this.conferenceData.conference.id)
         .then(() => {
           this.$store.dispatch("setCurrentConferenceData", {
             id: this.$route.params.id,
@@ -194,7 +194,7 @@ export default {
     },
     $_deleteConf() {
       this.loading = true;
-      this.axios.post("http://ivelov-vm-api.groupbwt.com/conferences/delete/" + this.conferenceData.conference.id).then(() => {
+      this.axios.post("/conferences/delete/" + this.conferenceData.conference.id).then(() => {
         this.$router.push('/');
       });
     },

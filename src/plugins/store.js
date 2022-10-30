@@ -102,13 +102,13 @@ export default new Vuex.Store({
     //async
     async setConferences(state, page = 1) {
       state.commit("setLoading", true);
-      axios.get("http://ivelov-vm-api.groupbwt.com/conferences/"+page).then((response) => {
+      axios.get("/conferences/"+page).then((response) => {
         state.commit("setConferencesPageInfo", response.data);
         state.commit("setLoading", false);
       });
     },
     async setAuth(state) {
-      axios.get("http://ivelov-vm-api.groupbwt.com/isAuth",{},{
+      axios.get("/isAuth",{},{
         headers: {
           'X-XSRF-TOKEN': VueCookies.get('XSRF-TOKEN'),
         }
@@ -122,7 +122,7 @@ export default new Vuex.Store({
       });
     },
     async setAddPerk(state) {
-      axios.get("http://ivelov-vm-api.groupbwt.com/canAdd").then((response) => {
+      axios.get("/canAdd").then((response) => {
         state.commit("setAdd", response.data==1 ? true : false);
       });
     },
@@ -135,7 +135,7 @@ export default new Vuex.Store({
         return;
       }
       state.commit("setLoading", true);
-      axios.get("http://ivelov-vm-api.groupbwt.com/conference/" + payload.id).then((response) => {
+      axios.get("/conference/" + payload.id).then((response) => {
         state.commit("setCurrentConferenceData", response.data);
         state.commit("setLoading", false);
       });

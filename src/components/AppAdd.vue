@@ -214,7 +214,7 @@ export default {
       let values = this.conferenceData.conference;
       values.id = null;
       this.axios
-        .post("http://ivelov-vm-api.groupbwt.com/add", values)
+        .post("/add", values)
         .then((response) => {
           console.log(response);
           this.btnsLoading = false;
