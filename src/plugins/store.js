@@ -74,6 +74,13 @@ export default new Vuex.Store({
     loading:false
   },
   categories:[],
+  categoriesList:[],
+  filters:{
+    reportsCount:-1,
+    categories:[],
+    startDate:'',
+    endDate:''
+  },
   },
   mutations: {
     //sync
@@ -205,23 +212,18 @@ export default new Vuex.Store({
     setCategories(state, categories){
       state.categories = categories;
     },
+    setCategoriesList(state, categoriesList){
+      state.categoriesList = categoriesList;
+    },
   },
   actions: {
     //async
     async setConferences(state, payload = {page:1}) {
       state.commit("setLoading", true);
-      if(payload.category !== undefined){
-        axios.get("/conferences/"+payload.page+'/'+payload.category).then((response) => {
-          state.commit("setConferencesPageInfo", response.data);
-          state.commit("setLoading", false);
-        });
-      }else{
-        axios.get("/conferences/"+payload.page).then((response) => {
-          state.commit("setConferencesPageInfo", response.data);
-          state.commit("setLoading", false);
-        });
-      }
-      
+      axios.post("/conferences/"+payload.page, state.getters.getFilters).then((response) => {
+        state.commit("setConferencesPageInfo", response.data);
+        state.commit("setLoading", false);
+      });
     },
     async setAuth(state) {
       axios.get("/isAuth",{},{
@@ -361,6 +363,11 @@ export default new Vuex.Store({
       }
       
     },
+    async setCategoriesList(state) {
+      axios.get("/categoriesList").then((response) => {
+        state.commit("setCategoriesList", response.data);
+      });
+    },
     
   },
   getters: {
@@ -399,6 +406,12 @@ export default new Vuex.Store({
     },
     getCategories(state) {
       return state.categories;
+    },
+    getCategoriesList(state) {
+      return state.categoriesList;
+    },
+    getFilters(state) {
+      return state.filters;
     },
   },
 });

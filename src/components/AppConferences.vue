@@ -13,19 +13,101 @@
         text
         @click="filterMenu = !filterMenu"
       >
-        <span v-if="filterMenu">&lt;</span>
-        <span v-else>></span>
+        <span>&lt;</span>
       </v-btn>
+      <v-divider></v-divider>
         <v-list >
           <v-list-item>
-            <v-slider
-              label="Reports count"
-              thumb-label
-            ></v-slider>
+            Reports count
           </v-list-item>
           <v-list-item>
-            Date end
+            <v-slider
+              v-model="filters.reportsCount"
+              thumb-label
+              min="-1"
+              max="100"
+            ></v-slider>
           </v-list-item>
+          <v-divider></v-divider>
+
+          <v-list-item>
+            Start date
+          </v-list-item>
+          <v-list-item>
+           <v-menu
+              ref="startDateMenu"
+              v-model="startDateMenu"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="filters.startDate"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  outlined
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="filters.startDate"
+              ></v-date-picker>
+            </v-menu>
+          </v-list-item>
+          <v-divider></v-divider>
+
+          <v-list-item>
+            End date
+          </v-list-item>
+          <v-list-item>
+           <v-menu
+              ref="endDateMenu"
+              v-model="endDateMenu"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="filters.endDate"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  outlined
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="filters.endDate"
+              ></v-date-picker>
+            </v-menu>
+          </v-list-item>
+          <v-divider></v-divider>
+
+          <v-list-item>
+            Categories
+          </v-list-item>
+          <v-list-item>
+            <v-autocomplete
+              v-model="filters.categories"
+              :items="categoriesList"
+              item-text="state"
+              item-value="value"
+              clearable
+              multiple
+              outlined
+            ></v-autocomplete>
+          </v-list-item>
+          <v-divider></v-divider>
+          <br>
+          <v-btn
+            color="success"
+            @click="$_reloadConferences"
+          >
+            Apply filters
+          </v-btn>
         </v-list>
       </v-navigation-drawer>
       <v-container v-if="loading">
@@ -156,7 +238,9 @@ export default {
     btnsLoading: false,
     catMenu:false,
     selectedCategory:undefined,
-    filterMenu:false
+    filterMenu:false,
+    startDateMenu:false,
+    endDateMenu:false,
   }),
   computed: {
     pageInfo() {
@@ -177,6 +261,12 @@ export default {
     categories(){
       return this.$store.getters.getCategories;
     },
+    categoriesList(){
+      return this.$store.getters.getCategoriesList;
+    },
+    filters(){
+      return this.$store.getters.getFilters;
+    }
   },
   mounted() {
     this.$store.dispatch("setAuth");
@@ -186,6 +276,7 @@ export default {
 
     this.$store.dispatch("setConferences", {page:this.curPage, category: this.$route.params.category});
     this.$store.dispatch("setCategories");
+    this.$store.dispatch("setCategoriesList");
   },
   methods: {
     $_joinConf(id) {
@@ -235,7 +326,10 @@ export default {
     $_clearCategory(){
       this.$router.push('/conferences/1');
       this.$store.dispatch("setConferences", {page:this.curPage});
-    }
+    },
+    $_reloadConferences(){
+      this.$store.dispatch("setConferences", {page:this.curPage});
+    },
   },
   components: { AppHeader },
 };
@@ -298,10 +392,9 @@ export default {
 
 .v-navigation-drawer{
     position: fixed;
-    padding: 80px 10px;
+    padding: 80px 10px 0 10px;
     max-width: 230px;
     width: 230px;
-    height: 100%;
   }
 
 
