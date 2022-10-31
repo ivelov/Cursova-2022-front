@@ -3,12 +3,20 @@
     <AppHeader :buttons="buttons"></AppHeader>
 
     <v-main>
-      <br /><br />
+      <br />
       <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
       <v-form v-else v-model="valid">
         <v-container>
+          <v-row>
+            <v-breadcrumbs
+            :items="conferenceData.breadcrumbs"
+            divider="/"
+            large
+          ></v-breadcrumbs>
+          </v-row>
+          <br>
           <v-row>
             <v-text-field
               v-model="conferenceData.conference.title"
@@ -16,6 +24,37 @@
               outlined
               :rules="[rules.required, rules.counterMax]"
             ></v-text-field>
+          </v-row>
+          <v-row>
+            <br /><br />
+            <v-menu
+              ref="catMenu"
+              v-model="catMenu"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-x
+              min-width="200"
+              min-height="50"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  :value="selectedCategory ? selectedCategory.name : ''"
+                  label="Category"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  outlined
+                ></v-text-field>
+              </template>
+              <template>
+                <v-treeview
+                  @update:active="(v)=>{selectedCategory = v[0]}"
+                  activatable
+                  return-object
+                  :items="categories"
+                ></v-treeview>
+              </template>
+            </v-menu>
           </v-row>
           <v-row>
             <v-select
@@ -176,6 +215,7 @@ export default {
     valid: false,
     dateMenu: false,
     timeMenu: false,
+    catMenu:false,
     btnsLoading: false,
     countriesLocations: {
       ukr: { lat: 50.464963, lng: 30.533887 },
@@ -186,6 +226,7 @@ export default {
     buttons: {
       back: true,
     },
+    selectedCategory:undefined,
   }),
   computed: {
     conferenceData() {
@@ -200,11 +241,18 @@ export default {
     rules() {
       return this.$store.getters.getRules;
     },
+    categories(){
+      return this.$store.getters.getCategories;
+    },
   },
   mounted() {
+    
     this.$store.dispatch("setCurrentConferenceData", {
       id: this.$route.params.id,
-    });
+    }).then(() => {
+      this.selectedCategory = {id:this.conferenceData.conference.categoryId, name:this.conferenceData.conference.categoryTitle};
+        });
+    this.$store.dispatch("setCategories");
   },
   methods: {
     $_markerUpdate(event) {
@@ -227,15 +275,14 @@ export default {
       }
       this.btnsLoading = true;
 
+      this.conferenceData.conference.categoryId = this.selectedCategory ? this.selectedCategory.id : null;
       let id = this.conferenceData.conference.id;
       this.axios
         .post("/conference/" + id + "/save", this.conferenceData.conference)
         .then((response) => {
           console.log(response);
+          this.$router.go();
           this.btnsLoading = false;
-        })
-        .catch((e) => {
-          console.error(e);
         });
     },
     $_deleteConf() {

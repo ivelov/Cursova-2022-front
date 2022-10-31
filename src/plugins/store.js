@@ -15,7 +15,7 @@ export default new Vuex.Store({
     ],
     rules: {
       required: (value) => !!value || "Required.",
-      counter: (value) => value.length >= 6 || "Min 6 characters",
+      counter: (value) => (value.length >= 6 || value.length == 0) || "Min 6 characters",
       counterMax: (value) => value.length <= 254 || "Max 255 characters",
       email: (value) => {
         const pattern = new RegExp("\\w@\\w");
@@ -33,6 +33,7 @@ export default new Vuex.Store({
       conference: {
         id: null,
         title: "",
+        category_id:null,
         country: "",
         date: "",
         time: "",
@@ -65,7 +66,6 @@ export default new Vuex.Store({
     reportsPageInfo: {
       reports:[],
       maxPage:1,
-      buttons:{'back':true}
   },
   commentsInfo:{
     comments:[],
@@ -73,6 +73,7 @@ export default new Vuex.Store({
     curPage:0,
     loading:false
   },
+  categories:[],
   },
   mutations: {
     //sync
@@ -151,11 +152,6 @@ export default new Vuex.Store({
     },
     setReportsPageInfo(state, reportsPageInfo) {
       state.reportsPageInfo = reportsPageInfo;
-      let buttonsArray = state.reportsPageInfo.buttons;
-      state.reportsPageInfo.buttons = {};
-      for (let buttonName of buttonsArray) {
-        state.reportsPageInfo.buttons[buttonName] = true;
-      }
     },
     setReportReadMore(state, index){
       state.reportsPageInfo.reports[index].readMore = !state.reportsPageInfo.reports[index].readMore; 
@@ -163,6 +159,9 @@ export default new Vuex.Store({
     setCurrentReportData(state, currentReportData) {
       state.currentReportData = currentReportData;
       currentReportData.report.presentation = new File([currentReportData.report.presentation], "presentation");
+    },
+    setReportConferenceCategory(state, reportConferenceCategory) {
+      state.currentReportData.conferenceCategory = reportConferenceCategory;
     },
     setComments(state, commentsInfo) {
       var commentsJson = commentsInfo.comments;
@@ -202,16 +201,27 @@ export default new Vuex.Store({
         curPage:0,
         loading:false
       }; 
-    }
+    },
+    setCategories(state, categories){
+      state.categories = categories;
+    },
   },
   actions: {
     //async
-    async setConferences(state, page = 1) {
+    async setConferences(state, payload = {page:1}) {
       state.commit("setLoading", true);
-      axios.get("/conferences/"+page).then((response) => {
-        state.commit("setConferencesPageInfo", response.data);
-        state.commit("setLoading", false);
-      });
+      if(payload.category !== undefined){
+        axios.get("/conferences/"+payload.page+'/'+payload.category).then((response) => {
+          state.commit("setConferencesPageInfo", response.data);
+          state.commit("setLoading", false);
+        });
+      }else{
+        axios.get("/conferences/"+payload.page).then((response) => {
+          state.commit("setConferencesPageInfo", response.data);
+          state.commit("setLoading", false);
+        });
+      }
+      
     },
     async setAuth(state) {
       axios.get("/isAuth",{},{
@@ -246,13 +256,14 @@ export default new Vuex.Store({
       }
       state.commit("setLoading", true);
       axios.get("/conference/" + payload.id).then((response) => {
+        console.log(response.data);
         state.commit("setCurrentConferenceData", response.data);
         state.commit("setLoading", false);
       });
     },
     async setReportBusyTimes(state, payload) {
       state.commit("setLoading", true);
-      await axios.get("/conference/"+payload.id+'/getBusyTimes',
+      await axios.post("/conference/"+payload.id+'/getBusyTimes',
         {repId: payload.edit? state.getters.getCurrentReportData.report.id : false}
       ).then((response) => {
         state.commit("setReportBusyTimes", response.data);
@@ -262,12 +273,28 @@ export default new Vuex.Store({
         state.commit("setReportError", true);
       });
     },
-    async setReports(state, page = 1) {
+    async setReports(state, payload = {page: 1, category: false}) {
       state.commit("setLoading", true);
-      axios.get("/reports/"+page).then((response) => {
+      if(payload.category){
+        axios.get("/reports/"+payload.page+'/'+payload.category).then((response) => {
+          state.commit("setReportsPageInfo", response.data);
+          state.commit("setLoading", false);
+        });
+      }else{
+        axios.get("/reports/"+payload.page).then((response) => {
+          state.commit("setReportsPageInfo", response.data);
+          state.commit("setLoading", false);
+        });
+      }
+      
+    },
+    async setFavoriteReports(state, payload = {page: 1}) {
+      state.commit("setLoading", true);
+      axios.get("/account/favorites/reports/"+payload.page).then((response) => {
         state.commit("setReportsPageInfo", response.data);
         state.commit("setLoading", false);
       });
+      
     },
     async setCurrentReportData(state, payload) {
       if (
@@ -277,13 +304,23 @@ export default new Vuex.Store({
         state.commit("setLoading", false);
         return;
       }
-      state.commit("setLoading", true);
-      axios.get("/report/" + payload.id).then((response) => {
-        state.commit("setCurrentReportData", response.data);
-        state.commit("setLoading", false);
-        if(payload.edit){
-          state.dispatch("setReportBusyTimes", {id: state.getters.getCurrentReportData.report.conferenceId, edit: true});
-        }
+      return new Promise((resolve, reject) => {
+        state.commit("setLoading", true);
+        axios.get("/report/" + payload.id).then((response) => {
+          state.commit("setCurrentReportData", response.data);
+          state.commit("setLoading", false);
+          if(payload.edit){
+            state.dispatch("setReportBusyTimes", {id: state.getters.getCurrentReportData.report.conferenceId, edit: true});
+          }
+          resolve();
+        }).catch((er)=>reject(er));
+      });
+      
+    },
+    async setReportConferenceCategory(state, conferenceId) {
+      axios.get("/conference/"+conferenceId+'/getCategory').then((response) => {
+        state.commit("setReportConferenceCategory", response.data);
+        state.dispatch("setCategories", {parentId:response.data, hard:true})
       });
     },
     async setComments(state, payload) {
@@ -305,12 +342,26 @@ export default new Vuex.Store({
 
         var page = state.getters.getCommentsInfo.curPage + 1; 
         axios.get("/report/" + payload.id+'/comments/'+page).then((response) => {
-          console.log(response);
           state.commit("setComments", response.data);
+        });
+      }
+    },
+    async setCategories(state, payload = {parentId: false, hard: false}) {
+      if(state.categories && !payload.hard) return;
+      if(payload.parentId){
+        axios.get("/categories/"+payload.parentId).then((response) => {
+          state.commit("setCategories", response.data);
+          state.commit("setLoading", false);
+        });
+      }else{
+        axios.get("/categories").then((response) => {
+          state.commit("setCategories", response.data);
+          state.commit("setLoading", false);
         });
       }
       
     },
+    
   },
   getters: {
     getCountries(state) {
@@ -345,6 +396,9 @@ export default new Vuex.Store({
     },
     getCommentsInfo(state) {
       return state.commentsInfo;
+    },
+    getCategories(state) {
+      return state.categories;
     },
   },
 });

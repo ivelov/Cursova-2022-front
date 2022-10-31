@@ -3,12 +3,19 @@
     <AppHeader :buttons="buttons"></AppHeader>
 
     <v-main>
-      <br /><br />
+      <br />
       <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
       <v-form v-model="valid" v-else>
         <v-container>
+          <v-row>
+            <v-breadcrumbs
+              :items="currentReportData.breadcrumbs"
+              divider="/"
+              large
+            ></v-breadcrumbs>
+          </v-row><br>
           <v-row>
             <v-text-field
               v-model="currentReportData.report.title"
@@ -17,6 +24,37 @@
               label="Title"
               outlined
             ></v-text-field>
+          </v-row>
+          <v-row>
+            <br /><br />
+            <v-menu
+              ref="catMenu"
+              v-model="catMenu"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-x
+              min-width="200"
+              min-height="50"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  :value="selectedCategory ? selectedCategory.name : ''"
+                  label="Category"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  outlined
+                ></v-text-field>
+              </template>
+              <template>
+                <v-treeview
+                  @update:active="(v)=>{selectedCategory = v[0]}"
+                  activatable
+                  return-object
+                  :items="categories"
+                ></v-treeview>
+              </template>
+            </v-menu>
           </v-row>
           <v-row>
             <v-textarea
@@ -149,6 +187,8 @@ export default {
     hoursBuf:0,
     minEndTime:'',
     maxEndTime:'',
+    catMenu:false,
+    selectedCategory:undefined
   }),
   computed: {
     rules(){
@@ -161,6 +201,7 @@ export default {
       return this.$store.getters.getCurrentReportData;
     },
     calcAllowedHours(){
+      if(!this.currentReportData.confStartTime) return undefined;
       var allowedHoursArr = [];
 
       var confStartHour =  parseInt(this.currentReportData.confStartTime.substring(0,2));
@@ -217,34 +258,47 @@ export default {
           allowedMinutesArr.push(minute);
       }
       return allowedMinutesArr;
-    }
+    },
+    categories(){
+      return this.$store.getters.getCategories;
+    },
   },
   mounted() {
-    this.$store.dispatch("setCurrentReportData", {id: this.$route.params.repId, edit:true});
+    this.$store.dispatch("setCurrentReportData", {id: this.$route.params.repId, edit:true}).then(()=>{
+      this.selectedCategory = {
+        name:this.currentReportData.report.categoryTitle, 
+        id:this.currentReportData.report.categoryId
+      }
+      this.$store.dispatch("setReportConferenceCategory", this.currentReportData.report.conferenceId);
+    });
+    
   },
   methods: {
     $_saveReport() {
       this.btnsLoading = true;
+      var report = Object.assign({}, this.currentReportData.report);
+      if(this.selectedCategory)
+        report.categoryId = this.selectedCategory.id;
 
-      if(this.currentReportData.report.presentation){
+      if(report.presentation){
         var reader = new FileReader();
-        reader.readAsBinaryString(this.currentReportData.report.presentation);
+        reader.readAsBinaryString(report.presentation);
 
         reader.onload = (res) => {
-          var presBuf = this.currentReportData.report.presentation;
-          this.currentReportData.report.presentation = res.currentTarget.result;
+          //var presBuf = report.presentation;
+          report.presentation = res.currentTarget.result;
 
           this.axios
-          .post("/report/"+this.currentReportData.report.id+'/save', this.currentReportData.report)
+          .post("/report/"+report.id+'/save', report)
           .then((response) => {
             console.log(response);
-            this.currentReportData.report.presentation = presBuf;
+            //report.presentation = presBuf;
             this.btnsLoading = false;
           })
         }
       }else{
         this.axios
-        .post("/report/"+this.currentReportData.report.id+'/save', this.currentReportData.report)
+        .post("/report/"+report.id+'/save', report)
         .then((response) => {
           console.log(response);
           this.btnsLoading = false;

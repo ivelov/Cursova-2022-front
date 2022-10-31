@@ -12,6 +12,10 @@ import AppReportAdd from "../components/AppReportAdd";
 import AppReports from "../components/AppReports";
 import AppReportDetails from "../components/AppReportDetails";
 import AppReportEdit from "../components/AppReportEdit";
+import AppCategoryAdd from "../components/AppCategoryAdd";
+import AppCategoryEdit from "../components/AppCategoryEdit";
+import AppCategories from "../components/AppCategories";
+import AppAccountEdit from "../components/AppAccountEdit";
 
 Vue.use(VueRouter);
 export default new VueRouter({
@@ -22,6 +26,10 @@ export default new VueRouter({
     },
     {
       path: "/conferences/:page",
+      component: AppConferences,
+    },
+    {
+      path: "/conferences/:page/:category",
       component: AppConferences,
     },
     {
@@ -60,6 +68,14 @@ export default new VueRouter({
     {
       path: "/reports/:page",
       component: AppReports,
+    },
+    {
+      path: "/reports/:page/:category",
+      component: AppReports,
+    },
+    {
+      path: "/account/favorites/reports/:favPage",
+      component: AppReports,
       meta:{
         requireAuth:true
       }
@@ -85,6 +101,35 @@ export default new VueRouter({
         requireAuth:true
       }
     },
+    {
+      path: "/categories",
+      component: AppCategories,
+      meta:{
+        requireAuth:true
+      }
+    },
+    {
+      path: "/addCategory",
+      component: AppCategoryAdd,
+      meta:{
+        requireAuth:true
+      }
+    },
+    {
+      path: "/editCategory/:id",
+      component: AppCategoryEdit,
+      meta:{
+        requireAuth:true
+      }
+    },
+    {
+      path: "/account/edit",
+      component: AppAccountEdit,
+      meta:{
+        requireAuth:true
+      }
+    },
+    
   ],
   mode: "history",
 });

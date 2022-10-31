@@ -19,6 +19,37 @@
             ></v-text-field>
           </v-row>
           <v-row>
+            <br /><br />
+            <v-menu
+              ref="catMenu"
+              v-model="catMenu"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-x
+              min-width="200"
+              min-height="50"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  :value="selectedCategory ? selectedCategory.name : ''"
+                  label="Category"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  outlined
+                ></v-text-field>
+              </template>
+              <template>
+                <v-treeview
+                  @update:active="(v)=>{selectedCategory = v[0]}"
+                  activatable
+                  return-object
+                  :items="categories"
+                ></v-treeview>
+              </template>
+            </v-menu>
+          </v-row>
+          <v-row>
             <v-textarea
               v-model="currentReportData.report.description"
               outlined
@@ -155,6 +186,8 @@ export default {
     hoursBuf:0,
     minEndTime:'',
     maxEndTime:'',
+    catMenu:false,
+    selectedCategory:undefined
   }),
   computed: {
     rules(){
@@ -167,6 +200,7 @@ export default {
       return this.$store.getters.getCurrentReportData;
     },
     calcAllowedHours(){
+      if(!this.currentReportData.confStartTime) return undefined;
       var allowedHoursArr = [];
 
       var confStartHour =  parseInt(this.currentReportData.confStartTime.substring(0,2));
@@ -193,6 +227,7 @@ export default {
       return allowedHoursArr;
     },
     fullBusy(){
+      if(!this.calcAllowedHours) return undefined;
       return this.calcAllowedHours.length == 0 ? true:false;
     }, 
     calcAllowedMinutes(){
@@ -226,16 +261,23 @@ export default {
           allowedMinutesArr.push(minute);
       }
       return allowedMinutesArr;
-    }
+    },
+    categories(){
+      return this.$store.getters.getCategories;
+    },
   },
   mounted() {
     this.$store.commit('clearCurrentReportData');
     this.currentReportData.report.conferenceId = this.$route.params.confId;
     this.$store.dispatch("setReportBusyTimes", {id: this.currentReportData.report.conferenceId, edit: false});
+    this.$store.dispatch("setReportConferenceCategory", this.currentReportData.report.conferenceId);
+    
   },
   methods: {
     $_saveReport() {
       this.btnsLoading = true;
+      if(this.selectedCategory)
+        this.currentReportData.report.categoryId = this.selectedCategory.id;
       if(this.currentReportData.report.presentation){
         var reader = new FileReader();
         reader.readAsBinaryString(this.currentReportData.report.presentation);
