@@ -2,7 +2,32 @@
   <div>
     <AppHeader :buttons="buttons"></AppHeader>
     <br />
-    <v-main>
+      <v-main>
+      <v-navigation-drawer  
+        class="filter-drawer"
+        v-model="filterMenu" 
+        absolute
+        :temporary="false"
+      >
+      <v-btn
+        text
+        @click="filterMenu = !filterMenu"
+      >
+        <span v-if="filterMenu">&lt;</span>
+        <span v-else>></span>
+      </v-btn>
+        <v-list >
+          <v-list-item>
+            <v-slider
+              label="Reports count"
+              thumb-label
+            ></v-slider>
+          </v-list-item>
+          <v-list-item>
+            Date end
+          </v-list-item>
+        </v-list>
+      </v-navigation-drawer>
       <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
@@ -40,6 +65,11 @@
             </v-container>
           </template>
         </v-menu>
+        <v-btn
+              @click="filterMenu = !filterMenu"
+            >
+              Filters
+            </v-btn>
         <v-row class="conf-row">
           <v-col>№</v-col>
           <v-col>Title</v-col>
@@ -125,7 +155,8 @@ export default {
     curPage: 1,
     btnsLoading: false,
     catMenu:false,
-    selectedCategory:undefined
+    selectedCategory:undefined,
+    filterMenu:false
   }),
   computed: {
     pageInfo() {
@@ -258,4 +289,20 @@ export default {
 .category-field {
   max-width: 300px;
 }
+
+.filter-btn{
+  position: absolute;
+  left: 0;
+  top: 50%;
+}
+
+.v-navigation-drawer{
+    position: fixed;
+    padding: 80px 10px;
+    max-width: 230px;
+    width: 230px;
+    height: 100%;
+  }
+
+
 </style>

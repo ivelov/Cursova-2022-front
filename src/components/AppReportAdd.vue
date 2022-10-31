@@ -385,4 +385,8 @@ export default {
 .v-alert{
   max-width: 300px;
 }
+
+.v-treeview{
+  background-color: white;
+}
 </style>
