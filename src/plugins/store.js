@@ -215,6 +215,9 @@ export default new Vuex.Store({
     setCategoriesList(state, categoriesList){
       state.categoriesList = categoriesList;
     },
+    clearFilters(state){
+      state.filters = {};
+    },
   },
   actions: {
     //async

@@ -9,12 +9,23 @@
         absolute
         :temporary="false"
       >
-      <v-btn
+        <v-btn
+        class="filter-close-btn"
         text
         @click="filterMenu = !filterMenu"
       >
         <span>&lt;</span>
       </v-btn>
+      <v-btn
+        color="primary"
+        @click="
+          $store.commit('clearFilters');
+          $_reloadConferences();
+        "
+      >
+        Reset Filters
+      </v-btn>
+      <br><br>
       <v-divider></v-divider>
         <v-list >
           <v-list-item>
@@ -26,6 +37,7 @@
               thumb-label
               min="-1"
               max="100"
+              @change="$_reloadConferences"
             ></v-slider>
           </v-list-item>
           <v-divider></v-divider>
@@ -100,53 +112,16 @@
               outlined
             ></v-autocomplete>
           </v-list-item>
-          <v-divider></v-divider>
-          <br>
-          <v-btn
-            color="success"
-            @click="$_reloadConferences"
-          >
-            Apply filters
-          </v-btn>
         </v-list>
       </v-navigation-drawer>
+      
       <v-container v-if="loading">
-        <v-text-field color="success" loading disabled></v-text-field>
+        <v-skeleton-loader
+          class="mx-auto"
+          type="table-thead, table-tbody"
+        ></v-skeleton-loader>
       </v-container>
       <v-container class="container-conferences" v-else>
-        <v-menu
-          ref="catMenu"
-          v-model="catMenu"
-          :close-on-content-click="false"
-          transition="scale-transition"
-          offset-x
-          min-width="200"
-          min-height="50"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-text-field
-              class="category-field"
-              label="Select category"
-              :value="pageInfo.categoryName"
-              readonly
-              clearable
-              @click:clear="$_clearCategory"
-              v-bind="attrs"
-              v-on="on"
-              outlined
-            ></v-text-field>
-          </template>
-          <template>
-            <v-container style="background-color: white;">
-              <v-treeview
-              @update:active="$_selectCategory"
-              activatable
-              return-object
-              :items="categories"
-            ></v-treeview>
-            </v-container>
-          </template>
-        </v-menu>
         <v-btn
               @click="filterMenu = !filterMenu"
             >
@@ -275,7 +250,6 @@ export default {
     this.curPage = this.$route.params.page;
 
     this.$store.dispatch("setConferences", {page:this.curPage, category: this.$route.params.category});
-    this.$store.dispatch("setCategories");
     this.$store.dispatch("setCategoriesList");
   },
   methods: {
@@ -317,15 +291,6 @@ export default {
       this.curPage = parseInt(this.curPage) - 1;
       this.$store.dispatch("setConferences", {page:this.curPage});
       this.$router.push("/conferences/" + this.curPage);
-    },
-    $_selectCategory(val){
-      this.catMenu = false;
-      this.$router.push('/conferences/1/'+val[0].id);
-      this.$store.dispatch("setConferences", {page:this.curPage, category: this.$route.params.category});
-    },
-    $_clearCategory(){
-      this.$router.push('/conferences/1');
-      this.$store.dispatch("setConferences", {page:this.curPage});
     },
     $_reloadConferences(){
       this.$store.dispatch("setConferences", {page:this.curPage});
@@ -384,10 +349,8 @@ export default {
   max-width: 300px;
 }
 
-.filter-btn{
-  position: absolute;
-  left: 0;
-  top: 50%;
+.filter-close-btn{
+  font-size: x-large;
 }
 
 .v-navigation-drawer{
