@@ -106,7 +106,7 @@
         </v-list-item>
         <v-list-item v-if="favCount>0">
         <v-btn
-          @click="$router.push('/account/favorites/reports/1')"
+          @click="$router.push('/account/favorites/reports/1'); $router.go()"
           text
         >
           <span>View favorites</span>

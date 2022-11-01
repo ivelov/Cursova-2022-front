@@ -284,7 +284,7 @@ export default {
         reader.onload = (res) => {
           this.currentReportData.report.presentation = res.currentTarget.result;
           this.axios
-          .post("/reports/add", this.currentReportData.report)
+          .post("/addReport", this.currentReportData.report)
           .then((response) => {
             console.log(response);
             this.btnsLoading = false;
@@ -294,7 +294,7 @@ export default {
         }
       }else{
         this.axios
-        .post("/reports/add", this.currentReportData.report)
+        .post("/addReport", this.currentReportData.report)
         .then((response) => {
           console.log(response);
           this.btnsLoading = false;

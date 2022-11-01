@@ -70,10 +70,6 @@ export default new VueRouter({
       component: AppReports,
     },
     {
-      path: "/reports/:page/:category",
-      component: AppReports,
-    },
-    {
       path: "/account/favorites/reports/:favPage",
       component: AppReports,
       meta:{

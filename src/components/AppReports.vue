@@ -3,44 +3,180 @@
     <AppHeader :key="headerRefreshKey" :buttons="buttons"></AppHeader>
     <br /><br />
     <v-main>
-      <v-container v-if="loading">
-        <v-text-field color="success" loading disabled></v-text-field>
-      </v-container>
-      <v-container class="container-conferences" v-else>
-        <v-menu
-          v-if="categories.length > 0"
-          ref="catMenu"
-          v-model="catMenu"
-          :close-on-content-click="false"
-          transition="scale-transition"
-          offset-x
-          min-width="200"
-          min-height="50"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-text-field
-              class="category-field"
-              label="Select category"
-              :value="pageInfo.categoryName"
-              readonly
+
+      <v-navigation-drawer  
+        class="filter-drawer"
+        v-model="filterMenu" 
+        absolute
+        :temporary="false"
+      >
+        <v-btn
+        class="filter-close-btn"
+        text
+        @click="filterMenu = !filterMenu"
+      >
+        <span>&lt;</span>
+      </v-btn>
+      <v-btn
+        color="primary"
+        @click="
+          $store.commit('clearFilters');
+          $_reloadReports();
+        "
+      >
+        Reset Filters
+      </v-btn>
+      <br><br>
+      <v-divider></v-divider>
+        <v-list >
+          
+          <v-list-item>
+            Start time
+          </v-list-item>
+          <v-list-item>
+           <v-menu
+              ref="startTimeMenu"
+              v-model="startTimeMenu"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="filters.startTime"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  outlined
+                ></v-text-field>
+              </template>
+              <v-time-picker
+                v-model="filters.startTime"
+                format="24hr"
+                min="7:00"
+                max="20:55"
+                @click:minute="
+                  $refs.startTimeMenu.save(filters.startTime);
+                "
+                @change="$_reloadReports"
+              ></v-time-picker>
+            </v-menu>
+          </v-list-item>
+          <v-divider></v-divider>
+
+          <v-list-item>
+            End time
+          </v-list-item>
+          <v-list-item>
+           <v-menu
+              ref="endTimeMenu"
+              v-model="endTimeMenu"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="filters.endTime"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  outlined
+                ></v-text-field>
+              </template>
+              <v-time-picker
+                v-model="filters.endTime"
+                format="24hr"
+                min="7:05"
+                max="21:00"
+                @click:minute="
+                  $refs.startTimeMenu.save(filters.endTime);
+                "
+                @change="$_reloadReports"
+              ></v-time-picker>
+            </v-menu>
+          </v-list-item>
+          <v-divider></v-divider>
+
+          <v-list-item>
+            Report duration
+          </v-list-item>
+          <v-list-item>
+            <v-slider
+              v-model="filters.duration"
+              thumb-label
+              min="-1"
+              max="60"
+              @change="$_reloadReports"
+            ></v-slider>
+          </v-list-item>
+          <v-divider></v-divider>
+
+          <v-list-item>
+            Categories
+          </v-list-item>
+          <v-list-item>
+            <v-autocomplete
+              v-model="filters.categories"
+              :items="categoriesList"
+              item-text="state"
+              item-value="value"
               clearable
-              @click:clear="$_clearCategory"
-              v-bind="attrs"
-              v-on="on"
+              multiple
               outlined
-            ></v-text-field>
-          </template>
-          <template>
-            <v-container style="background-color: white;">
-              <v-treeview
-              @update:active="$_selectCategory"
-              activatable
-              return-object
-              :items="categories"
-            ></v-treeview>
-            </v-container>
-          </template>
-        </v-menu>
+              @change="$_reloadReports"
+            ></v-autocomplete>
+          </v-list-item>
+        </v-list>
+      </v-navigation-drawer>
+
+      <v-container v-if="$store.getters.isAuth">
+        <v-btn
+              @click="filterMenu = !filterMenu"
+            >
+              Filters
+            </v-btn>
+            <br><br>
+      </v-container>
+    
+      <v-container v-if="loading">
+        <v-row>
+          <v-col
+            cols="12"
+            md="4"
+          >
+            <v-skeleton-loader
+              class="mx-auto"
+              width="300"
+              type="card, actions"
+            ></v-skeleton-loader>
+          </v-col>
+          <v-col
+            cols="12"
+            md="4"
+          >
+            <v-skeleton-loader
+              class="mx-auto"
+              width="300"
+              type="card, actions"
+            ></v-skeleton-loader>
+          </v-col>
+          <v-col
+            cols="12"
+            md="4"
+          >
+            <v-skeleton-loader
+              class="mx-auto"
+              width="300"
+              type="card, actions"
+            ></v-skeleton-loader>
+          </v-col>
+        </v-row>
+        
+      </v-container>
+      <v-container v-else>
         <v-row>
           <v-col
             class="report"
@@ -127,7 +263,10 @@ export default {
     btnsLoading: false,
     readMore:[],
     catMenu: false,
-    headerRefreshKey: 0
+    headerRefreshKey: 0,
+    filterMenu:false,
+    endTimeMenu:false,
+    startTimeMenu:false
   }),
   computed: {
     pageInfo() {
@@ -142,21 +281,23 @@ export default {
     prevBtnDisabled() {
       return this.curPage <= 1;
     },
-    categories(){
-      return this.$store.getters.getCategories;
+    categoriesList(){
+      return this.$store.getters.getCategoriesList;
     },
+    filters(){
+      return this.$store.getters.getFilters;
+    }
   },
   mounted() {
     
     if(this.$route.params.favPage){
       this.curPage = this.$route.params.favPage;
-      this.$store.dispatch("setFavoriteReports", {page:this.curPage});
+      this.$store.dispatch("setReports", {page:this.curPage, favorites:true});
     }else{
       this.curPage = this.$route.params.page;
-      this.$store.dispatch("setReports", {page:this.curPage, category: this.$route.params.category});
-      this.$store.dispatch("setCategories");
+      this.$store.dispatch("setReports", {page:this.curPage});
     }
-    
+    this.$store.dispatch("setCategoriesList");
 
     for (let i = 0; i < 15; i++) {
       this.readMore.push(false);
@@ -165,31 +306,22 @@ export default {
   methods: {
     $_nextPage() {
       this.curPage = parseInt(this.curPage) + 1;
-      this.$store.dispatch("setReports", {page:this.curPage});
-      this.$router.push("/reports/" + this.curPage);
+      this.$store.dispatch("setReports", {page:this.curPage, favorites: this.$route.params.favPage ? true : false});
+      this.$router.push(this.$route.params.favPage ? "/account/favorites/reports/" + this.curPage : "/reports/" + this.curPage);
       for (let i = 0; i < 15; i++) {
         this.readMore.push(false);
       }
     },
     $_prevPage() {
       this.curPage = parseInt(this.curPage) - 1;
-      this.$store.dispatch("setReports", {page:this.curPage});
-      this.$router.push("/reports/" + this.curPage);
+      this.$store.dispatch("setReports", {page:this.curPage, favorites: this.$route.params.favPage ? true : false});
+      this.$router.push(this.$route.params.favPage ? "/account/favorites/reports/" + this.curPage : "/reports/" + this.curPage);
       for (let i = 0; i < 15; i++) {
         this.readMore.push(false);
       }
     },
     $_readMore(index){
       this.$set(this.readMore,index,!this.readMore[index]);
-    },
-    $_selectCategory(val){
-      this.catMenu = false;
-      this.$router.push('/reports/1/'+val[0].id);
-      this.$store.dispatch("setReports", {page:this.curPage, category: this.$route.params.category});
-    },
-    $_clearCategory(){
-      this.$router.push('/reports/1');
-      this.$store.dispatch("setReports", {page:this.curPage});
     },
     $_favoriteToggle(report){
       report.favLoading = true;
@@ -215,6 +347,9 @@ export default {
         });
       }
       
+    },
+    $_reloadReports(){
+      this.$store.dispatch("setReports", {page:this.curPage, favorites: this.$route.params.favPage ? true : false});
     }
   },
   components: { AppHeader },
@@ -222,6 +357,7 @@ export default {
 </script>
 
 <style scoped>
+
   .report-card{
     min-height: 276px;
   }
@@ -245,5 +381,16 @@ export default {
   }
   .gray-fav{
     color: gray;
+  }
+
+  .filter-drawer{
+    min-height: 500px;
+  }
+
+  .v-navigation-drawer{
+    position: fixed;
+    padding: 80px 10px 5px 10px;
+    max-width: 250px;
+    width: 250px;
   }
 </style>

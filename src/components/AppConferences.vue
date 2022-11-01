@@ -65,6 +65,7 @@
               </template>
               <v-date-picker
                 v-model="filters.startDate"
+                @change="$_reloadConferences"
               ></v-date-picker>
             </v-menu>
           </v-list-item>
@@ -93,6 +94,7 @@
               </template>
               <v-date-picker
                 v-model="filters.endDate"
+                @change="$_reloadConferences"
               ></v-date-picker>
             </v-menu>
           </v-list-item>
@@ -110,11 +112,21 @@
               clearable
               multiple
               outlined
+              @change="$_reloadConferences"
             ></v-autocomplete>
           </v-list-item>
         </v-list>
       </v-navigation-drawer>
       
+      <v-container v-if="$store.getters.isAuth">
+        <v-btn
+              @click="filterMenu = !filterMenu"
+            >
+              Filters
+            </v-btn>
+            <br><br>
+      </v-container>
+
       <v-container v-if="loading">
         <v-skeleton-loader
           class="mx-auto"
@@ -122,11 +134,6 @@
         ></v-skeleton-loader>
       </v-container>
       <v-container class="container-conferences" v-else>
-        <v-btn
-              @click="filterMenu = !filterMenu"
-            >
-              Filters
-            </v-btn>
         <v-row class="conf-row">
           <v-col>№</v-col>
           <v-col>Title</v-col>
@@ -233,9 +240,6 @@ export default {
     prevBtnDisabled() {
       return this.curPage <= 1;
     },
-    categories(){
-      return this.$store.getters.getCategories;
-    },
     categoriesList(){
       return this.$store.getters.getCategoriesList;
     },
@@ -301,8 +305,8 @@ export default {
 </script>
 
 <style scoped>
+
 .container-conferences {
-  
   overflow-x: auto;
 }
 
@@ -355,9 +359,9 @@ export default {
 
 .v-navigation-drawer{
     position: fixed;
-    padding: 80px 10px 0 10px;
-    max-width: 230px;
-    width: 230px;
+    padding: 80px 10px 5px 10px;
+    max-width: 250px;
+    width: 250px;
   }
 
 

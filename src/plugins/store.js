@@ -75,12 +75,7 @@ export default new Vuex.Store({
   },
   categories:[],
   categoriesList:[],
-  filters:{
-    reportsCount:-1,
-    categories:[],
-    startDate:'',
-    endDate:''
-  },
+  filters:{},
   },
   mutations: {
     //sync
@@ -278,27 +273,21 @@ export default new Vuex.Store({
         state.commit("setReportError", true);
       });
     },
-    async setReports(state, payload = {page: 1, category: false}) {
+    async setReports(state, payload = {page: 1, favorites:false}) {
       state.commit("setLoading", true);
-      if(payload.category){
-        axios.get("/reports/"+payload.page+'/'+payload.category).then((response) => {
+      if(payload.favorites){
+        var data = Object.assign({}, state.getters.getFilters);
+        data.favorites = true;
+        axios.post("/reports/"+payload.page, data).then((response) => {
           state.commit("setReportsPageInfo", response.data);
           state.commit("setLoading", false);
         });
       }else{
-        axios.get("/reports/"+payload.page).then((response) => {
+        axios.post("/reports/"+payload.page, state.getters.getFilters).then((response) => {
           state.commit("setReportsPageInfo", response.data);
           state.commit("setLoading", false);
         });
       }
-      
-    },
-    async setFavoriteReports(state, payload = {page: 1}) {
-      state.commit("setLoading", true);
-      axios.get("/account/favorites/reports/"+payload.page).then((response) => {
-        state.commit("setReportsPageInfo", response.data);
-        state.commit("setLoading", false);
-      });
       
     },
     async setCurrentReportData(state, payload) {
