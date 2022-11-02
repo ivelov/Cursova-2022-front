@@ -218,6 +218,13 @@ export default new Vuex.Store({
     //async
     async setConferences(state, payload = {page:1}) {
       state.commit("setLoading", true);
+      if(!state.getters.isAuth){
+        axios.get("/conferences/"+payload.page).then((response) => {
+          state.commit("setConferencesPageInfo", response.data);
+          state.commit("setLoading", false);
+        });
+        return;
+      }
       axios.post("/conferences/"+payload.page, state.getters.getFilters).then((response) => {
         state.commit("setConferencesPageInfo", response.data);
         state.commit("setLoading", false);
@@ -275,6 +282,13 @@ export default new Vuex.Store({
     },
     async setReports(state, payload = {page: 1, favorites:false}) {
       state.commit("setLoading", true);
+      if(!state.getters.isAuth){
+        axios.get("/reports/"+payload.page).then((response) => {
+          state.commit("setReportsPageInfo", response.data);
+          state.commit("setLoading", false);
+        });
+        return;
+      }
       if(payload.favorites){
         var data = Object.assign({}, state.getters.getFilters);
         data.favorites = true;
