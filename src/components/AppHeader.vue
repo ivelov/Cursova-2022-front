@@ -559,7 +559,5 @@ export default {
 .result:hover {
   background-color: lightgray;
 }
-.search-field-mini{
- /* border: 0.5px solid currentColor;*/
-}
+
 </style>

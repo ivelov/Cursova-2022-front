@@ -2,35 +2,29 @@
   <div>
     <AppHeader :buttons="buttons"></AppHeader>
     <br />
-      <v-main>
-      <v-navigation-drawer  
+    <v-main>
+      <v-navigation-drawer
         class="filter-drawer"
-        v-model="filterMenu" 
+        v-model="filterMenu"
         absolute
         :temporary="false"
       >
+        <v-btn class="filter-close-btn" text @click="filterMenu = !filterMenu">
+          <span>&lt;</span>
+        </v-btn>
         <v-btn
-        class="filter-close-btn"
-        text
-        @click="filterMenu = !filterMenu"
-      >
-        <span>&lt;</span>
-      </v-btn>
-      <v-btn
-        color="primary"
-        @click="
-          $store.commit('clearFilters');
-          $_reloadConferences();
-        "
-      >
-        Reset Filters
-      </v-btn>
-      <br><br>
-      <v-divider></v-divider>
-        <v-list >
-          <v-list-item>
-            Reports count
-          </v-list-item>
+          color="primary"
+          @click="
+            $store.commit('clearFilters');
+            $_reloadConferences();
+          "
+        >
+          Reset Filters
+        </v-btn>
+        <br /><br />
+        <v-divider></v-divider>
+        <v-list>
+          <v-list-item> Reports count </v-list-item>
           <v-list-item>
             <v-slider
               v-model="filters.reportsCount"
@@ -42,11 +36,9 @@
           </v-list-item>
           <v-divider></v-divider>
 
+          <v-list-item> Start date </v-list-item>
           <v-list-item>
-            Start date
-          </v-list-item>
-          <v-list-item>
-           <v-menu
+            <v-menu
               ref="startDateMenu"
               v-model="startDateMenu"
               :close-on-content-click="false"
@@ -71,11 +63,9 @@
           </v-list-item>
           <v-divider></v-divider>
 
+          <v-list-item> End date </v-list-item>
           <v-list-item>
-            End date
-          </v-list-item>
-          <v-list-item>
-           <v-menu
+            <v-menu
               ref="endDateMenu"
               v-model="endDateMenu"
               :close-on-content-click="false"
@@ -100,9 +90,7 @@
           </v-list-item>
           <v-divider></v-divider>
 
-          <v-list-item>
-            Categories
-          </v-list-item>
+          <v-list-item> Categories </v-list-item>
           <v-list-item>
             <v-autocomplete
               v-model="filters.categories"
@@ -117,14 +105,10 @@
           </v-list-item>
         </v-list>
       </v-navigation-drawer>
-      
+
       <v-container v-if="$store.getters.isAuth">
-        <v-btn
-              @click="filterMenu = !filterMenu"
-            >
-              Filters
-            </v-btn>
-            <br><br>
+        <v-btn @click="filterMenu = !filterMenu"> Filters </v-btn>
+        <br /><br />
       </v-container>
 
       <v-container v-if="loading">
@@ -141,13 +125,21 @@
           <v-col></v-col>
           <v-col></v-col>
         </v-row>
-        <v-row class="conf-row" v-for="(conference, index) in pageInfo.conferences" :key="conference.id">
-          <v-col>{{ (index + 1) + (curPage-1) * 15 }}</v-col>
+        <v-row
+          class="conf-row"
+          v-for="(conference, index) in pageInfo.conferences"
+          :key="conference.id"
+        >
+          <v-col>{{ index + 1 + (curPage - 1) * 15 }}</v-col>
           <v-col>{{ conference.title }}</v-col>
           <v-col>{{ conference.date }}</v-col>
           <v-col>
             <v-row class="share-row" v-if="conference.participant">
-              <v-btn class="conf-btn" @click="$_cancelJoin(conference.id)" color="primary">
+              <v-btn
+                class="conf-btn"
+                @click="$_cancelJoin(conference.id)"
+                color="primary"
+              >
                 <span>Cancel join</span>
               </v-btn>
               <ShareNetwork
@@ -182,30 +174,38 @@
             >
               <span>Delete</span>
             </v-btn>
-            <v-btn class="conf-btn" @click="$_joinConf(conference.id)" color="primary" v-if="!conference.participant">
+            <v-btn
+              class="conf-btn"
+              @click="$_joinConf(conference.id)"
+              color="primary"
+              v-if="!conference.participant"
+            >
               <span>Join</span>
             </v-btn>
           </v-col>
           <v-col>
-            <v-btn class="conf-btn" @click="$_details(conference.id)" color="primary">
+            <v-btn
+              class="conf-btn"
+              @click="$_details(conference.id)"
+              color="primary"
+            >
               <span>Details</span>
             </v-btn>
           </v-col>
         </v-row>
         <br />
         <br />
-        
       </v-container>
       <p width="100%" class="text-center">
-          Page {{ curPage }} of {{ pageInfo.maxPage }}
-          <v-btn @click="$_prevPage" text :disabled="prevBtnDisabled">
-            <span>Prev</span>
-          </v-btn>
-          <v-btn @click="$_nextPage" text :disabled="nextBtnDisabled">
-            <span>Next</span>
-          </v-btn>
-        </p>
-        <br />
+        Page {{ curPage }} of {{ pageInfo.maxPage }}
+        <v-btn @click="$_prevPage" text :disabled="prevBtnDisabled">
+          <span>Prev</span>
+        </v-btn>
+        <v-btn @click="$_nextPage" text :disabled="nextBtnDisabled">
+          <span>Next</span>
+        </v-btn>
+      </p>
+      <br />
     </v-main>
   </div>
 </template>
@@ -218,11 +218,11 @@ export default {
   data: () => ({
     curPage: 1,
     btnsLoading: false,
-    catMenu:false,
-    selectedCategory:undefined,
-    filterMenu:false,
-    startDateMenu:false,
-    endDateMenu:false,
+    catMenu: false,
+    selectedCategory: undefined,
+    filterMenu: false,
+    startDateMenu: false,
+    endDateMenu: false,
   }),
   computed: {
     pageInfo() {
@@ -240,12 +240,12 @@ export default {
     prevBtnDisabled() {
       return this.curPage <= 1;
     },
-    categoriesList(){
+    categoriesList() {
       return this.$store.getters.getCategoriesList;
     },
-    filters(){
+    filters() {
       return this.$store.getters.getFilters;
-    }
+    },
   },
   mounted() {
     this.$store.dispatch("setAuth");
@@ -253,7 +253,10 @@ export default {
 
     this.curPage = this.$route.params.page;
 
-    this.$store.dispatch("setConferences", {page:this.curPage, category: this.$route.params.category});
+    this.$store.dispatch("setConferences", {
+      page: this.curPage,
+      category: this.$route.params.category,
+    });
     this.$store.dispatch("setCategoriesList");
   },
   methods: {
@@ -262,19 +265,19 @@ export default {
         this.$store.commit("setLoading", true);
         this.$router.push("/login");
       } else {
-        this.$router.push("/addReport/"+id);
+        this.$router.push("/addReport/" + id);
       }
     },
     $_deleteConf(id) {
       this.$store.commit("setLoading", true);
       this.axios.post("/conferences/delete/" + id).then(() => {
-        this.$store.dispatch("setConferences", {page:this.curPage});
+        this.$store.dispatch("setConferences", { page: this.curPage });
       });
     },
     $_cancelJoin(id) {
       this.$store.commit("setLoading", true);
       this.axios.post("/reports/delete/" + id).then(() => {
-        this.$store.dispatch("setConferences", {page:this.curPage});
+        this.$store.dispatch("setConferences", { page: this.curPage });
       });
     },
     $_details(id) {
@@ -288,16 +291,16 @@ export default {
     },
     $_nextPage() {
       this.curPage = parseInt(this.curPage) + 1;
-      this.$store.dispatch("setConferences", {page:this.curPage});
+      this.$store.dispatch("setConferences", { page: this.curPage });
       this.$router.push("/conferences/" + this.curPage);
     },
     $_prevPage() {
       this.curPage = parseInt(this.curPage) - 1;
-      this.$store.dispatch("setConferences", {page:this.curPage});
+      this.$store.dispatch("setConferences", { page: this.curPage });
       this.$router.push("/conferences/" + this.curPage);
     },
-    $_reloadConferences(){
-      this.$store.dispatch("setConferences", {page:this.curPage});
+    $_reloadConferences() {
+      this.$store.dispatch("setConferences", { page: this.curPage });
     },
   },
   components: { AppHeader },
@@ -305,7 +308,6 @@ export default {
 </script>
 
 <style scoped>
-
 .container-conferences {
   overflow-x: auto;
 }
@@ -316,7 +318,6 @@ export default {
   align-items: center;
 }
 
-
 .row:nth-child(n + 2) {
   margin-top: 16px;
 }
@@ -325,7 +326,7 @@ export default {
   margin-left: 5px;
 }
 
-.conf-btn{
+.conf-btn {
   margin: 2px;
 }
 
@@ -353,16 +354,14 @@ export default {
   max-width: 300px;
 }
 
-.filter-close-btn{
+.filter-close-btn {
   font-size: x-large;
 }
 
-.v-navigation-drawer{
-    position: fixed;
-    padding: 80px 10px 5px 10px;
-    max-width: 250px;
-    width: 250px;
-  }
-
-
+.v-navigation-drawer {
+  position: fixed;
+  padding: 80px 10px 5px 10px;
+  max-width: 250px;
+  width: 250px;
+}
 </style>
