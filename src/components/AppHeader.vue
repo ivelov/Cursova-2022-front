@@ -13,7 +13,65 @@
     >
     </v-app-bar-nav-icon>
     <div v-else>
-      <v-btn
+
+    <v-dialog
+      v-if="$store.getters.isAuth"
+      v-model="search.dialog"
+      width="500"
+    >
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+          icon
+          v-bind="attrs"
+          v-on="on"
+        >
+          <v-icon>mdi-magnify</v-icon>
+        </v-btn>
+      </template>
+      <div class="search-div">
+        <v-text-field
+          v-model="search.text"
+          outlined
+          label="Search"
+          clearable
+        ></v-text-field>
+        <v-card class="search-card">
+          <v-row>
+            <v-col cols="8">
+                <v-text-field v-if="search.loading" color="success" loading disabled></v-text-field>
+                <div v-for="(type, index) in search.results" :key="index">
+                  <p style="font-size:larger">{{type.name}}</p>
+                  <v-list>
+                    <v-list-item
+                     class="result transition-fast-in-fast-out" 
+                     v-for="result in type.content" 
+                     :key="result.id"
+                     @click="$router.push(result.path)"
+                    >
+                      <span
+                        
+                      >{{result.title}}</span>
+                    </v-list-item>
+                  </v-list>
+                </div>
+            </v-col>
+            <v-divider vertical></v-divider>
+            <v-col cols="4">
+              <v-checkbox
+                v-model="search.types.conferences"
+                label="Conferences"
+              ></v-checkbox>
+              <v-checkbox
+                v-model="search.types.reports"
+                label="Reports"
+              ></v-checkbox>
+            </v-col>
+          </v-row>
+        </v-card>
+      </div>
+    </v-dialog>
+  
+    <v-btn
       @click="$router.push('/login')"
       text
       v-if="!$store.getters.isAuth"
@@ -240,10 +298,30 @@ export default {
       logoutDisable: false,
       drawer:false,
       favLoading:true,
-      favCount:0
+      favCount:0,
+      search:{
+        dialog:false,
+        loading:false,
+        text:'',
+        waiting:false,
+        results:[],
+        types:{
+          conferences:true,
+          reports:true,
+        },
+      },
     };
   },
-
+  computed:{
+    searchText(){
+      return this.search.text;
+    }
+  },
+  watch:{
+    searchText(){
+      this.$_search();
+    }
+  },
   props: {
     buttons: Object,
   },
@@ -280,6 +358,52 @@ export default {
       this.$store.commit("clearCurrentConferenceData");
       this.$router.push("/add");
     },
+    $_search(fromWatch = true){
+      if(!this.searchloading){
+        this.search.loading = true;
+        this.search.waiting = false;
+        var loadingCount = 0;
+        this.search.results = [];
+        if(this.search.types.conferences){
+          loadingCount++;
+          console.log(loadingCount);
+          this.axios.post("/conferencesFind", {searchText:this.search.text}).then((response) => {
+            this.search.results.push({
+              name: 'Conferences',
+              content: response.data,
+            });
+            console.log(this.search.results);
+            loadingCount--;
+            if(loadingCount == 0)
+              this.search.loading = false;
+          });
+        }
+        if(this.search.types.reports){
+          loadingCount++;
+          console.log(loadingCount);
+          this.axios.post("/reportsFind", {searchText:this.search.text}).then((response) => {
+            this.search.results.push({
+              name: 'Reports',
+              content: response.data,
+            });
+            loadingCount--;
+            if(loadingCount == 0)
+              this.search.loading = false;
+          });
+        }
+        
+      }else{
+        if(fromWatch){
+          if(!this.search.waiting){
+            this.search.waiting = true;
+            console.log('from watch');
+            setTimeout(() => {this.$_search(false)}, 100);  
+          }
+        }else{
+          setTimeout(() => {this.$_search(false)}, 100);
+        }
+      }
+    }
   },
 };
 </script>
@@ -319,5 +443,18 @@ export default {
     width: min-content;
     max-width: 27px;
     height: 15px;
+  }
+
+  .search-div{
+    background-color: white;
+    padding: 10px;
+  }
+  .search-card{
+    padding: 10px;
+    min-height: 50px;
+  }
+
+  .result:hover{
+    background-color: lightgray;
   }
 </style>
