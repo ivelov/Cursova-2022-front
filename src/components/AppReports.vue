@@ -244,6 +244,7 @@ export default {
     filterMenu: false,
     endTimeMenu: false,
     startTimeMenu: false,
+    queueFull:false,
   }),
   computed: {
     pageInfo() {
@@ -335,11 +336,25 @@ export default {
         });
       }
     },
-    $_reloadReports() {
-      this.$store.dispatch("setReports", {
-        page: this.curPage,
-        favorites: this.$route.params.favPage ? true : false,
-      });
+    $_reloadReports(fromOutside = true) {
+      if(!this.loading){
+        this.queueFull = false;
+        this.$store.dispatch("setReports", {
+          page: this.curPage,
+          favorites: this.$route.params.favPage ? true : false,
+        });
+      }else{
+        if(!fromOutside){
+          setTimeout(() => {
+              this.$_reloadReports(false);
+            }, 100);
+        }else{
+          if(!this.queueFull){
+            this.queueFull = true;
+            this.$_reloadReports(false);
+          }
+        }
+      }
     },
   },
   components: { AppHeader },

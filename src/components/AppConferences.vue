@@ -223,6 +223,7 @@ export default {
     filterMenu: false,
     startDateMenu: false,
     endDateMenu: false,
+    queueFull:false,
   }),
   computed: {
     pageInfo() {
@@ -299,8 +300,22 @@ export default {
       this.$store.dispatch("setConferences", { page: this.curPage });
       this.$router.push("/conferences/" + this.curPage);
     },
-    $_reloadConferences() {
-      this.$store.dispatch("setConferences", { page: this.curPage });
+    $_reloadConferences(fromOutside = true) {
+      if(!this.loading){
+        this.queueFull = false;
+        this.$store.dispatch("setConferences", { page: this.curPage });
+      }else{
+        if(!fromOutside){
+          setTimeout(() => {
+              this.$_reloadConferences(false);
+            }, 100);
+        }else{
+          if(!this.queueFull){
+            this.queueFull = true;
+            this.$_reloadConferences(false);
+          }
+        }
+      }
     },
   },
   components: { AppHeader },
