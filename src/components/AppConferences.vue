@@ -253,10 +253,8 @@ export default {
     this.$store.dispatch("setAddPerk");
 
     this.curPage = this.$route.params.page;
-
     this.$store.dispatch("setConferences", {
       page: this.curPage,
-      category: this.$route.params.category,
     });
     this.$store.dispatch("setCategoriesList");
   },

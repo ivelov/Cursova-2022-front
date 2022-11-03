@@ -29,10 +29,6 @@ export default new VueRouter({
       component: AppConferences,
     },
     {
-      path: "/conferences/:page/:category",
-      component: AppConferences,
-    },
-    {
       path: "/login",
       component: AppLogin,
       meta:{

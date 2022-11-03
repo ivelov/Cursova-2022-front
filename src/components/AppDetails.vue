@@ -14,7 +14,18 @@
             :items="conferenceData.breadcrumbs"
             divider="/"
             large
-          ></v-breadcrumbs>
+          >
+          <template v-slot:item="{ item }">
+            <v-breadcrumbs-item
+              style="color:blue;cursor: pointer;"
+              @click="
+              $_breadcrumbClick(item.categoryId);          
+              "
+            >
+             {{item.text}}
+            </v-breadcrumbs-item>
+          </template>
+          </v-breadcrumbs>
           </v-row>
           <br><br>
           <v-row>
@@ -229,6 +240,10 @@ export default {
           this.$router.push("/");
         });
     },
+    $_breadcrumbClick(categoryId){
+      this.$store.commit('setFilters', {categories:[categoryId]});
+      this.$router.push('/conferences/1');    
+    }
   },
   components: { AppHeader },
 };
