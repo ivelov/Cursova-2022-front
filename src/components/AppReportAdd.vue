@@ -204,8 +204,12 @@ export default {
       var allowedHoursArr = [];
 
       var confStartHour =  parseInt(this.currentReportData.confStartTime.substring(0,2));
+      var confStartMinute =  parseInt(this.currentReportData.confStartTime.substring(3,5));
       for (let i = confStartHour; i < 21; i++) {
         var freeTime = 60;
+        if(i == confStartHour){
+          freeTime -= confStartMinute;
+        }
         for (let j = 0; j < this.currentReportData.busyStartTimes.length; j++) {
           var startHour = parseInt(this.currentReportData.busyStartTimes[j].substring(0,2));
           var endHour = parseInt(this.currentReportData.busyEndTimes[j].substring(0,2));
