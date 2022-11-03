@@ -255,7 +255,9 @@
             label="Search"
             v-bind="attrs"
             v-on="on"
-            outlined
+            background-color="transparent"
+            solo
+            flat
             clearable
             hide-details
           ></v-text-field>
@@ -544,7 +546,9 @@ export default {
 .search-field {
   width: 400px;
 }
-
+.search-field-mini{
+  border: 1px solid black;
+}
 .search-field-row {
   align-items: center;
 }

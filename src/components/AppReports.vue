@@ -115,7 +115,7 @@
       </v-navigation-drawer>
 
       <v-container v-if="$store.getters.isAuth">
-        <v-btn @click="filterMenu = !filterMenu"> Filters </v-btn>
+        <v-btn @click="filterMenu = !filterMenu"><v-icon>mdi-filter-outline</v-icon> Filters </v-btn>
         <br /><br />
       </v-container>
 
