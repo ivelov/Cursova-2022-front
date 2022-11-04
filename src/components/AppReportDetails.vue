@@ -140,7 +140,7 @@ export default {
   methods: {
     $_cancelPart(){
       this.btnsLoading = true;
-      this.axios.post("/reports/delete/" + this.currentReportData.report.conferenceId).then(() => {
+      this.axios.post("/reports/delete/" + this.currentReportData.report.conferenceId, {reportId: this.$route.params.repId}).then(() => {
         this.$router.push('/reports/1');
       });
     },

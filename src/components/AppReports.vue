@@ -267,6 +267,7 @@ export default {
     },
   },
   mounted() {
+    this.$store.dispatch("setAuth");
     if (this.$route.params.favPage) {
       this.curPage = this.$route.params.favPage;
       this.$store.dispatch("setReports", {
