@@ -221,16 +221,39 @@ export default {
   methods: {
     $_cancelJoin() {
       this.btnsLoading = true;
-      this.axios.post("/reports/delete/" + this.$route.params.id).then(() => {
-        this.$store.dispatch("setCurrentConferenceData", {
-          id: this.$route.params.id,
-          hard: true,
+      if(this.conferenceData.isListener){
+        this.axios.post("/conference/" + this.$route.params.id + '/cancelJoin').then((response) => {
+          if(response.data == 0) console.error('0 participants deleted');
+          
+          this.$store.dispatch("setCurrentConferenceData", {
+              id: this.$route.params.id,
+              hard: true,
+          });
+          this.btnsLoading = false;
         });
-        this.btnsLoading = false;
-      });
+      }else{
+        this.axios.post("/reports/delete/" + this.$route.params.id).then(() => {
+          this.$store.dispatch("setCurrentConferenceData", {
+              id: this.$route.params.id,
+              hard: true,
+          });
+          this.btnsLoading = false;
+        });
+      }
     },
     $_joinConf() {
-      this.$router.push("/addReport/" + this.$route.params.id);
+      if(this.conferenceData.isListener){
+        this.btnsLoading = true;
+        this.axios.post("/conference/"+this.$route.params.id+'/join').then(() => {
+          this.$store.dispatch("setCurrentConferenceData", {
+              id: this.$route.params.id,
+              hard: true,
+          });
+          this.btnsLoading = false;
+        });
+      }else{
+        this.$router.push("/addReport/" + this.$route.params.id);
+      }
     },
     $_deleteConf() {
       this.btnsLoading = true;

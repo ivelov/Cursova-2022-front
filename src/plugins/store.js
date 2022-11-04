@@ -247,6 +247,7 @@ export default new Vuex.Store({
         
       }).catch(()=>{
         state.commit("setAuth", false);
+        state.commit("clearAuthData");
       });
     },
     async setAddPerk(state) {
