@@ -14,7 +14,18 @@
             :items="conferenceData.breadcrumbs"
             divider="/"
             large
-          ></v-breadcrumbs>
+          >
+          <template v-slot:item="{ item }">
+            <v-breadcrumbs-item
+              style="color:blue;cursor: pointer;"
+              @click="
+              $_breadcrumbClick(item.categoryId);          
+              "
+            >
+             {{item.text}}
+            </v-breadcrumbs-item>
+          </template>
+          </v-breadcrumbs>
           </v-row>
           <br><br>
           <v-row>
@@ -210,16 +221,39 @@ export default {
   methods: {
     $_cancelJoin() {
       this.btnsLoading = true;
-      this.axios.post("/reports/delete/" + this.$route.params.id).then(() => {
-        this.$store.dispatch("setCurrentConferenceData", {
-          id: this.$route.params.id,
-          hard: true,
+      if(this.conferenceData.isListener){
+        this.axios.post("/conference/" + this.$route.params.id + '/cancelJoin').then((response) => {
+          if(response.data == 0) console.error('0 participants deleted');
+          
+          this.$store.dispatch("setCurrentConferenceData", {
+              id: this.$route.params.id,
+              hard: true,
+          });
+          this.btnsLoading = false;
         });
-        this.btnsLoading = false;
-      });
+      }else{
+        this.axios.post("/reports/delete/" + this.$route.params.id).then(() => {
+          this.$store.dispatch("setCurrentConferenceData", {
+              id: this.$route.params.id,
+              hard: true,
+          });
+          this.btnsLoading = false;
+        });
+      }
     },
     $_joinConf() {
-      this.$router.push("/addReport/" + this.$route.params.id);
+      if(this.conferenceData.isListener){
+        this.btnsLoading = true;
+        this.axios.post("/conference/"+this.$route.params.id+'/join').then(() => {
+          this.$store.dispatch("setCurrentConferenceData", {
+              id: this.$route.params.id,
+              hard: true,
+          });
+          this.btnsLoading = false;
+        });
+      }else{
+        this.$router.push("/addReport/" + this.$route.params.id);
+      }
     },
     $_deleteConf() {
       this.btnsLoading = true;
@@ -229,6 +263,10 @@ export default {
           this.$router.push("/");
         });
     },
+    $_breadcrumbClick(categoryId){
+      this.$store.commit('setFilters', {categories:[categoryId]});
+      this.$router.push('/conferences/1');    
+    }
   },
   components: { AppHeader },
 };

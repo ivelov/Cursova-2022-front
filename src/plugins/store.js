@@ -74,6 +74,8 @@ export default new Vuex.Store({
     loading:false
   },
   categories:[],
+  categoriesList:[],
+  filters:{},
   },
   mutations: {
     //sync
@@ -205,23 +207,31 @@ export default new Vuex.Store({
     setCategories(state, categories){
       state.categories = categories;
     },
+    setCategoriesList(state, categoriesList){
+      state.categoriesList = categoriesList;
+    },
+    clearFilters(state){
+      state.filters = {};
+    },
+    setFilters(state, filters){
+      state.filters = filters;
+    },
   },
   actions: {
     //async
     async setConferences(state, payload = {page:1}) {
       state.commit("setLoading", true);
-      if(payload.category !== undefined){
-        axios.get("/conferences/"+payload.page+'/'+payload.category).then((response) => {
-          state.commit("setConferencesPageInfo", response.data);
-          state.commit("setLoading", false);
-        });
-      }else{
+      if(!state.getters.isAuth){
         axios.get("/conferences/"+payload.page).then((response) => {
           state.commit("setConferencesPageInfo", response.data);
           state.commit("setLoading", false);
         });
+        return;
       }
-      
+      axios.post("/conferences/"+payload.page, state.getters.getFilters).then((response) => {
+        state.commit("setConferencesPageInfo", response.data);
+        state.commit("setLoading", false);
+      });
     },
     async setAuth(state) {
       axios.get("/isAuth",{},{
@@ -237,6 +247,7 @@ export default new Vuex.Store({
         
       }).catch(()=>{
         state.commit("setAuth", false);
+        state.commit("clearAuthData");
       });
     },
     async setAddPerk(state) {
@@ -256,7 +267,6 @@ export default new Vuex.Store({
       }
       state.commit("setLoading", true);
       axios.get("/conference/" + payload.id).then((response) => {
-        console.log(response.data);
         state.commit("setCurrentConferenceData", response.data);
         state.commit("setLoading", false);
       });
@@ -273,27 +283,28 @@ export default new Vuex.Store({
         state.commit("setReportError", true);
       });
     },
-    async setReports(state, payload = {page: 1, category: false}) {
+    async setReports(state, payload = {page: 1, favorites:false}) {
       state.commit("setLoading", true);
-      if(payload.category){
-        axios.get("/reports/"+payload.page+'/'+payload.category).then((response) => {
-          state.commit("setReportsPageInfo", response.data);
-          state.commit("setLoading", false);
-        });
-      }else{
+      if(!state.getters.isAuth){
         axios.get("/reports/"+payload.page).then((response) => {
           state.commit("setReportsPageInfo", response.data);
           state.commit("setLoading", false);
         });
+        return;
       }
-      
-    },
-    async setFavoriteReports(state, payload = {page: 1}) {
-      state.commit("setLoading", true);
-      axios.get("/account/favorites/reports/"+payload.page).then((response) => {
-        state.commit("setReportsPageInfo", response.data);
-        state.commit("setLoading", false);
-      });
+      if(payload.favorites){
+        var data = Object.assign({}, state.getters.getFilters);
+        data.favorites = true;
+        axios.post("/reports/"+payload.page, data).then((response) => {
+          state.commit("setReportsPageInfo", response.data);
+          state.commit("setLoading", false);
+        });
+      }else{
+        axios.post("/reports/"+payload.page, state.getters.getFilters).then((response) => {
+          state.commit("setReportsPageInfo", response.data);
+          state.commit("setLoading", false);
+        });
+      }
       
     },
     async setCurrentReportData(state, payload) {
@@ -361,6 +372,11 @@ export default new Vuex.Store({
       }
       
     },
+    async setCategoriesList(state) {
+      axios.get("/categoriesList").then((response) => {
+        state.commit("setCategoriesList", response.data);
+      });
+    },
     
   },
   getters: {
@@ -399,6 +415,12 @@ export default new Vuex.Store({
     },
     getCategories(state) {
       return state.categories;
+    },
+    getCategoriesList(state) {
+      return state.categoriesList;
+    },
+    getFilters(state) {
+      return state.filters;
     },
   },
 });

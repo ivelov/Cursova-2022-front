@@ -296,4 +296,7 @@ export default {
   margin-right: 5px;
   margin-bottom: 5px;
 }
+.v-treeview{
+  background-color: white;
+}
 </style>

@@ -14,7 +14,18 @@
               :items="currentReportData.breadcrumbs"
               divider="/"
               large
-            ></v-breadcrumbs>
+            >
+            <template v-slot:item="{ item }">
+              <v-breadcrumbs-item
+                style="color:blue;cursor: pointer;"
+                @click="
+                $_breadcrumbClick(item.categoryId);          
+                "
+              >
+              {{item.text}}
+              </v-breadcrumbs-item>
+            </template>
+            </v-breadcrumbs>
           </v-row><br>
           <v-btn
             class="btn"
@@ -132,6 +143,10 @@ export default {
       this.axios.post("/reports/delete/" + this.currentReportData.report.conferenceId).then(() => {
         this.$router.push('/reports/1');
       });
+    },
+    $_breadcrumbClick(categoryId){
+      this.$store.commit('setFilters', {categories:[categoryId]});
+      this.$router.push('/reports/1');    
     }
   },
   components: { AppHeader, AppComments },

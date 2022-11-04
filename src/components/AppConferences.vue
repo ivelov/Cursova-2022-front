@@ -3,43 +3,121 @@
     <AppHeader :buttons="buttons"></AppHeader>
     <br />
     <v-main>
+      <v-navigation-drawer
+        class="filter-drawer"
+        v-model="filterMenu"
+        absolute
+        :temporary="false"
+      >
+        <v-btn class="filter-close-btn" text @click="filterMenu = !filterMenu">
+          <span>&lt;</span>
+        </v-btn>
+        <v-btn
+          color="primary"
+          @click="
+            $store.commit('clearFilters');
+            $_reloadConferences();
+          "
+        >
+          Reset Filters
+        </v-btn>
+        <br /><br />
+        <v-divider></v-divider>
+        <v-list>
+          <v-list-item> Reports count </v-list-item>
+          <v-list-item>
+            <v-slider
+              v-model="filters.reportsCount"
+              thumb-label
+              min="-1"
+              max="100"
+              @change="$_reloadConferences"
+            ></v-slider>
+          </v-list-item>
+          <v-divider></v-divider>
+
+          <v-list-item> Start date </v-list-item>
+          <v-list-item>
+            <v-menu
+              ref="startDateMenu"
+              v-model="startDateMenu"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="filters.startDate"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  outlined
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="filters.startDate"
+                @change="$_reloadConferences"
+              ></v-date-picker>
+            </v-menu>
+          </v-list-item>
+          <v-divider></v-divider>
+
+          <v-list-item> End date </v-list-item>
+          <v-list-item>
+            <v-menu
+              ref="endDateMenu"
+              v-model="endDateMenu"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="filters.endDate"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  outlined
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="filters.endDate"
+                @change="$_reloadConferences"
+              ></v-date-picker>
+            </v-menu>
+          </v-list-item>
+          <v-divider></v-divider>
+
+          <v-list-item> Categories </v-list-item>
+          <v-list-item>
+            <v-autocomplete
+              v-model="filters.categories"
+              :items="categoriesList"
+              item-text="state"
+              item-value="value"
+              clearable
+              multiple
+              outlined
+              @change="$_reloadConferences"
+            ></v-autocomplete>
+          </v-list-item>
+        </v-list>
+      </v-navigation-drawer>
+
+      <v-container v-if="$store.getters.isAuth">
+        <v-btn @click="filterMenu = !filterMenu"><v-icon>mdi-filter-outline</v-icon> Filters </v-btn>
+        <br /><br />
+      </v-container>
+
       <v-container v-if="loading">
-        <v-text-field color="success" loading disabled></v-text-field>
+        <v-skeleton-loader
+          class="mx-auto"
+          type="table-thead, table-tbody"
+        ></v-skeleton-loader>
       </v-container>
       <v-container class="container-conferences" v-else>
-        <v-menu
-          ref="catMenu"
-          v-model="catMenu"
-          :close-on-content-click="false"
-          transition="scale-transition"
-          offset-x
-          min-width="200"
-          min-height="50"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-text-field
-              class="category-field"
-              label="Select category"
-              :value="pageInfo.categoryName"
-              readonly
-              clearable
-              @click:clear="$_clearCategory"
-              v-bind="attrs"
-              v-on="on"
-              outlined
-            ></v-text-field>
-          </template>
-          <template>
-            <v-container style="background-color: white;">
-              <v-treeview
-              @update:active="$_selectCategory"
-              activatable
-              return-object
-              :items="categories"
-            ></v-treeview>
-            </v-container>
-          </template>
-        </v-menu>
         <v-row class="conf-row">
           <v-col>№</v-col>
           <v-col>Title</v-col>
@@ -47,13 +125,23 @@
           <v-col></v-col>
           <v-col></v-col>
         </v-row>
-        <v-row class="conf-row" v-for="(conference, index) in pageInfo.conferences" :key="conference.id">
-          <v-col>{{ (index + 1) + (curPage-1) * 15 }}</v-col>
+        <v-row
+          class="conf-row"
+          v-for="(conference, index) in pageInfo.conferences"
+          :key="conference.id"
+        >
+          <v-col>{{ index + 1 + (curPage - 1) * 15 }}</v-col>
           <v-col>{{ conference.title }}</v-col>
           <v-col>{{ conference.date }}</v-col>
           <v-col>
             <v-row class="share-row" v-if="conference.participant">
-              <v-btn class="conf-btn" @click="$_cancelJoin(conference.id)" color="primary">
+              <v-btn
+                class="conf-btn"
+                :disabled="btnsLoading"
+                :loading="btnsLoading"
+                @click="$_cancelJoin(conference.id)"
+                color="primary"
+              >
                 <span>Cancel join</span>
               </v-btn>
               <ShareNetwork
@@ -82,36 +170,48 @@
 
             <v-btn
               class="conf-btn"
+              :disabled="btnsLoading"
+              :loading="btnsLoading"
               @click="$_deleteConf(conference.id)"
               color="error"
               v-else-if="conference.canEdit"
             >
               <span>Delete</span>
             </v-btn>
-            <v-btn class="conf-btn" @click="$_joinConf(conference.id)" color="primary" v-if="!conference.participant">
+            <v-btn
+              class="conf-btn"
+              :disabled="btnsLoading"
+              :loading="btnsLoading"
+              @click="$_joinConf(conference.id)"
+              color="primary"
+              v-if="!conference.participant"
+            >
               <span>Join</span>
             </v-btn>
           </v-col>
           <v-col>
-            <v-btn class="conf-btn" @click="$_details(conference.id)" color="primary">
+            <v-btn
+              class="conf-btn"
+              @click="$_details(conference.id)"
+              color="primary"
+            >
               <span>Details</span>
             </v-btn>
           </v-col>
         </v-row>
         <br />
         <br />
-        
       </v-container>
       <p width="100%" class="text-center">
-          Page {{ curPage }} of {{ pageInfo.maxPage }}
-          <v-btn @click="$_prevPage" text :disabled="prevBtnDisabled">
-            <span>Prev</span>
-          </v-btn>
-          <v-btn @click="$_nextPage" text :disabled="nextBtnDisabled">
-            <span>Next</span>
-          </v-btn>
-        </p>
-        <br />
+        Page {{ curPage }} of {{ pageInfo.maxPage }}
+        <v-btn @click="$_prevPage" text :disabled="prevBtnDisabled">
+          <span>Prev</span>
+        </v-btn>
+        <v-btn @click="$_nextPage" text :disabled="nextBtnDisabled">
+          <span>Next</span>
+        </v-btn>
+      </p>
+      <br />
     </v-main>
   </div>
 </template>
@@ -124,8 +224,12 @@ export default {
   data: () => ({
     curPage: 1,
     btnsLoading: false,
-    catMenu:false,
-    selectedCategory:undefined
+    catMenu: false,
+    selectedCategory: undefined,
+    filterMenu: false,
+    startDateMenu: false,
+    endDateMenu: false,
+    queueFull:false,
   }),
   computed: {
     pageInfo() {
@@ -143,8 +247,11 @@ export default {
     prevBtnDisabled() {
       return this.curPage <= 1;
     },
-    categories(){
-      return this.$store.getters.getCategories;
+    categoriesList() {
+      return this.$store.getters.getCategoriesList;
+    },
+    filters() {
+      return this.$store.getters.getFilters;
     },
   },
   mounted() {
@@ -152,9 +259,10 @@ export default {
     this.$store.dispatch("setAddPerk");
 
     this.curPage = this.$route.params.page;
-
-    this.$store.dispatch("setConferences", {page:this.curPage, category: this.$route.params.category});
-    this.$store.dispatch("setCategories");
+    this.$store.dispatch("setConferences", {
+      page: this.curPage,
+    });
+    this.$store.dispatch("setCategoriesList");
   },
   methods: {
     $_joinConf(id) {
@@ -162,20 +270,35 @@ export default {
         this.$store.commit("setLoading", true);
         this.$router.push("/login");
       } else {
-        this.$router.push("/addReport/"+id);
+        if(this.pageInfo.isListener){
+          this.btnsLoading = true;
+          this.axios.post("/conference/"+id+'/join').then(() => {
+            this.btnsLoading = false;
+            this.$_reloadConferences();
+          });
+        }else{
+          this.$router.push("/addReport/" + id);
+        }
       }
     },
     $_deleteConf(id) {
       this.$store.commit("setLoading", true);
       this.axios.post("/conferences/delete/" + id).then(() => {
-        this.$store.dispatch("setConferences", {page:this.curPage});
+        this.$store.dispatch("setConferences", { page: this.curPage });
       });
     },
     $_cancelJoin(id) {
-      this.$store.commit("setLoading", true);
-      this.axios.post("/reports/delete/" + id).then(() => {
-        this.$store.dispatch("setConferences", {page:this.curPage});
-      });
+      if(this.pageInfo.isListener){
+        this.$store.commit("setLoading", true);
+        this.axios.post("/conference/" + id + '/cancelJoin').then(() => {
+          this.$store.dispatch("setConferences", { page: this.curPage });
+        });
+      }else{
+        this.$store.commit("setLoading", true);
+        this.axios.post("/reports/delete/" + id).then(() => {
+          this.$store.dispatch("setConferences", { page: this.curPage });
+        });
+      }
     },
     $_details(id) {
       if (!this.$store.getters.isAuth) {
@@ -188,23 +311,31 @@ export default {
     },
     $_nextPage() {
       this.curPage = parseInt(this.curPage) + 1;
-      this.$store.dispatch("setConferences", {page:this.curPage});
+      this.$store.dispatch("setConferences", { page: this.curPage });
       this.$router.push("/conferences/" + this.curPage);
     },
     $_prevPage() {
       this.curPage = parseInt(this.curPage) - 1;
-      this.$store.dispatch("setConferences", {page:this.curPage});
+      this.$store.dispatch("setConferences", { page: this.curPage });
       this.$router.push("/conferences/" + this.curPage);
     },
-    $_selectCategory(val){
-      this.catMenu = false;
-      this.$router.push('/conferences/1/'+val[0].id);
-      this.$store.dispatch("setConferences", {page:this.curPage, category: this.$route.params.category});
+    $_reloadConferences(fromOutside = true) {
+      if(!this.loading){
+        this.queueFull = false;
+        this.$store.dispatch("setConferences", { page: this.curPage });
+      }else{
+        if(!fromOutside){
+          setTimeout(() => {
+              this.$_reloadConferences(false);
+            }, 100);
+        }else{
+          if(!this.queueFull){
+            this.queueFull = true;
+            this.$_reloadConferences(false);
+          }
+        }
+      }
     },
-    $_clearCategory(){
-      this.$router.push('/conferences/1');
-      this.$store.dispatch("setConferences", {page:this.curPage});
-    }
   },
   components: { AppHeader },
 };
@@ -212,7 +343,6 @@ export default {
 
 <style scoped>
 .container-conferences {
-  
   overflow-x: auto;
 }
 
@@ -222,7 +352,6 @@ export default {
   align-items: center;
 }
 
-
 .row:nth-child(n + 2) {
   margin-top: 16px;
 }
@@ -231,7 +360,7 @@ export default {
   margin-left: 5px;
 }
 
-.conf-btn{
+.conf-btn {
   margin: 2px;
 }
 
@@ -257,5 +386,16 @@ export default {
 
 .category-field {
   max-width: 300px;
+}
+
+.filter-close-btn {
+  font-size: x-large;
+}
+
+.v-navigation-drawer {
+  position: fixed;
+  padding: 80px 10px 5px 10px;
+  max-width: 250px;
+  width: 250px;
 }
 </style>
