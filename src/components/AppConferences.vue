@@ -137,6 +137,8 @@
             <v-row class="share-row" v-if="conference.participant">
               <v-btn
                 class="conf-btn"
+                :disabled="btnsLoading"
+                :loading="btnsLoading"
                 @click="$_cancelJoin(conference.id)"
                 color="primary"
               >
@@ -168,6 +170,8 @@
 
             <v-btn
               class="conf-btn"
+              :disabled="btnsLoading"
+              :loading="btnsLoading"
               @click="$_deleteConf(conference.id)"
               color="error"
               v-else-if="conference.canEdit"
@@ -176,6 +180,8 @@
             </v-btn>
             <v-btn
               class="conf-btn"
+              :disabled="btnsLoading"
+              :loading="btnsLoading"
               @click="$_joinConf(conference.id)"
               color="primary"
               v-if="!conference.participant"
@@ -264,7 +270,15 @@ export default {
         this.$store.commit("setLoading", true);
         this.$router.push("/login");
       } else {
-        this.$router.push("/addReport/" + id);
+        if(this.pageInfo.isListener){
+          this.btnsLoading = true;
+          this.axios.post("/conference/"+id+'/join').then(() => {
+            this.btnsLoading = false;
+            this.$_reloadConferences();
+          });
+        }else{
+          this.$router.push("/addReport/" + id);
+        }
       }
     },
     $_deleteConf(id) {
@@ -274,10 +288,17 @@ export default {
       });
     },
     $_cancelJoin(id) {
-      this.$store.commit("setLoading", true);
-      this.axios.post("/reports/delete/" + id).then(() => {
-        this.$store.dispatch("setConferences", { page: this.curPage });
-      });
+      if(this.pageInfo.isListener){
+        this.$store.commit("setLoading", true);
+        this.axios.post("/conference/" + id + '/cancelJoin').then(() => {
+          this.$store.dispatch("setConferences", { page: this.curPage });
+        });
+      }else{
+        this.$store.commit("setLoading", true);
+        this.axios.post("/reports/delete/" + id).then(() => {
+          this.$store.dispatch("setConferences", { page: this.curPage });
+        });
+      }
     },
     $_details(id) {
       if (!this.$store.getters.isAuth) {
