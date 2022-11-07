@@ -218,6 +218,8 @@
 
 <script>
 import AppHeader from "./AppHeader.vue";
+import Pusher from "pusher-js";
+
 
 export default {
   name: "AppConferences",
@@ -230,6 +232,7 @@ export default {
     startDateMenu: false,
     endDateMenu: false,
     queueFull:false,
+    broadcastMessage:''
   }),
   computed: {
     pageInfo() {
@@ -263,6 +266,17 @@ export default {
       page: this.curPage,
     });
     this.$store.dispatch("setCategoriesList");
+    
+    Pusher.logToConsole = false;
+    var pusher = new Pusher('4906f8eefb961b37dc0e', {
+      cluster: 'eu'
+    });
+
+    var channel = pusher.subscribe('my-channel');
+    channel.bind('ExportEvent', function(data) {
+      //app.messages.push(JSON.stringify(data));
+      console.log(data);
+    });
   },
   methods: {
     $_joinConf(id) {

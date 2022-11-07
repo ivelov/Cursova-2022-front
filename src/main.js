@@ -9,8 +9,49 @@ import VueSocialSharing from 'vue-social-sharing'
 import * as VueGoogleMaps from 'vue2-google-maps';
 import wysiwyg from "vue-wysiwyg";
 import VueCookies from 'vue-cookies'
+import Pusher from "pusher-js";
+import Echo from "laravel-echo";
 
+Pusher.logToConsole = true;
 
+    var pusher = new Pusher('4906f8eefb961b37dc0e', {
+      cluster: 'eu'
+    });
+
+    var channel = pusher.subscribe('my-channel');
+    channel.bind('ExportEvent', function(data) {
+      //app.messages.push(JSON.stringify(data));
+      console.log(data);
+    });
+
+window.Echo = new Echo({
+  broadcaster: 'pusher',
+  key: '4906f8eefb961b37dc0e',
+  cluster: 'eu',
+  encrypted: true,
+  host: "127.0.0.1:8000",
+});
+
+/*import Echo from "laravel-echo"
+
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: 'xxxxxxxxxxxxxxxxxxxx',
+    cluster: 'eu',
+    encrypted: true
+});*/
+/*
+Pusher.logToConsole = true;
+
+    var pusher = new Pusher('4906f8eefb961b37dc0e', {
+      cluster: 'eu'
+    });
+
+    var channel = pusher.subscribe('my-channel');
+    channel.bind('my-event', function(data) {
+      app.messages.push(JSON.stringify(data));
+    });
+*/
 axios.defaults.baseURL='/V1';
 //axios.defaults.baseURL='http://ivelov-vm-api.groupbwt.com';
 axios.defaults.headers.common = {
