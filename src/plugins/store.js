@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
 import VueCookies from 'vue-cookies'
+import Pusher from "pusher-js";
 
 Vue.use(Vuex);
 
@@ -76,6 +77,9 @@ export default new Vuex.Store({
   categories:[],
   categoriesList:[],
   filters:{},
+  pusher:undefined,
+  channel:undefined,
+  channelLoading: false,
   },
   mutations: {
     //sync
@@ -215,6 +219,21 @@ export default new Vuex.Store({
     },
     setFilters(state, filters){
       state.filters = filters;
+    },
+    initializePusher(state) {
+      if(!state.pusher){
+        this.pusher = new Pusher('4906f8eefb961b37dc0e', {
+          cluster: 'eu'
+        });
+        this.channel = this.pusher.subscribe('my-channel');
+        this.channel.bind('ExportEvent', (v)=>{
+          console.log(v);
+          this.commit('setChannelLoading', false);
+        });
+      }
+    },
+    setChannelLoading(state, loading){
+      state.channelLoading = loading;
     },
   },
   actions: {
@@ -377,7 +396,6 @@ export default new Vuex.Store({
         state.commit("setCategoriesList", response.data);
       });
     },
-    
   },
   getters: {
     getCountries(state) {
@@ -421,6 +439,15 @@ export default new Vuex.Store({
     },
     getFilters(state) {
       return state.filters;
+    },
+    getPusher(state) {
+      return state.pusher;
+    },
+    getChannel(state) {
+      return state.channel;
+    },
+    getChannelLoading(state) {
+      return state.channelLoading;
     },
   },
 });

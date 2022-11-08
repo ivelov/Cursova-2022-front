@@ -119,7 +119,11 @@
       </v-container>
       <v-container class="container-conferences" v-else>
 
-        <v-btn  @click="$_testClick">
+        <v-btn  
+          @click="$_testClick" 
+          :disabled="channelLoading"
+          :loading="channelLoading"
+        >
           <span>Test</span>
         </v-btn>
         <v-row class="conf-row">
@@ -222,7 +226,6 @@
 
 <script>
 import AppHeader from "./AppHeader.vue";
-import Pusher from "pusher-js";
 
 
 export default {
@@ -236,7 +239,6 @@ export default {
     startDateMenu: false,
     endDateMenu: false,
     queueFull:false,
-    broadcastMessage:''
   }),
   computed: {
     pageInfo() {
@@ -260,6 +262,9 @@ export default {
     filters() {
       return this.$store.getters.getFilters;
     },
+    channelLoading() {
+      return this.$store.getters.getChannelLoading;
+    },
   },
   mounted() {
     this.$store.dispatch("setAuth");
@@ -270,24 +275,7 @@ export default {
       page: this.curPage,
     });
     this.$store.dispatch("setCategoriesList");
-    
-    Pusher.logToConsole = true;
-
-    /*window.Echo.channel('my-channel').listen('ExportEvent', (e) => {
-      console.log(e);
-      console.log('yes');
-    });*/
-    
-    var pusher = new Pusher('4906f8eefb961b37dc0e', {
-      cluster: 'eu'
-    });
-
-    var channel = pusher.subscribe('my-channel');
-    channel.bind('ExportEvent', function(data) {
-      //app.messages.push(JSON.stringify(data));
-      console.log(data);
-      console.log('yes');
-    });
+        
   },
   methods: {
     $_joinConf(id) {
@@ -362,10 +350,11 @@ export default {
       }
     },
     $_testClick() {
-      this.axios.post("/export/conference/1").then((response) => {
-          console.log(response);
-        });
+      this.$store.commit('setChannelLoading', true);
+      this.$store.commit('initializePusher');
+      this.axios.post("/export/conference/1");
     },
+
   },
   components: { AppHeader },
 };

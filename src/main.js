@@ -14,6 +14,8 @@ import Echo from "laravel-echo";
 //Pusher.logToConsole = true;
 
 window.Pusher = require('pusher-js');
+window.Pusher.logToConsole = true;
+
 
 window.Echo = new Echo({
   broadcaster: 'pusher',
