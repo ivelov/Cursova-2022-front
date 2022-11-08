@@ -118,6 +118,10 @@
         ></v-skeleton-loader>
       </v-container>
       <v-container class="container-conferences" v-else>
+
+        <v-btn  @click="$_testClick">
+          <span>Test</span>
+        </v-btn>
         <v-row class="conf-row">
           <v-col>№</v-col>
           <v-col>Title</v-col>
@@ -267,7 +271,13 @@ export default {
     });
     this.$store.dispatch("setCategoriesList");
     
-    Pusher.logToConsole = false;
+    Pusher.logToConsole = true;
+
+    /*window.Echo.channel('my-channel').listen('ExportEvent', (e) => {
+      console.log(e);
+      console.log('yes');
+    });*/
+    
     var pusher = new Pusher('4906f8eefb961b37dc0e', {
       cluster: 'eu'
     });
@@ -276,6 +286,7 @@ export default {
     channel.bind('ExportEvent', function(data) {
       //app.messages.push(JSON.stringify(data));
       console.log(data);
+      console.log('yes');
     });
   },
   methods: {
@@ -349,6 +360,11 @@ export default {
           }
         }
       }
+    },
+    $_testClick() {
+      this.axios.post("/export/conference/1").then((response) => {
+          console.log(response);
+        });
     },
   },
   components: { AppHeader },

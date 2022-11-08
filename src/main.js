@@ -9,20 +9,11 @@ import VueSocialSharing from 'vue-social-sharing'
 import * as VueGoogleMaps from 'vue2-google-maps';
 import wysiwyg from "vue-wysiwyg";
 import VueCookies from 'vue-cookies'
-import Pusher from "pusher-js";
 import Echo from "laravel-echo";
 
-Pusher.logToConsole = true;
+//Pusher.logToConsole = true;
 
-    var pusher = new Pusher('4906f8eefb961b37dc0e', {
-      cluster: 'eu'
-    });
-
-    var channel = pusher.subscribe('my-channel');
-    channel.bind('ExportEvent', function(data) {
-      //app.messages.push(JSON.stringify(data));
-      console.log(data);
-    });
+window.Pusher = require('pusher-js');
 
 window.Echo = new Echo({
   broadcaster: 'pusher',
@@ -52,6 +43,10 @@ Pusher.logToConsole = true;
       app.messages.push(JSON.stringify(data));
     });
 */
+/*
+window.Echo.private('my-channel').listen("ExportEvent", function(e) {
+  console.log(e);
+})*/
 axios.defaults.baseURL='/V1';
 //axios.defaults.baseURL='http://ivelov-vm-api.groupbwt.com';
 axios.defaults.headers.common = {
