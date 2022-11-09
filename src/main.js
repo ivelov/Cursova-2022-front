@@ -11,7 +11,6 @@ import wysiwyg from "vue-wysiwyg";
 import VueCookies from 'vue-cookies'
 import Echo from "laravel-echo";
 
-//Pusher.logToConsole = true;
 
 window.Pusher = require('pusher-js');
 window.Pusher.logToConsole = true;
@@ -25,30 +24,6 @@ window.Echo = new Echo({
   host: "127.0.0.1:8000",
 });
 
-/*import Echo from "laravel-echo"
-
-window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: 'xxxxxxxxxxxxxxxxxxxx',
-    cluster: 'eu',
-    encrypted: true
-});*/
-/*
-Pusher.logToConsole = true;
-
-    var pusher = new Pusher('4906f8eefb961b37dc0e', {
-      cluster: 'eu'
-    });
-
-    var channel = pusher.subscribe('my-channel');
-    channel.bind('my-event', function(data) {
-      app.messages.push(JSON.stringify(data));
-    });
-*/
-/*
-window.Echo.private('my-channel').listen("ExportEvent", function(e) {
-  console.log(e);
-})*/
 axios.defaults.baseURL='/V1';
 //axios.defaults.baseURL='http://ivelov-vm-api.groupbwt.com';
 axios.defaults.headers.common = {

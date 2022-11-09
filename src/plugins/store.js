@@ -80,6 +80,7 @@ export default new Vuex.Store({
   pusher:undefined,
   channel:undefined,
   channelLoading: false,
+  canExport:false,
   },
   mutations: {
     //sync
@@ -142,6 +143,7 @@ export default new Vuex.Store({
           participant: false,
           canUpdate: false,
         };
+      state.canExport = false;
     },
     setReportBusyTimes(state, busyTimes) {
       state.currentReportData.confStartTime = busyTimes.confStartTime;
@@ -221,19 +223,30 @@ export default new Vuex.Store({
       state.filters = filters;
     },
     initializePusher(state) {
-      if(!state.pusher){
-        this.pusher = new Pusher('4906f8eefb961b37dc0e', {
-          cluster: 'eu'
-        });
-        this.channel = this.pusher.subscribe('my-channel');
-        this.channel.bind('ExportEvent', (v)=>{
-          console.log(v);
-          this.commit('setChannelLoading', false);
+      if(state.pusher === undefined){
+        axios.get("/getChannelId").then((response) => {
+          state.pusher = new Pusher('4906f8eefb961b37dc0e', {
+            cluster: 'eu',
+          });
+          state.channel = state.pusher.subscribe('export-channel.'+response.data);
+          state.channel.bind('ExportEvent', (v)=>{
+            var hiddenElement = document.createElement('a');  
+            hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(v.resultCSV);
+            hiddenElement.target = '_blank';  
+              
+            hiddenElement.download = v.fileName ? v.fileName : 'export.csv';  
+            hiddenElement.click();  
+
+            this.commit('setChannelLoading', false);
+          });
         });
       }
     },
     setChannelLoading(state, loading){
       state.channelLoading = loading;
+    },
+    setCanExport(state, can){
+      state.canExport = can;
     },
   },
   actions: {
@@ -269,11 +282,16 @@ export default new Vuex.Store({
         state.commit("clearAuthData");
       });
     },
-    async setAddPerk(state) {
+    async setPerks(state) {
       axios.get("/canAdd").then((response) => {
         state.commit("setAdd", response.data==1 ? true : false);
       }).catch(()=>{
         state.commit("setAdd", false);
+      });
+      axios.get("/canExport").then((response) => {
+        state.commit("setCanExport", response.data==1 ? true : false);
+      }).catch(()=>{
+        state.commit("setCanExport", false);
       });
     },
     async setCurrentConferenceData(state, payload) {
@@ -448,6 +466,9 @@ export default new Vuex.Store({
     },
     getChannelLoading(state) {
       return state.channelLoading;
+    },
+    canExport(state) {
+      return state.canExport;
     },
   },
 });

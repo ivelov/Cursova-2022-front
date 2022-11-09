@@ -9,6 +9,16 @@
         absolute
         :temporary="false"
       >
+        <v-btn  
+          class="mb-4"
+          v-if="canExport"
+          @click="$_exportConferences" 
+          :disabled="channelLoading"
+          :loading="channelLoading"
+          color="primary"
+        >
+          <span>Export Conferences</span>
+        </v-btn>
         <v-btn class="filter-close-btn" text @click="filterMenu = !filterMenu">
           <span>&lt;</span>
         </v-btn>
@@ -119,13 +129,6 @@
       </v-container>
       <v-container class="container-conferences" v-else>
 
-        <v-btn  
-          @click="$_testClick" 
-          :disabled="channelLoading"
-          :loading="channelLoading"
-        >
-          <span>Test</span>
-        </v-btn>
         <v-row class="conf-row">
           <v-col>№</v-col>
           <v-col>Title</v-col>
@@ -265,10 +268,13 @@ export default {
     channelLoading() {
       return this.$store.getters.getChannelLoading;
     },
+    canExport() {
+      return this.$store.getters.canExport;
+    },
   },
   mounted() {
     this.$store.dispatch("setAuth");
-    this.$store.dispatch("setAddPerk");
+    this.$store.dispatch("setPerks");
 
     this.curPage = this.$route.params.page;
     this.$store.dispatch("setConferences", {
@@ -349,7 +355,7 @@ export default {
         }
       }
     },
-    $_testClick() {
+    $_exportConferences() {
       this.$store.commit('setChannelLoading', true);
       this.$store.commit('initializePusher');
       this.axios.post("/export/conference/1");
