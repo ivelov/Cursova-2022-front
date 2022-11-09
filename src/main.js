@@ -9,20 +9,6 @@ import VueSocialSharing from 'vue-social-sharing'
 import * as VueGoogleMaps from 'vue2-google-maps';
 import wysiwyg from "vue-wysiwyg";
 import VueCookies from 'vue-cookies'
-import Echo from "laravel-echo";
-
-
-window.Pusher = require('pusher-js');
-window.Pusher.logToConsole = true;
-
-
-window.Echo = new Echo({
-  broadcaster: 'pusher',
-  key: '4906f8eefb961b37dc0e',
-  cluster: 'eu',
-  encrypted: true,
-  host: "127.0.0.1:8000",
-});
 
 axios.defaults.baseURL='/V1';
 //axios.defaults.baseURL='http://ivelov-vm-api.groupbwt.com';

@@ -3,6 +3,8 @@ import Vuex from "vuex";
 import axios from "axios";
 import VueCookies from 'vue-cookies'
 import Pusher from "pusher-js";
+import Echo from "laravel-echo";
+
 
 Vue.use(Vuex);
 
@@ -225,6 +227,17 @@ export default new Vuex.Store({
     initializePusher(state) {
       if(state.pusher === undefined){
         axios.get("/getChannelId").then((response) => {
+          window.Pusher = require('pusher-js');
+          window.Pusher.logToConsole = true;
+
+          window.Echo = new Echo({
+            broadcaster: 'pusher',
+            key: '4906f8eefb961b37dc0e',
+            cluster: 'eu',
+            encrypted: true,
+            host: "127.0.0.1:8000",
+          });
+          
           state.pusher = new Pusher('4906f8eefb961b37dc0e', {
             cluster: 'eu',
           });

@@ -358,7 +358,7 @@ export default {
     $_exportConferences() {
       this.$store.commit('setChannelLoading', true);
       this.$store.commit('initializePusher');
-      this.axios.post("/export/conference/1");
+      this.axios.post("/export/conferences");
     },
 
   },
