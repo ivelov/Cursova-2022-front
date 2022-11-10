@@ -4,7 +4,7 @@ import axios from "axios";
 import VueCookies from 'vue-cookies'
 import Pusher from "pusher-js";
 import Echo from "laravel-echo";
-
+import router from './router'
 
 Vue.use(Vuex);
 
@@ -101,7 +101,12 @@ export default new Vuex.Store({
       if(isAuth == true){
         VueCookies.set('isAuth', isAuth);
       }else{
-        VueCookies.remove('isAuth');
+        if(VueCookies.get('isAuth')){
+          VueCookies.remove('isAuth');
+          router.go();
+        }else{
+          VueCookies.remove('isAuth');
+        }
       }
     },
     setAdd(state, canAdd) {
