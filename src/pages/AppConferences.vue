@@ -127,6 +127,9 @@
           type="table-thead, table-tbody"
         ></v-skeleton-loader>
       </v-container>
+      <v-container v-else-if="Object.keys(pageInfo.conferences).length == 0" class="text-center">
+        No results
+      </v-container>
       <v-container class="container-conferences" v-else>
 
         <v-row class="conf-row">
@@ -281,7 +284,7 @@ export default {
       page: this.curPage,
     });
     this.$store.dispatch("setCategoriesList");
-    /*this.axios.post('https://api.zoom.us/v2/users/ivelov.vlad1@gmail.com').then((data) => {
+    /*this.axios.post('https://zoom.us/oauth/token?grant_type=account_credentials&account_id=3028238599').then((data) => {
         console.log(data);
     });*/
   },

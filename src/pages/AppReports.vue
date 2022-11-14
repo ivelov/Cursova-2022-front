@@ -118,7 +118,9 @@
         <v-btn @click="filterMenu = !filterMenu"><v-icon>mdi-filter-outline</v-icon> Filters </v-btn>
         <br /><br />
       </v-container>
-
+      <v-container v-else-if="Object.keys(pageInfo.reports).length == 0" class="text-center">
+        No results
+      </v-container>
       <v-container v-if="loading">
         <v-row>
           <v-col cols="12" md="4">
