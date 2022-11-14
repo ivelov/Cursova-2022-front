@@ -48,6 +48,7 @@
 <script>
 import AppHeader from "./subComponents/AppHeader.vue";
 import VueCookies from 'vue-cookies'
+import rulesMixin from './mixins/rulesMixin.vue'
 
 export default {
   name: "AppLogin",
@@ -63,11 +64,6 @@ export default {
       conferences: true,
     },
   }),
-  computed: {
-    rules() {
-      return this.$store.getters.getRules;
-    },
-  },
   methods: {
     $_enter() {
       this.btnsLoading = true;
@@ -109,6 +105,7 @@ export default {
     },
   },
   components: { AppHeader },
+  mixins:[rulesMixin]
 };
 </script>
 

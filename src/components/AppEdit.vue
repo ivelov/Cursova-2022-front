@@ -208,6 +208,8 @@
 
 <script>
 import AppHeader from "./subComponents/AppHeader.vue";
+import rulesMixin from './mixins/rulesMixin.vue';
+
 export default {
   name: "AppEdit",
 
@@ -237,9 +239,6 @@ export default {
     },
     countries() {
       return this.$store.getters.getCountries;
-    },
-    rules() {
-      return this.$store.getters.getRules;
     },
     categories(){
       return this.$store.getters.getCategories;
@@ -295,6 +294,7 @@ export default {
     },
   },
   components: { AppHeader },
+  mixins:[rulesMixin]
 };
 </script>
 

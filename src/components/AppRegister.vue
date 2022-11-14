@@ -145,6 +145,8 @@ import AppHeader from "./subComponents/AppHeader.vue";
 import { MazPhoneNumberInput } from "maz-ui";
 import "maz-ui/lib/css/base.css";
 import VueCookies from 'vue-cookies'
+import countriesMixin from './mixins/countriesMixin.vue'
+import rulesMixin from './mixins/rulesMixin.vue'
 
 export default {
   name: "AppRegister",
@@ -181,14 +183,6 @@ export default {
       conferences: true,
     },
   }),
-  computed: {
-    countries() {
-      return this.$store.getters.getCountries;
-    },
-    rules() {
-      return this.$store.getters.getRules;
-    },
-  },
   methods: {
     $_register() {
       this.btnsLoading = true;
@@ -228,6 +222,7 @@ export default {
     },
   },
   components: { AppHeader, MazPhoneNumberInput },
+  mixins:[countriesMixin, rulesMixin]
 };
 </script>
 

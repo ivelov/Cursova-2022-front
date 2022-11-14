@@ -281,7 +281,9 @@ export default {
       page: this.curPage,
     });
     this.$store.dispatch("setCategoriesList");
-        
+    /*this.axios.post('https://api.zoom.us/v2/users/ivelov.vlad1@gmail.com').then((data) => {
+        console.log(data);
+    });*/
   },
   methods: {
     $_joinConf(id) {

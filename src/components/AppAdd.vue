@@ -194,6 +194,8 @@
 
 <script>
 import AppHeader from "./subComponents/AppHeader.vue";
+import rulesMixin from './mixins/rulesMixin.vue';
+
 export default {
   name: "AppEdit",
 
@@ -218,17 +220,11 @@ export default {
     conferenceData() {
       return this.$store.getters.getCurrentConferenceData;
     },
-    /*categoryId(){
-      return this.conferenceData.conference.categoryId;
-    },*/
     loading() {
       return this.$store.getters.isLoading;
     },
     countries() {
       return this.$store.getters.getCountries;
-    },
-    rules() {
-      return this.$store.getters.getRules;
     },
     categories(){
       return this.$store.getters.getCategories;
@@ -238,11 +234,6 @@ export default {
     this.$store.dispatch("setCategories");
     this.$store.commit("setLoading", false);
   },
-  /*watch:{
-    categoryId(val){
-      this.selectedCategory.id = val;
-    }
-  },*/
   methods: {
     $_markerUpdate(event) {
       this.conferenceData.conference.latitude = event.latLng.lat();
@@ -279,6 +270,7 @@ export default {
     },
   },
   components: { AppHeader },
+  mixins:[rulesMixin]
 };
 </script>
 

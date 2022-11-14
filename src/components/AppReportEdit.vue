@@ -172,6 +172,8 @@
 
 <script>
 import AppHeader from "./subComponents/AppHeader.vue";
+import rulesMixin from './mixins/rulesMixin.vue';
+
 export default {
   name: "AppReportsAdd",
 
@@ -191,9 +193,6 @@ export default {
     selectedCategory:undefined
   }),
   computed: {
-    rules(){
-      return this.$store.getters.getRules;
-    },
     loading(){
       return this.$store.getters.isLoading;
     },
@@ -372,6 +371,7 @@ export default {
     }
   },
   components: { AppHeader },
+  mixins:[rulesMixin]
 };
 </script>
 

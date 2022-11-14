@@ -12,6 +12,7 @@
     "@tinymce/tinymce-vue": "^3.2.8",
     "babel-plugin-component": "^1.1.1",
     "core-js": "^3.8.3",
+    "dotenv-webpack": "^8.0.1",
     "laravel-echo": "^1.14.1",
     "maz-ui": "^2.3.13",
     "pusher-js": "^7.4.0",

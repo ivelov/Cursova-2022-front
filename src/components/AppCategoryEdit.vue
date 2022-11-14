@@ -61,6 +61,7 @@
 
 <script>
 import AppHeader from "./subComponents/AppHeader.vue";
+import rulesMixin from './mixins/rulesMixin.vue'
 export default {
   name: "AppCategoryEdit",
 
@@ -78,9 +79,6 @@ export default {
   computed: {
     loading() {
       return this.$store.getters.isLoading;
-    },
-    rules() {
-      return this.$store.getters.getRules;
     },
   },
   mounted() {
@@ -121,6 +119,7 @@ export default {
     },
   },
   components: { AppHeader },
+  mixins:[rulesMixin]
 };
 </script>
 

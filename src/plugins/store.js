@@ -10,28 +10,6 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    countries: [
-      { state: "Russia", value: "ru" },
-      { state: "Ukraine", value: "ukr" },
-      { state: "United States", value: "usa" },
-      { state: "United Kingdom", value: "uk" },
-    ],
-    rules: {
-      required: (value) => !!value || "Required.",
-      counter: (value) => (value.length >= 6 || value.length == 0) || "Min 6 characters",
-      counterMax: (value) => value.length <= 254 || "Max 255 characters",
-      email: (value) => {
-        const pattern = new RegExp("\\w@\\w");
-        return pattern.test(value) || "Invalid e-mail.";
-      },
-      size: (value) => {
-        if(!value) return true;
-        if(typeof(value)=='string') return false;
-        if(value.size > 10000000) 
-          return "Max 10 MB file"
-        return true;
-      },
-    },
     currentConferenceData: {
       conference: {
         id: null,
@@ -434,12 +412,6 @@ export default new Vuex.Store({
     },
   },
   getters: {
-    getCountries(state) {
-      return state.countries;
-    },
-    getRules(state) {
-      return state.rules;
-    },
     getConferences(state) {
       return state.conferencesPageInfo.conferences;
     },

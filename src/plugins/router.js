@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-//import App from '../App.vue'
+import store from './store';
 
 import AppConferences from "../components/AppConferences";
 import AppLogin from "../components/AppLogin";
@@ -18,7 +18,7 @@ import AppCategories from "../components/AppCategories";
 import AppAccountEdit from "../components/AppAccountEdit";
 
 Vue.use(VueRouter);
-export default new VueRouter({
+const router = new VueRouter({
   routes: [
     {
       path: "/",
@@ -124,4 +124,39 @@ export default new VueRouter({
     
   ],
   mode: "history",
+  
 });
+
+router.beforeEach((to, from, next) => {
+
+  if (to.meta.hideForAuth) {
+      if (store.getters.isAuth) {
+        next({ path: '/' });
+      } else {
+        next();
+      }
+
+  } else if (to.meta.requireAuth){
+    if (store.getters.isAuth) {
+        next();
+    } else {
+        next({ path: '/login' });
+    }
+
+  } else if (to.meta.requireEdit){
+    if (store.getters.getCurrentConferenceData.canUpdate) {
+        next();
+    } else {
+        next({ path: '/' });
+    }
+  } else if (to.meta.requireAdd){
+    if (store.getters.canAdd) {
+      next();
+    } else {
+        next({ path: '/' });
+    }
+  }
+  next();
+});
+
+export default router;
