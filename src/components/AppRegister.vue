@@ -208,7 +208,7 @@ export default {
             .then((response) => {
               this.btnsLoading = false;
               if (response.data == 1) {
-                this.$router.go();
+                this.$router.push('/conferences/1');
               }
             })
             .catch((e) => {

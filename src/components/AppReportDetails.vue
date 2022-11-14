@@ -8,6 +8,16 @@
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
       <v-form  v-else>
+        <v-btn  
+          v-if="canExport"
+          class="float-right"
+          :disabled="channelLoading"
+          :loading="channelLoading"
+          color="primary"
+          @click="$_exportComments"
+        >
+          <span>Export comments</span>
+        </v-btn>
         <v-container>
           <v-row>
             <v-breadcrumbs
@@ -133,21 +143,33 @@ export default {
     currentReportData(){
       return this.$store.getters.getCurrentReportData;
     },
+    canExport() {
+      return this.$store.getters.canExport;
+    },
+    channelLoading() {
+      return this.$store.getters.getChannelLoading;
+    },
   },
   mounted() {
     this.$store.dispatch("setCurrentReportData", {id: this.$route.params.repId});
+    this.$store.dispatch("setPerks");
   },
   methods: {
     $_cancelPart(){
       this.btnsLoading = true;
-      this.axios.post("/reports/delete/" + this.currentReportData.report.conferenceId).then(() => {
+      this.axios.post("/reports/delete/" + this.currentReportData.report.conferenceId, {reportId: this.$route.params.repId}).then(() => {
         this.$router.push('/reports/1');
       });
     },
     $_breadcrumbClick(categoryId){
       this.$store.commit('setFilters', {categories:[categoryId]});
       this.$router.push('/reports/1');    
-    }
+    },
+    $_exportComments(){
+      this.$store.commit('setChannelLoading', true);
+      this.$store.commit('initializePusher');
+      this.axios.post("/export/report/"+this.$route.params.repId+'/comments');  
+    },
   },
   components: { AppHeader, AppComments },
 };

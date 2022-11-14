@@ -8,6 +8,54 @@
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
       <v-form v-else>
+
+        <v-menu
+          v-if="canExport"
+          :close-on-content-click="false"
+          transition="scroll-y-transition"
+          offset-y
+          left
+          open-on-hover
+          min-width="auto"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn  
+              class="float-right"
+              v-bind="attrs"
+              v-on="on"
+            >
+              <span>Exports</span>
+            </v-btn>
+          </template>
+          <v-container class="overflow-x-auto" style="background-color:white">
+            <v-list>
+              <v-list-item class="export-item">
+                <v-btn  
+                  class="mx-auto"
+                  :disabled="channelLoading"
+                  :loading="channelLoading"
+                  color="primary"
+                  @click="$_exportReports"
+                >
+                  <span>Export presentations</span>
+                </v-btn>
+              </v-list-item>
+              <v-list-item class="export-item">
+                <v-btn  
+                  class="mt-4 mx-auto"
+                  :disabled="channelLoading"
+                  :loading="channelLoading"
+                  color="primary"
+                  @click="$_exportListeners"
+                >
+                  <span>Export members</span>
+                </v-btn>
+              </v-list-item>
+            </v-list>
+          </v-container>
+          
+        </v-menu>
+
         <v-container>
           <v-row>
             <v-breadcrumbs
@@ -212,11 +260,18 @@ export default {
     countries() {
       return this.$store.getters.getCountries;
     },
+    canExport() {
+      return this.$store.getters.canExport;
+    },
+    channelLoading() {
+      return this.$store.getters.getChannelLoading;
+    },
   },
   mounted() {
     this.$store.dispatch("setCurrentConferenceData", {
       id: this.$route.params.id,
     });
+    this.$store.dispatch("setPerks");
   },
   methods: {
     $_cancelJoin() {
@@ -266,7 +321,17 @@ export default {
     $_breadcrumbClick(categoryId){
       this.$store.commit('setFilters', {categories:[categoryId]});
       this.$router.push('/conferences/1');    
-    }
+    },
+    $_exportReports(){
+      this.$store.commit('setChannelLoading', true);
+      this.$store.commit('initializePusher');
+      this.axios.post("/export/conference/"+this.conferenceData.conference.id+'/reports');   
+    },
+    $_exportListeners(){
+      this.$store.commit('setChannelLoading', true);
+      this.$store.commit('initializePusher');
+      this.axios.post("/export/conference/"+this.conferenceData.conference.id+'/listeners');  
+    },
   },
   components: { AppHeader },
 };
@@ -301,5 +366,9 @@ export default {
 
 .v-breadcrumbs{
   padding: 0;
+}
+
+.export-item{
+  min-width: 250px;
 }
 </style>

@@ -2,6 +2,9 @@ import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
 import VueCookies from 'vue-cookies'
+import Pusher from "pusher-js";
+import Echo from "laravel-echo";
+import router from './router'
 
 Vue.use(Vuex);
 
@@ -76,6 +79,10 @@ export default new Vuex.Store({
   categories:[],
   categoriesList:[],
   filters:{},
+  pusher:undefined,
+  channel:undefined,
+  channelLoading: false,
+  canExport:false,
   },
   mutations: {
     //sync
@@ -94,7 +101,12 @@ export default new Vuex.Store({
       if(isAuth == true){
         VueCookies.set('isAuth', isAuth);
       }else{
-        VueCookies.remove('isAuth');
+        if(VueCookies.get('isAuth')){
+          VueCookies.remove('isAuth');
+          router.go();
+        }else{
+          VueCookies.remove('isAuth');
+        }
       }
     },
     setAdd(state, canAdd) {
@@ -138,6 +150,7 @@ export default new Vuex.Store({
           participant: false,
           canUpdate: false,
         };
+      state.canExport = false;
     },
     setReportBusyTimes(state, busyTimes) {
       state.currentReportData.confStartTime = busyTimes.confStartTime;
@@ -216,6 +229,43 @@ export default new Vuex.Store({
     setFilters(state, filters){
       state.filters = filters;
     },
+    initializePusher(state) {
+      if(state.pusher === undefined){
+        axios.get("/getChannelId").then((response) => {
+          window.Pusher = require('pusher-js');
+          window.Pusher.logToConsole = true;
+
+          window.Echo = new Echo({
+            broadcaster: 'pusher',
+            key: '4906f8eefb961b37dc0e',
+            cluster: 'eu',
+            encrypted: true,
+            host: "127.0.0.1:8000",
+          });
+          
+          state.pusher = new Pusher('4906f8eefb961b37dc0e', {
+            cluster: 'eu',
+          });
+          state.channel = state.pusher.subscribe('export-channel.'+response.data);
+          state.channel.bind('ExportEvent', (v)=>{
+            var hiddenElement = document.createElement('a');  
+            hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(v.resultCSV);
+            hiddenElement.target = '_blank';  
+              
+            hiddenElement.download = v.fileName ? v.fileName : 'export.csv';  
+            hiddenElement.click();  
+
+            this.commit('setChannelLoading', false);
+          });
+        });
+      }
+    },
+    setChannelLoading(state, loading){
+      state.channelLoading = loading;
+    },
+    setCanExport(state, can){
+      state.canExport = can;
+    },
   },
   actions: {
     //async
@@ -250,11 +300,16 @@ export default new Vuex.Store({
         state.commit("clearAuthData");
       });
     },
-    async setAddPerk(state) {
+    async setPerks(state) {
       axios.get("/canAdd").then((response) => {
         state.commit("setAdd", response.data==1 ? true : false);
       }).catch(()=>{
         state.commit("setAdd", false);
+      });
+      axios.get("/canExport").then((response) => {
+        state.commit("setCanExport", response.data==1 ? true : false);
+      }).catch(()=>{
+        state.commit("setCanExport", false);
       });
     },
     async setCurrentConferenceData(state, payload) {
@@ -377,7 +432,6 @@ export default new Vuex.Store({
         state.commit("setCategoriesList", response.data);
       });
     },
-    
   },
   getters: {
     getCountries(state) {
@@ -421,6 +475,18 @@ export default new Vuex.Store({
     },
     getFilters(state) {
       return state.filters;
+    },
+    getPusher(state) {
+      return state.pusher;
+    },
+    getChannel(state) {
+      return state.channel;
+    },
+    getChannelLoading(state) {
+      return state.channelLoading;
+    },
+    canExport(state) {
+      return state.canExport;
     },
   },
 });

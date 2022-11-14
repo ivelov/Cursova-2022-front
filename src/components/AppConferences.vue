@@ -9,6 +9,16 @@
         absolute
         :temporary="false"
       >
+        <v-btn  
+          class="mb-4"
+          v-if="canExport"
+          @click="$_exportConferences" 
+          :disabled="channelLoading"
+          :loading="channelLoading"
+          color="primary"
+        >
+          <span>Export Conferences</span>
+        </v-btn>
         <v-btn class="filter-close-btn" text @click="filterMenu = !filterMenu">
           <span>&lt;</span>
         </v-btn>
@@ -118,6 +128,7 @@
         ></v-skeleton-loader>
       </v-container>
       <v-container class="container-conferences" v-else>
+
         <v-row class="conf-row">
           <v-col>№</v-col>
           <v-col>Title</v-col>
@@ -219,6 +230,7 @@
 <script>
 import AppHeader from "./AppHeader.vue";
 
+
 export default {
   name: "AppConferences",
   data: () => ({
@@ -253,16 +265,23 @@ export default {
     filters() {
       return this.$store.getters.getFilters;
     },
+    channelLoading() {
+      return this.$store.getters.getChannelLoading;
+    },
+    canExport() {
+      return this.$store.getters.canExport;
+    },
   },
   mounted() {
     this.$store.dispatch("setAuth");
-    this.$store.dispatch("setAddPerk");
+    this.$store.dispatch("setPerks");
 
     this.curPage = this.$route.params.page;
     this.$store.dispatch("setConferences", {
       page: this.curPage,
     });
     this.$store.dispatch("setCategoriesList");
+        
   },
   methods: {
     $_joinConf(id) {
@@ -336,6 +355,12 @@ export default {
         }
       }
     },
+    $_exportConferences() {
+      this.$store.commit('setChannelLoading', true);
+      this.$store.commit('initializePusher');
+      this.axios.post("/export/conferences");
+    },
+
   },
   components: { AppHeader },
 };
