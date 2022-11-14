@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import AppHeader from "./AppHeader.vue";
+import AppHeader from "./subComponents/AppHeader.vue";
 import VueCookies from 'vue-cookies'
 
 export default {

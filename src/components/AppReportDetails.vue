@@ -125,8 +125,8 @@
 </template>
 
 <script>
-import AppHeader from "./AppHeader.vue";
-import AppComments from "./AppComments.vue";
+import AppHeader from "./subComponents/AppHeader.vue";
+import AppComments from "./subComponents/AppComments.vue";
 export default {
   name: "AppReportsDetails",
 

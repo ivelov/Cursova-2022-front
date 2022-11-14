@@ -207,7 +207,7 @@
 </template>
 
 <script>
-import AppHeader from "./AppHeader.vue";
+import AppHeader from "./subComponents/AppHeader.vue";
 export default {
   name: "AppEdit",
 

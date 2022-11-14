@@ -141,7 +141,7 @@
 </template>
 
 <script>
-import AppHeader from "./AppHeader.vue";
+import AppHeader from "./subComponents/AppHeader.vue";
 import { MazPhoneNumberInput } from "maz-ui";
 import "maz-ui/lib/css/base.css";
 import VueCookies from 'vue-cookies'
