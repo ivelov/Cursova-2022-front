@@ -46,9 +46,9 @@
 </template>
 
 <script>
-import AppHeader from "./subComponents/AppHeader.vue";
+import AppHeader from "../components/AppHeader.vue";
 import VueCookies from 'vue-cookies'
-import rulesMixin from './mixins/rulesMixin.vue'
+import rulesMixin from '../components/mixins/rulesMixin.vue'
 
 export default {
   name: "AppLogin",

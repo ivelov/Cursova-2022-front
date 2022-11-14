@@ -2,20 +2,20 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import store from './store';
 
-import AppConferences from "../components/AppConferences";
-import AppLogin from "../components/AppLogin";
-import AppRegister from "../components/AppRegister";
-import AppDetails from "../components/AppDetails";
-import AppEdit from "../components/AppEdit";
-import AppAdd from "../components/AppAdd";
-import AppReportAdd from "../components/AppReportAdd";
-import AppReports from "../components/AppReports";
-import AppReportDetails from "../components/AppReportDetails";
-import AppReportEdit from "../components/AppReportEdit";
-import AppCategoryAdd from "../components/AppCategoryAdd";
-import AppCategoryEdit from "../components/AppCategoryEdit";
-import AppCategories from "../components/AppCategories";
-import AppAccountEdit from "../components/AppAccountEdit";
+import AppConferences from "../pages/AppConferences";
+import AppLogin from "../pages/AppLogin";
+import AppRegister from "../pages/AppRegister";
+import AppDetails from "../pages/AppDetails";
+import AppEdit from "../pages/AppEdit";
+import AppAdd from "../pages/AppAdd";
+import AppReportAdd from "../pages/AppReportAdd";
+import AppReports from "../pages/AppReports";
+import AppReportDetails from "../pages/AppReportDetails";
+import AppReportEdit from "../pages/AppReportEdit";
+import AppCategoryAdd from "../pages/AppCategoryAdd";
+import AppCategoryEdit from "../pages/AppCategoryEdit";
+import AppCategories from "../pages/AppCategories";
+import AppAccountEdit from "../pages/AppAccountEdit";
 
 Vue.use(VueRouter);
 const router = new VueRouter({

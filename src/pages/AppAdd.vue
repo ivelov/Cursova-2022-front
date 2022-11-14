@@ -3,27 +3,20 @@
     <AppHeader :buttons="buttons"></AppHeader>
 
     <v-main>
-      <br />
+      <br /><br />
       <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
       <v-form v-else v-model="valid">
         <v-container>
           <v-row>
-            <v-breadcrumbs
-            :items="conferenceData.breadcrumbs"
-            divider="/"
-            large
-          ></v-breadcrumbs>
-          </v-row>
-          <br>
-          <v-row>
             <v-text-field
               v-model="conferenceData.conference.title"
               label="Title"
               outlined
               :rules="[rules.required, rules.counterMax]"
-            ></v-text-field>
+            >
+            </v-text-field>
           </v-row>
           <v-row>
             <br /><br />
@@ -85,8 +78,8 @@
                   readonly
                   v-bind="attrs"
                   v-on="on"
-                  outlined
                   :rules="[rules.required]"
+                  outlined
                 ></v-text-field>
               </template>
               <v-date-picker
@@ -136,6 +129,7 @@
               v-model="conferenceData.conference.latitude"
               label="Latitude"
               outlined
+              type="number"
             >
             </v-text-field>
           </v-row>
@@ -144,6 +138,7 @@
               v-model="conferenceData.conference.longitude"
               label="Longitude"
               outlined
+              type="number"
             >
             </v-text-field>
           </v-row>
@@ -176,29 +171,20 @@
           <v-btn
             class="btn"
             color="success"
+            @click="$_saveConf"
             :disabled="!valid || btnsLoading"
             :loading="btnsLoading"
-            @click="$_saveConf"
           >
             <span>Save</span>
           </v-btn>
           <v-btn
             class="btn"
             color="primary"
-            :loading="btnsLoading"
             :disabled="btnsLoading"
-            @click="$router.push('/conference/' + conferenceData.conference.id)"
+            :loading="btnsLoading"
+            @click="$router.push('/')"
           >
             <span>Cancel</span>
-          </v-btn>
-          <v-btn
-            class="btn"
-            color="error"
-            :loading="btnsLoading"
-            :disabled="btnsLoading"
-            @click="$_deleteConf"
-          >
-            <span>Delete</span>
           </v-btn>
         </v-container>
       </v-form>
@@ -207,8 +193,8 @@
 </template>
 
 <script>
-import AppHeader from "./subComponents/AppHeader.vue";
-import rulesMixin from './mixins/rulesMixin.vue';
+import AppHeader from "../components/AppHeader.vue";
+import rulesMixin from '../components/mixins/rulesMixin.vue';
 
 export default {
   name: "AppEdit",
@@ -219,14 +205,14 @@ export default {
     timeMenu: false,
     catMenu:false,
     btnsLoading: false,
+    buttons: {
+      back: true,
+    },
     countriesLocations: {
       ukr: { lat: 50.464963, lng: 30.533887 },
       ru: { lat: 55.796459, lng: 37.578641 },
       usa: { lat: 38.897029, lng: -77.071906 },
       uk: { lat: 51.504263, lng: -0.13515 },
-    },
-    buttons: {
-      back: true,
     },
     selectedCategory:undefined,
   }),
@@ -245,13 +231,8 @@ export default {
     },
   },
   mounted() {
-    
-    this.$store.dispatch("setCurrentConferenceData", {
-      id: this.$route.params.id,
-    }).then(() => {
-      this.selectedCategory = {id:this.conferenceData.conference.categoryId, name:this.conferenceData.conference.categoryTitle};
-        });
     this.$store.dispatch("setCategories");
+    this.$store.commit("setLoading", false);
   },
   methods: {
     $_markerUpdate(event) {
@@ -273,23 +254,18 @@ export default {
         return;
       }
       this.btnsLoading = true;
-
+      
       this.conferenceData.conference.categoryId = this.selectedCategory ? this.selectedCategory.id : null;
-      let id = this.conferenceData.conference.id;
+      let values = this.conferenceData.conference;
+      values.id = null;
       this.axios
-        .post("/conference/" + id + "/save", this.conferenceData.conference)
+        .post("/add", values)
         .then((response) => {
           console.log(response);
-          this.$router.go();
           this.btnsLoading = false;
-        });
-    },
-    $_deleteConf() {
-      this.btnsLoading = true;
-      this.axios
-        .post("/conferences/delete/" + this.conferenceData.conference.id)
-        .then(() => {
-          this.$router.push("/");
+        })
+        .catch((e) => {
+          console.error(e);
         });
     },
   },
@@ -303,14 +279,15 @@ export default {
   width: 90%;
   margin: auto;
 }
+
 .v-text-field {
   max-width: 300px;
 }
+
 .btn {
   margin-right: 5px;
   margin-bottom: 5px;
 }
-
 .v-treeview{
   background-color: white;
 }

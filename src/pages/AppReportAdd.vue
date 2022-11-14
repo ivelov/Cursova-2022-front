@@ -3,19 +3,12 @@
     <AppHeader :buttons="buttons"></AppHeader>
 
     <v-main>
-      <br />
+      <br /><br />
       <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
       <v-form v-model="valid" v-else>
         <v-container>
-          <v-row>
-            <v-breadcrumbs
-              :items="currentReportData.breadcrumbs"
-              divider="/"
-              large
-            ></v-breadcrumbs>
-          </v-row><br>
           <v-row>
             <v-text-field
               v-model="currentReportData.report.title"
@@ -92,8 +85,8 @@
                 v-model="currentReportData.report.startTime"
                 full-width
                 format="24hr"
-                :allowed-hours="$_allowedHours"
-                :allowed-minutes="$_allowedMinutes"
+                :allowed-hours="allowedHours"
+                :allowed-minutes="allowedMinutes"
                 :min="currentReportData.confStartTime"
                 @click:hour="$_hourClick"
                 @click:minute="
@@ -150,8 +143,14 @@
               :rules="[rules.size]"
             ></v-file-input>
           </v-row>
-          
-          <br /><br />
+          <v-alert
+          v-if="fullBusy"
+            color="red"
+            type="warning"
+          >
+          Sorry, the conference is busy all the time
+          </v-alert>
+          <br />
           <v-btn
             class="btn"
             color="success"
@@ -161,7 +160,7 @@
           >
             <span>Save</span>
           </v-btn>
-          <v-btn class="btn" color="primary" @click="$router.push('/reports/1')">
+          <v-btn class="btn" color="primary" @click="$router.push('/')">
             <span>Cancel</span>
           </v-btn>
         </v-container>
@@ -171,8 +170,8 @@
 </template>
 
 <script>
-import AppHeader from "./subComponents/AppHeader.vue";
-import rulesMixin from './mixins/rulesMixin.vue';
+import AppHeader from "../components/AppHeader.vue";
+import rulesMixin from '../components/mixins/rulesMixin.vue';
 
 export default {
   name: "AppReportsAdd",
@@ -230,6 +229,10 @@ export default {
       }
       return allowedHoursArr;
     },
+    fullBusy(){
+      if(!this.calcAllowedHours) return undefined;
+      return this.calcAllowedHours.length == 0 ? true:false;
+    }, 
     calcAllowedMinutes(){
       var curHour = this.hoursBuf;
       var allowedMinutesArr = [];
@@ -267,52 +270,47 @@ export default {
     },
   },
   mounted() {
-    this.$store.dispatch("setCurrentReportData", {id: this.$route.params.repId, edit:true}).then(()=>{
-      this.selectedCategory = {
-        name:this.currentReportData.report.categoryTitle, 
-        id:this.currentReportData.report.categoryId
-      }
-      this.$store.dispatch("setReportConferenceCategory", this.currentReportData.report.conferenceId);
-    });
+    this.$store.commit('clearCurrentReportData');
+    this.currentReportData.report.conferenceId = this.$route.params.confId;
+    this.$store.dispatch("setReportBusyTimes", {id: this.currentReportData.report.conferenceId, edit: false});
+    this.$store.dispatch("setReportConferenceCategory", this.currentReportData.report.conferenceId);
     
   },
   methods: {
     $_saveReport() {
       this.btnsLoading = true;
-      var report = Object.assign({}, this.currentReportData.report);
       if(this.selectedCategory)
-        report.categoryId = this.selectedCategory.id;
-
-      if(report.presentation){
+        this.currentReportData.report.categoryId = this.selectedCategory.id;
+      if(this.currentReportData.report.presentation){
         var reader = new FileReader();
-        reader.readAsBinaryString(report.presentation);
-
+        reader.readAsBinaryString(this.currentReportData.report.presentation);
         reader.onload = (res) => {
-          //var presBuf = report.presentation;
-          report.presentation = res.currentTarget.result;
-
+          this.currentReportData.report.presentation = res.currentTarget.result;
           this.axios
-          .post("/report/"+report.id+'/save', report)
+          .post("/addReport", this.currentReportData.report)
           .then((response) => {
             console.log(response);
-            //report.presentation = presBuf;
             this.btnsLoading = false;
+            this.$store.commit('clearCurrentReportData');
+            this.$router.push('/reports/1');
           })
         }
       }else{
         this.axios
-        .post("/report/"+report.id+'/save', report)
+        .post("/addReport", this.currentReportData.report)
         .then((response) => {
           console.log(response);
           this.btnsLoading = false;
+          this.$store.commit('clearCurrentReportData');
+          this.$router.push('/reports/1');
         })
       }
       
     },
-    $_allowedHours(v){
+    allowedHours(v){
       return this.calcAllowedHours.includes(v);
     },
-    $_allowedMinutes(v){
+    allowedMinutes(v){
       return this.calcAllowedMinutes.includes(v);
     },
     $_hourClick(v){
@@ -347,8 +345,6 @@ export default {
         }
       }
       this.maxEndTime = '' + maxEndTimeBufHour + ':' + maxEndTimeBufMinute;
-      console.log(this.minEndTime+' '+this.maxEndTime);
-
     },
     /**
      * Determines is time1 is bigger than time2
@@ -388,6 +384,10 @@ export default {
 .btn {
   margin-right: 5px;
   margin-bottom: 5px;
+}
+
+.v-alert{
+  max-width: 300px;
 }
 
 .v-treeview{

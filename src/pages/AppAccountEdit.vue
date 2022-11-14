@@ -4,8 +4,10 @@
 
     <v-main>
       <br /><br />
-
-      <v-form v-model="valid">
+      <v-container v-if="loading">
+        <v-text-field color="success" loading disabled></v-text-field>
+      </v-container>
+      <v-form v-model="valid" v-else>
         <v-container>
           <v-row>
             <v-text-field
@@ -19,13 +21,24 @@
           </v-row>
           <v-row>
             <v-text-field
-              v-model="values.password"
+              v-model="values.currentPassword"
               type="password"
               :rules="[rules.required, rules.counter, rules.counterMax]"
-              label="Password"
+              label="Current password"
+              outlined
+              :error-messages="errors.currentPassword"
+              @change="errors.currentPassword = null"
+            ></v-text-field>
+          </v-row>
+          <v-row>
+            <v-text-field
+              v-model="values.password"
+              type="password"
+              :rules="[rules.counter, rules.counterMax]"
+              label="New password"
               outlined
               :error-messages="errors.password"
-              @update="errors.password = null"
+              @change="errors.password = null"
             ></v-text-field>
           </v-row>
           <v-row>
@@ -35,7 +48,7 @@
               label="Firstname"
               outlined
               :error-messages="errors.firstname"
-              @update="errors.firstname = null"
+              @change="errors.firstname = null"
             ></v-text-field>
           </v-row>
           <v-row>
@@ -45,7 +58,7 @@
               label="Lastname"
               outlined
               :error-messages="errors.lastname"
-              @update="errors.lastname = null"
+              @change="errors.lastname = null"
             ></v-text-field>
           </v-row>
           <v-row>
@@ -59,21 +72,7 @@
               item-text="state"
               item-value="value"
               :error-messages="errors.country"
-              @update="errors.country = null"
-            ></v-autocomplete>
-          </v-row>
-          <v-row>
-            <v-autocomplete
-              v-model="values.role"
-              auto-select-first
-              label="Role"
-              :rules="[rules.required, rules.counterMax]"
-              outlined
-              :items="roles"
-              item-text="state"
-              item-value="value"
-              :error-messages="errors.role"
-              @update="errors.role = null"
+              @change="errors.country = null"
             ></v-autocomplete>
           </v-row>
           <v-row>
@@ -108,7 +107,7 @@
                   :rules="[rules.required]"
                   outlined
                   :error-messages="errors.birthdate"
-                  @update="errors.birthdate = null"
+                  @change="errors.birthdate = null"
                 ></v-text-field>
               </template>
               <v-date-picker
@@ -124,16 +123,15 @@
           </v-row>
           <br />
           <v-btn
-            @click="$_register"
+            @click="$_save"
             class="btn"
             :disabled="!valid || !phoneValid || btnsLoading"
             :loading="btnsLoading"
             color="success"
           >
-            <span>Register</span>
+            <span>Save</span>
           </v-btn>
           <br /><br />
-          <p>Have an account? <a @click="$router.push('/login')">Login</a></p>
         </v-container>
       </v-form>
     </v-main>
@@ -141,17 +139,18 @@
 </template>
 
 <script>
-import AppHeader from "./subComponents/AppHeader.vue";
+import AppHeader from "../components/AppHeader.vue";
 import { MazPhoneNumberInput } from "maz-ui";
 import "maz-ui/lib/css/base.css";
 import VueCookies from 'vue-cookies'
-import countriesMixin from './mixins/countriesMixin.vue'
-import rulesMixin from './mixins/rulesMixin.vue'
+import countriesMixin from '../components/mixins/countriesMixin.vue'
+import rulesMixin from '../components/mixins/rulesMixin.vue'
 
 export default {
-  name: "AppRegister",
+  name: "AppAccountEdit",
 
   data: () => ({
+    loading:true,
     dateMenu: false,
     valid: true,
     phoneValid: false,
@@ -164,6 +163,7 @@ export default {
       birthdate: null,
       phone: null,
       country: null,
+      currentPassword:null,
     },
     values: {
       email: "",
@@ -180,11 +180,19 @@ export default {
       { state: "Announcer", value: "announcer" },
     ],
     buttons: {
-      conferences: true,
+      back: true,
     },
   }),
+  mounted(){
+    this.loading = true;
+    this.axios.get("/account")
+      .then((response) => {
+        this.values = response.data;
+        this.loading = false;
+      });
+  },
   methods: {
-    $_register() {
+    $_save() {
       this.btnsLoading = true;
       for (let errorKey in this.errors) {
         this.errors[errorKey] = null;
@@ -194,7 +202,7 @@ export default {
         .get("/sanctum/csrf-cookie")
         .then(() => {
           this.axios
-            .post("/register", this.values, {
+            .post("/account/save", this.values, {
               headers: {
                 "X-XSRF-TOKEN": VueCookies.get("XSRF-TOKEN"),
               },
@@ -202,12 +210,12 @@ export default {
             .then((response) => {
               this.btnsLoading = false;
               if (response.data == 1) {
-                this.$router.push('/conferences/1');
+                this.$router.push("/");
               }
             })
             .catch((e) => {
               this.btnsLoading = false;
-              console.log(e);
+              console.error(e);
               let errors = e.response.data.errors;
               if (typeof errors != undefined) {
                 for (const key in errors) {
