@@ -10,6 +10,9 @@
       <v-form v-else v-model="valid">
         <v-container>
           <v-row>
+            <h3 class="mb-5">Enter report info:</h3>
+          </v-row>
+          <v-row>
             <v-text-field
               v-model="conferenceData.conference.title"
               label="Title"
@@ -195,6 +198,7 @@
 <script>
 import AppHeader from "../components/AppHeader.vue";
 import rulesMixin from '../components/mixins/rulesMixin.vue';
+import countriesMixin from '../components/mixins/countriesMixin.vue';
 
 export default {
   name: "AppEdit",
@@ -222,9 +226,6 @@ export default {
     },
     loading() {
       return this.$store.getters.isLoading;
-    },
-    countries() {
-      return this.$store.getters.getCountries;
     },
     categories(){
       return this.$store.getters.getCategories;
@@ -263,6 +264,7 @@ export default {
         .then((response) => {
           console.log(response);
           this.btnsLoading = false;
+          this.$router.push('/conferences/1');
         })
         .catch((e) => {
           console.error(e);
@@ -270,7 +272,7 @@ export default {
     },
   },
   components: { AppHeader },
-  mixins:[rulesMixin]
+  mixins:[rulesMixin, countriesMixin]
 };
 </script>
 

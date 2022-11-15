@@ -284,8 +284,8 @@ export default {
       page: this.curPage,
     });
     this.$store.dispatch("setCategoriesList");
-    /*this.axios.post('https://zoom.us/oauth/token?grant_type=account_credentials&account_id=3028238599').then((data) => {
-        console.log(data);
+    /*this.axios.get('/zoom/getToken').then((data) => {
+        console.log(data.data);
     });*/
   },
   methods: {

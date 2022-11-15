@@ -10,6 +10,9 @@
       <v-form v-model="valid" v-else>
         <v-container>
           <v-row>
+            <h3 class="mb-5">Enter report info:</h3>
+          </v-row>
+          <v-row>
             <v-text-field
               v-model="currentReportData.report.title"
               :rules="[rules.required, rules.counterMax]"
@@ -143,12 +146,27 @@
               :rules="[rules.size]"
             ></v-file-input>
           </v-row>
+          <v-row>
+            <v-checkbox
+              v-model="currentReportData.report.isOnline"
+              label="Online"
+            >
+            </v-checkbox>
+          </v-row>
           <v-alert
-          v-if="fullBusy"
+            v-if="fullBusy"
             color="red"
             type="warning"
           >
-          Sorry, the conference is busy all the time
+            Sorry, the conference is busy all the time
+          </v-alert>
+          <v-alert
+            v-if="currentReportData.report.isOnline"
+            border="left"
+            colored-border
+            color="green"
+          >
+            The link to the zoom meeting will be created 10 minutes before the start
           </v-alert>
           <br />
           <v-btn

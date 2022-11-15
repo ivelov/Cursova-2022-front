@@ -38,6 +38,7 @@ export default new Vuex.Store({
         startTime:'',
         endTime:'',
         presentation:null,
+        isOnline:false,
       },
       canUpdate:false,
       busyStartTimes:[],

@@ -150,8 +150,23 @@
               :rules="[rules.size]"
             ></v-file-input>
           </v-row>
-          
-          <br /><br />
+          <v-row>
+            <v-checkbox
+              v-model="currentReportData.report.isOnline"
+              label="Online"
+            >
+            </v-checkbox>
+          </v-row>
+          <br />
+          <v-alert
+            v-if="currentReportData.report.isOnline"
+            border="left"
+            colored-border
+            color="green"
+          >
+            The link to the zoom meeting will be created 10 minutes before the start
+          </v-alert>
+          <br />
           <v-btn
             class="btn"
             color="success"

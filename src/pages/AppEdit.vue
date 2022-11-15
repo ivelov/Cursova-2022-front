@@ -209,6 +209,7 @@
 <script>
 import AppHeader from "../components/AppHeader.vue";
 import rulesMixin from '../components/mixins/rulesMixin.vue';
+import countriesMixin from '../components/mixins/countriesMixin.vue';
 
 export default {
   name: "AppEdit",
@@ -236,9 +237,6 @@ export default {
     },
     loading() {
       return this.$store.getters.isLoading;
-    },
-    countries() {
-      return this.$store.getters.getCountries;
     },
     categories(){
       return this.$store.getters.getCategories;
@@ -294,7 +292,7 @@ export default {
     },
   },
   components: { AppHeader },
-  mixins:[rulesMixin]
+  mixins:[rulesMixin, countriesMixin]
 };
 </script>
 
