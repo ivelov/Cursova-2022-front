@@ -126,6 +126,7 @@
                   v-on="on"
                   :disabled="currentReportData.report.startTime.length == 0"
                   :rules="[rules.required]"
+                  @click.once="$_startTimeClick()"
                 ></v-text-field>
               </template>
               <v-time-picker
@@ -362,8 +363,6 @@ export default {
         }
       }
       this.maxEndTime = '' + maxEndTimeBufHour + ':' + maxEndTimeBufMinute;
-      console.log(this.minEndTime+' '+this.maxEndTime);
-
     },
     /**
      * Determines is time1 is bigger than time2
