@@ -143,7 +143,7 @@
           </v-col>
         </v-row>
       </v-container>
-      <v-container v-else-if="Object.keys(pageInfo.reports).length == 0" class="text-center">
+      <v-container v-else-if="pageInfo.reports? Object.keys(pageInfo.reports).length == 0 : false" class="text-center">
         No results
       </v-container>
       <v-container v-else>
@@ -156,11 +156,16 @@
             sm="4"
           >
             <v-card class="report-card" elevation="2">
-              <v-card-title
-                ><a @click="$router.push('/report/' + report.id)">{{
-                  report.title
-                }}</a></v-card-title
-              >
+              <v-card-title>
+                <router-link :to="'/report/' + report.id">
+                  <v-badge
+                    :color="report.statusColor"
+                    dot
+                  >
+                    {{report.title}}
+                  </v-badge>
+                </router-link>
+              </v-card-title>
               <v-card-text>
                 <p>Conference: {{ report.conferenceTitle }}</p>
                 <p>Time: {{ report.startTime }}-{{ report.endTime }}</p>
@@ -171,6 +176,7 @@
                   {{ report.description.slice(0, 100) }}
                   <span
                     v-if="!readMore[index] && report.description.length > 100"
+                    class="readmore-span"
                     @click="$_readMore(index)"
                   >
                     ..read more
@@ -182,6 +188,11 @@
                   <span @click="$_readMore(index)"> ..hide </span>
                 </p>
                 <p>Comments: {{ report.commentsCount }}</p>
+                <AppTimer
+                  v-if="report.statusColor == 'yellow'"
+                  :remaining-time-original="report.remainingTime"
+                  @end="$_changeStatus(report, 'red')"
+                />
               </v-card-text>
               <v-card-actions>
                 <v-row class="actions-row">
@@ -233,6 +244,7 @@
 
 <script>
 import AppHeader from "../components/AppHeader.vue";
+import AppTimer from "../components/AppTimer.vue";
 
 export default {
   name: "AppReports",
@@ -360,8 +372,11 @@ export default {
         }
       }
     },
+    $_changeStatus(report, status) {
+      this.$set(report, 'statusColor', status);
+    }
   },
-  components: { AppHeader },
+  components: { AppHeader, AppTimer },
 };
 </script>
 
@@ -401,5 +416,11 @@ export default {
   padding: 80px 10px 5px 10px;
   max-width: 250px;
   width: 250px;
+}
+.readmore-span{
+  cursor: pointer;
+}
+.readmore-span:hover{
+  color:grey;
 }
 </style>

@@ -127,7 +127,7 @@
           type="table-thead, table-tbody"
         ></v-skeleton-loader>
       </v-container>
-      <v-container v-else-if="Object.keys(pageInfo.conferences).length == 0" class="text-center">
+      <v-container v-else-if="pageInfo.conferences? Object.keys(pageInfo.conferences).length == 0 : false" class="text-center">
         No results
       </v-container>
       <v-container class="container-conferences" v-else>

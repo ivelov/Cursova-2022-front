@@ -10,7 +10,7 @@
       <v-form v-else v-model="valid">
         <v-container>
           <v-row>
-            <h3 class="mb-5">Enter report info:</h3>
+            <h3 class="mb-5">Enter conference info:</h3>
           </v-row>
           <v-row>
             <v-text-field

@@ -95,7 +95,13 @@
               disabled
             ></v-file-input>
           </v-row>
-          
+          <v-row>
+            <AppTimer
+              v-if="currentReportData.remainingTime"
+              :remaining-time-original="currentReportData.remainingTime"
+              @end="$_timerEnd()"
+            />
+          </v-row>
           <br />
           <v-btn
             v-if="currentReportData.canUpdate"
@@ -127,6 +133,8 @@
 <script>
 import AppHeader from "../components/AppHeader.vue";
 import AppComments from "../components/AppComments.vue";
+import AppTimer from "../components/AppTimer.vue";
+
 export default {
   name: "AppReportsDetails",
 
@@ -170,8 +178,12 @@ export default {
       this.$store.commit('initializePusher');
       this.axios.post("/export/report/"+this.$route.params.repId+'/comments');  
     },
+    $_timerEnd(){
+      this.$set(this.currentReportData, 'remainingTime', false);
+      this.$store.dispatch("setCurrentReportData", {id: this.$route.params.repId, hard: true});
+    },
   },
-  components: { AppHeader, AppComments },
+  components: { AppHeader, AppComments, AppTimer },
 };
 </script>
 
