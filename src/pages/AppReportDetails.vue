@@ -95,12 +95,25 @@
               disabled
             ></v-file-input>
           </v-row>
-          <v-row>
+          <v-row  v-if="currentReportData.remainingTime">
             <AppTimer
-              v-if="currentReportData.remainingTime"
               :remaining-time-original="currentReportData.remainingTime"
               @end="$_timerEnd()"
             />
+          </v-row>
+          <v-row  v-if="currentReportData.meetingJoinLink" class="mb-3">
+            <v-btn
+              color="success"
+            >
+              <a class="text-white" :href="currentReportData.meetingJoinLink">Join Zoom meeting</a>
+            </v-btn>
+          </v-row>
+          <v-row  v-if="currentReportData.meetingStartLink">
+            <v-btn
+              color="success"
+            >
+              <a class="text-white" :href="currentReportData.meetingStartLink">Start Zoom meeting</a>
+            </v-btn>
           </v-row>
           <br />
           <v-btn
@@ -200,5 +213,9 @@ export default {
 .btn {
   margin-right: 5px;
   margin-bottom: 5px;
+}
+
+.text-white{
+  color: white;
 }
 </style>
