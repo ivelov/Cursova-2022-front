@@ -7,7 +7,7 @@
       <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
-      <v-form v-else v-model="valid">
+      <v-form v-else v-model="valid" @submit.prevent="$_saveCategory">
         <v-container>
           <v-row>
             <v-text-field
@@ -52,9 +52,9 @@
           
           <br /><br />
           <v-btn
+            type="submit"
             class="btn"
             color="success"
-            @click="$_saveCategory"
             :disabled="!valid || btnsLoading"
             :loading="btnsLoading"
           >

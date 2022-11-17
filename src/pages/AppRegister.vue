@@ -5,7 +5,7 @@
     <v-main>
       <br /><br />
 
-      <v-form v-model="valid">
+      <v-form v-model="valid" v-on:submit.prevent="">
         <v-container>
           <v-row>
             <v-text-field
@@ -25,7 +25,7 @@
               label="Password"
               outlined
               :error-messages="errors.password"
-              @update="errors.password = null"
+              @change="errors.password = null"
             ></v-text-field>
           </v-row>
           <v-row>
@@ -35,7 +35,7 @@
               label="Firstname"
               outlined
               :error-messages="errors.firstname"
-              @update="errors.firstname = null"
+              @change="errors.firstname = null"
             ></v-text-field>
           </v-row>
           <v-row>
@@ -45,7 +45,7 @@
               label="Lastname"
               outlined
               :error-messages="errors.lastname"
-              @update="errors.lastname = null"
+              @change="errors.lastname = null"
             ></v-text-field>
           </v-row>
           <v-row>
@@ -59,7 +59,7 @@
               item-text="state"
               item-value="value"
               :error-messages="errors.country"
-              @update="errors.country = null"
+              @change="errors.country = null"
             ></v-autocomplete>
           </v-row>
           <v-row>
@@ -73,7 +73,7 @@
               item-text="state"
               item-value="value"
               :error-messages="errors.role"
-              @update="errors.role = null"
+              @change="errors.role = null"
             ></v-autocomplete>
           </v-row>
           <v-row>
@@ -82,7 +82,7 @@
               default-country-code="UA"
               :only-countries="['UA', 'US', 'RU', 'GB']"
               required
-              class="form-input"
+              class="form-input-maz"
               @update="$_phoneChange"
               :error-messages="errors.phone"
               @blur="errors.phone = null"
@@ -125,6 +125,7 @@
           <br />
           <v-btn
             @click="$_register"
+            type="submit"
             class="btn"
             :disabled="!valid || !phoneValid || btnsLoading"
             :loading="btnsLoading"
@@ -200,9 +201,8 @@ export default {
               },
             })
             .then((response) => {
-              this.btnsLoading = false;
               if (response.data == 1) {
-                this.$router.push('/conferences/1');
+                this.$router.go('/conferences/1');
               }
             })
             .catch((e) => {
@@ -246,7 +246,7 @@ export default {
 .maz-border-color {
   border-color: rgba(0, 0, 0, 0.38);
 }
-.form-input {
+.form-input-maz {
   max-height: 46px;
 }
 </style>

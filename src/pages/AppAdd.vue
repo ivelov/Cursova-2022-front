@@ -7,7 +7,7 @@
       <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
-      <v-form v-else v-model="valid">
+      <v-form v-else v-model="valid" @submit.prevent="$_saveConf">
         <v-container>
           <v-row>
             <h3 class="mb-5">Enter conference info:</h3>
@@ -172,9 +172,9 @@
           </v-row>
           <br /><br />
           <v-btn
+            type="submit"
             class="btn"
             color="success"
-            @click="$_saveConf"
             :disabled="!valid || btnsLoading"
             :loading="btnsLoading"
           >

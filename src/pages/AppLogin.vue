@@ -4,7 +4,7 @@
 
     <v-main>
       <br /><br />
-      <v-form v-model="valid">
+      <v-form v-model="valid" @submit.prevent="$_enter">
         <v-container>
           <v-row>
             <v-text-field
@@ -28,10 +28,12 @@
             ></v-text-field>
           </v-row>
           <br />
-          <v-btn @click="$_enter" class="btn" 
-          :disabled="!valid || btnsLoading"
-          :loading="btnsLoading"
-          color="success">
+          <v-btn 
+           type="submit"
+           class="btn" 
+           :disabled="!valid || btnsLoading"
+           :loading="btnsLoading"
+           color="success">
             <span>Enter</span>
           </v-btn>
           <br /><br />
@@ -79,7 +81,6 @@ export default {
             'X-XSRF-TOKEN': VueCookies.get('XSRF-TOKEN'),
           }
         }).then((response) => {
-          this.btnsLoading = false;
           if (response.data == 1) {
             this.$store.commit('setAuth',true)
             this.$router.go();
