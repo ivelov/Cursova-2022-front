@@ -16,6 +16,7 @@ import AppCategoryAdd from "../pages/AppCategoryAdd";
 import AppCategoryEdit from "../pages/AppCategoryEdit";
 import AppCategories from "../pages/AppCategories";
 import AppAccountEdit from "../pages/AppAccountEdit";
+import AppMeetings from "../pages/AppMeetings";
 
 Vue.use(VueRouter);
 const router = new VueRouter({
@@ -121,7 +122,13 @@ const router = new VueRouter({
         requireAuth:true
       }
     },
-    
+    {
+      path: "/meetings",
+      component: AppMeetings,
+      meta:{
+        requireAuth:true
+      }
+    },
   ],
   mode: "history",
   

@@ -97,18 +97,40 @@
             <span class="mr-2">Back</span>
           </v-btn>
 
-          <v-btn
-            @click="$router.push('/categories')"
-            text
-            v-if="
-              typeof buttons['categories'] != undefined
-                ? buttons['categories']
-                : false
-            "
-          >
-            <span class="mr-2">Categories</span>
-          </v-btn>
-
+          <v-menu v-if="$store.getters.isAuth" open-on-hover offset-y>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn v-bind="attrs" v-on="on" text>
+                Administration
+              </v-btn>
+            </template>
+            <v-list>
+              <v-list-item>
+                <v-btn
+                  text
+                  v-if="
+                    typeof buttons['categories'] != undefined
+                      ? buttons['categories']
+                      : false
+                  "
+                >
+                  <router-link class="btn-link" to="/categories">Categories</router-link>
+                </v-btn>
+              </v-list-item>
+              <v-list-item>
+                <v-btn
+                  text
+                  v-if="
+                    typeof buttons['categories'] != undefined
+                      ? buttons['categories']
+                      : false
+                  "
+                >
+                  <router-link class="btn-link" to="/meetings">Meetings</router-link>
+                </v-btn>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+          
           <v-btn
             @click="$_gotoAdd"
             text
@@ -564,4 +586,8 @@ export default {
   background-color: lightgray;
 }
 
+.btn-link{
+  color:black;
+  text-decoration: none;
+}
 </style>

@@ -62,6 +62,10 @@ export default new Vuex.Store({
   channel:undefined,
   channelLoading: false,
   canExport:false,
+  meetingsPageInfo:{
+    meetings:{},
+    maxPage:1
+  },
   },
   mutations: {
     //sync
@@ -245,6 +249,9 @@ export default new Vuex.Store({
     setCanExport(state, can){
       state.canExport = can;
     },
+    setMeetingsPageInfo(state, pageInfo){
+      state.meetingsPageInfo = pageInfo;
+    },
   },
   actions: {
     //async
@@ -411,6 +418,14 @@ export default new Vuex.Store({
         state.commit("setCategoriesList", response.data);
       });
     },
+    async setMeetingsPageInfo(state) {
+      return new Promise((resolve, reject) => {
+        axios.get("/meetings").then((response) => {
+          state.commit("setMeetingsPageInfo", response.data);
+          resolve();
+        }).catch(()=>{reject()});
+      });
+    },
   },
   getters: {
     getConferences(state) {
@@ -460,6 +475,9 @@ export default new Vuex.Store({
     },
     canExport(state) {
       return state.canExport;
+    },
+    getMeetingsPageInfo(state) {
+      return state.meetingsPageInfo;
     },
   },
 });
