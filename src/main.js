@@ -16,14 +16,15 @@ axios.defaults.headers.common = {
 };
 axios.defaults.withCredentials = 'true';
 axios.defaults.headers.common['Content-Type'] = 'application/json';
-Vue.use(VueAxios, axios)
-Vue.use(VueSocialSharing)
+Vue.use(VueAxios, axios);
+
+Vue.use(VueSocialSharing);
 
 Vue.config.productionTip = false
 
 Vue.use(VueGoogleMaps, {
   load: {
-    key: 'AIzaSyDvKC-wRgTVGX1cu1h7PKlfqb6eF4SIDp0',
+    key: process.env.VUE_APP_GMAP_KEY,
     libraries: 'places', 
   },
 })

@@ -34,7 +34,7 @@
             v-for="(meeting, index) in pageInfo.meetings"
             :key="meeting.id"
           >
-            <td>{{index}}</td>
+            <td>{{index+1}}</td>
             <td>{{meeting.uuid}}</td>
             <td>{{meeting.id}}</td>
             <td>{{meeting.host_id}}</td>
