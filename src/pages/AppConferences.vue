@@ -11,7 +11,7 @@
       >
         <v-btn  
           class="mb-4"
-          v-if="canExport"
+          v-if="isAdmin"
           @click="$_exportConferences" 
           :disabled="channelLoading"
           :loading="channelLoading"
@@ -123,7 +123,7 @@
 
       <v-container v-if="loading">
         <v-skeleton-loader
-          class="mx-auto"
+          class="mx-auto skeleton"
           type="table-thead, table-tbody"
         ></v-skeleton-loader>
       </v-container>
@@ -237,6 +237,10 @@ import AppHeader from "../components/AppHeader.vue";
 export default {
   name: "AppConferences",
   data: () => ({
+    buttons:{
+      reports:true,
+      addConference: false,
+    },
     curPage: 1,
     btnsLoading: false,
     catMenu: false,
@@ -249,9 +253,6 @@ export default {
   computed: {
     pageInfo() {
       return this.$store.getters.getConferencesPageInfo;
-    },
-    buttons() {
-      return this.$store.getters.getConferencesPageInfo.buttons;
     },
     loading() {
       return this.$store.getters.isLoading;
@@ -271,13 +272,15 @@ export default {
     channelLoading() {
       return this.$store.getters.getChannelLoading;
     },
-    canExport() {
-      return this.$store.getters.canExport;
+    isAdmin() {
+      return this.$store.getters.isAdmin;
     },
   },
   mounted() {
     this.$store.dispatch("setAuth");
-    this.$store.dispatch("setPerks");
+    this.$store.dispatch("definePerks").then(()=>{
+      this.buttons.addConference = this.$store.getters.canAdd;
+    });
 
     this.curPage = this.$route.params.page;
     this.$store.dispatch("setConferences", {
@@ -427,5 +430,9 @@ export default {
   padding: 80px 10px 5px 10px;
   max-width: 250px;
   width: 250px;
+}
+
+.skeleton{
+  min-width: 620px;
 }
 </style>

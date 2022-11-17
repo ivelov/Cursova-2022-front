@@ -9,7 +9,7 @@
       </v-container>
       <v-form  v-else>
         <v-btn  
-          v-if="canExport"
+          v-if="isAdmin"
           class="float-right"
           :disabled="channelLoading"
           :loading="channelLoading"
@@ -164,8 +164,8 @@ export default {
     currentReportData(){
       return this.$store.getters.getCurrentReportData;
     },
-    canExport() {
-      return this.$store.getters.canExport;
+    isAdmin() {
+      return this.$store.getters.isAdmin;
     },
     channelLoading() {
       return this.$store.getters.getChannelLoading;
@@ -173,7 +173,7 @@ export default {
   },
   mounted() {
     this.$store.dispatch("setCurrentReportData", {id: this.$route.params.repId});
-    this.$store.dispatch("setPerks");
+    this.$store.dispatch("definePerks");
   },
   methods: {
     $_cancelPart(){

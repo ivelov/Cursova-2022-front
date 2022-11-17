@@ -185,7 +185,7 @@
                 <p class="report-space" v-else-if="!report.description"></p>
                 <p class="report-space" v-if="readMore[index]">
                   {{ report.description }}
-                  <span @click="$_readMore(index)"> ..hide </span>
+                  <span class="readmore-span" @click="$_readMore(index)"> Hide </span>
                 </p>
                 <p>Comments: {{ report.commentsCount }}</p>
                 <AppTimer
@@ -282,7 +282,7 @@ export default {
   },
   mounted() {
     this.$store.dispatch("setAuth");
-    this.$store.dispatch("setPerks");
+    this.$store.dispatch("definePerks");
     if (this.$route.params.favPage) {
       this.curPage = this.$route.params.favPage;
       this.$store.dispatch("setReports", {
@@ -421,6 +421,6 @@ export default {
   cursor: pointer;
 }
 .readmore-span:hover{
-  color:grey;
+  color:black;
 }
 </style>

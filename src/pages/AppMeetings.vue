@@ -92,8 +92,6 @@ export default {
 
 .meeting-row{
   min-width: 620px;
-  /*outline: 3px solid #ced4da;*/
-  align-items: center;
 }
 
 </style>

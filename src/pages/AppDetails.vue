@@ -10,7 +10,7 @@
       <v-form v-else>
 
         <v-menu
-          v-if="canExport"
+          v-if="isAdmin"
           :close-on-content-click="false"
           transition="scroll-y-transition"
           offset-y
@@ -260,8 +260,8 @@ export default {
     countries() {
       return this.$store.getters.getCountries;
     },
-    canExport() {
-      return this.$store.getters.canExport;
+    isAdmin() {
+      return this.$store.getters.isAdmin;
     },
     channelLoading() {
       return this.$store.getters.getChannelLoading;
@@ -271,7 +271,7 @@ export default {
     this.$store.dispatch("setCurrentConferenceData", {
       id: this.$route.params.id,
     });
-    this.$store.dispatch("setPerks");
+    this.$store.dispatch("definePerks");
   },
   methods: {
     $_cancelJoin() {

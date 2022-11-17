@@ -26,7 +26,6 @@ export default new Vuex.Store({
     },
     conferencesPageInfo: {
         maxPage:1,
-        buttons:{}
     },
     loading: true,
     currentReportData:{
@@ -48,34 +47,28 @@ export default new Vuex.Store({
     reportsPageInfo: {
       reports:[],
       maxPage:1,
-  },
-  commentsInfo:{
-    comments:[],
-    maxPage:1,
-    curPage:0,
-    loading:false
-  },
-  categories:[],
-  categoriesList:[],
-  filters:{},
-  pusher:undefined,
-  channel:undefined,
-  channelLoading: false,
-  canExport:false,
-  meetingsPageInfo:{
-    meetings:{},
-    maxPage:1
-  },
+    },
+    commentsInfo:{
+      comments:[],
+      maxPage:1,
+      curPage:0,
+      loading:false
+    },
+    categories:[],
+    categoriesList:[],
+    filters:{},
+    pusher:undefined,
+    channel:undefined,
+    channelLoading: false,
+    meetingsPageInfo:{
+      meetings:{},
+      maxPage:1
+    },
   },
   mutations: {
     //sync
     setConferencesPageInfo(state, conferencesPageInfo) {
-      state.conferencesPageInfo = conferencesPageInfo;
-      let buttonsArray = state.conferencesPageInfo.buttons;
-      state.conferencesPageInfo.buttons = {};
-      for (let buttonName of buttonsArray) {
-        state.conferencesPageInfo.buttons[buttonName] = true;
-      }
+      state.conferencesPageInfo = conferencesPageInfo;      
     },
     setLoading(state, loading) {
       state.loading = loading;
@@ -90,13 +83,6 @@ export default new Vuex.Store({
         }else{
           VueCookies.remove('isAuth');
         }
-      }
-    },
-    setAdd(state, canAdd) {
-      if(canAdd == true){
-        VueCookies.set('canAdd', canAdd);
-      }else{
-        VueCookies.remove('canAdd');
       }
     },
     setCurrentConferenceData(state, currentConferenceData) {
@@ -119,6 +105,7 @@ export default new Vuex.Store({
     },
     clearAuthData(state){
       VueCookies.remove('isAuth');
+      VueCookies.remove('isAdmin');
       VueCookies.remove('canAdd');
       state.currentConferenceData = {
           conference: {
@@ -252,6 +239,20 @@ export default new Vuex.Store({
     setMeetingsPageInfo(state, pageInfo){
       state.meetingsPageInfo = pageInfo;
     },
+    definePerks(state, perks){
+      let availablePerks = ['canAdd', 'isAdmin'];
+      availablePerks.forEach(perk => {
+        if(perks[perk]){
+          if(!VueCookies.isKey(perk)){
+            VueCookies.set(perk, true);
+          }
+        }else{
+          if(VueCookies.isKey(perk)){
+            VueCookies.remove(perk);
+          }
+        }
+      });
+    }
   },
   actions: {
     //async
@@ -286,16 +287,15 @@ export default new Vuex.Store({
         state.commit("clearAuthData");
       });
     },
-    async setPerks(state) {
-      axios.get("/canAdd").then((response) => {
-        state.commit("setAdd", response.data==1 ? true : false);
-      }).catch(()=>{
-        state.commit("setAdd", false);
-      });
-      axios.get("/canExport").then((response) => {
-        state.commit("setCanExport", response.data==1 ? true : false);
-      }).catch(()=>{
-        state.commit("setCanExport", false);
+    async definePerks(state) {
+      return new Promise((resolve, reject) => {
+        axios.get("/get-perks").then((response) => {
+          state.commit("definePerks", response.data);
+          resolve();
+        }).catch(()=>{
+          state.commit("definePerks", {});
+          reject();
+        });
       });
     },
     async setCurrentConferenceData(state, payload) {
@@ -473,8 +473,8 @@ export default new Vuex.Store({
     getChannelLoading(state) {
       return state.channelLoading;
     },
-    canExport(state) {
-      return state.canExport;
+    isAdmin() {
+      return VueCookies.get('isAdmin');
     },
     getMeetingsPageInfo(state) {
       return state.meetingsPageInfo;
