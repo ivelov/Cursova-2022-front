@@ -46,55 +46,43 @@
           >
             <span>Go to conference</span>
           </v-btn><br><br>
-          <v-row>
-            <v-text-field
-              v-model="currentReportData.report.title"
-              label="Title"
-              outlined
-              disabled
-            ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-              v-model="currentReportData.report.categoryTitle"
-              label="Category"
-              outlined
-              disabled
-            ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-textarea
-              v-model="currentReportData.report.description"
-              outlined
-              label="Description"
-              disabled
-            ></v-textarea>
-          </v-row>
-          <v-row>
-            <v-text-field
-              v-model="currentReportData.report.startTime"
-              label="Start time"
-              outlined
-              disabled
-            ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-              v-model="currentReportData.report.endTime"
-              label="End time"
-              outlined
-              disabled
-            ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-file-input
-              v-model="currentReportData.report.presentation"
-              accept=".ppt,.pptx"
-              label="Presentation"
-              outlined
-              disabled
-            ></v-file-input>
-          </v-row>
+
+          <h4>Title:</h4>
+          <p class="ml-3 mb-3">{{currentReportData.report.title}}</p>
+          
+          <div v-if="currentReportData.report.categoryTitle">
+            <h4>Category:</h4>
+            <p class="ml-3 mb-3">{{currentReportData.report.categoryTitle}}</p>
+          </div>
+          
+          <div class="tight" v-if="currentReportData.report.categoryTitle">
+            <h4>Description:</h4>
+            <p class="ml-3 mb-3">{{currentReportData.report.description}}</p>
+          </div>
+
+          <h4>Start time:</h4>
+          <v-time-picker 
+            class="mt-2 tight" 
+            v-model="currentReportData.report.startTime" 
+            readonly
+            full-width
+            format="24hr"
+          ></v-time-picker>
+
+          <h4>End time:</h4>
+          <v-time-picker 
+            class="mt-2 tight" 
+            v-model="currentReportData.report.endTime" 
+            readonly
+            full-width
+            format="24hr"
+          ></v-time-picker>
+
+          <div class="tight" v-if="currentReportData.report.presentation">
+            <h4>Presentation:</h4>
+            <a class="ml-3 mb-3" href="#">Presentation</a> <!-- TODO: change this when fix presentations -->
+          </div>
+      
           <v-row  v-if="currentReportData.remainingTime">
             <AppTimer
               :remaining-time-original="currentReportData.remainingTime"
@@ -206,7 +194,7 @@ export default {
   margin: auto;
 }
 
-.v-text-field {
+.v-text-field, .tight {
   max-width: 300px;
 }
 

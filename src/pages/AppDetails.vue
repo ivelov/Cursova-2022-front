@@ -90,7 +90,13 @@
           <v-date-picker class="mt-2 tight" v-model="conferenceData.conference.date" readonly></v-date-picker>
           
           <h4>Time:</h4>
-          <v-time-picker class="mt-2 tight" v-model="conferenceData.conference.time" readonly></v-time-picker>
+          <v-time-picker 
+            class="mt-2 tight" 
+            v-model="conferenceData.conference.time" 
+            readonly
+            full-width
+            format="24hr"
+          ></v-time-picker>
 
           <div v-if="conferenceData.conference.latitude != 0 && conferenceData.conference.longitude != 0">
             <h4>Position:</h4>
