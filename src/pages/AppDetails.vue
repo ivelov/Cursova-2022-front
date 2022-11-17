@@ -3,12 +3,10 @@
     <AppHeader :buttons="buttons"></AppHeader>
 
     <v-main>
-      <br /><br />
       <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
-      <v-form v-else>
-
+      <div v-else class="mt-5">
         <v-menu
           v-if="isAdmin"
           :close-on-content-click="false"
@@ -76,69 +74,28 @@
           </v-breadcrumbs>
           </v-row>
           <br><br>
-          <v-row>
-            <v-text-field
-              v-model="conferenceData.conference.title"
-              label="Title"
-              outlined
-              disabled
-            ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-              v-model="conferenceData.conference.categoryTitle"
-              label="Category"
-              outlined
-              disabled
-            ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-select
-              v-model="conferenceData.conference.country"
-              label="Country"
-              outlined
-              disabled
-              :items="countries"
-              item-text="state"
-              item-value="value"
-            ></v-select>
-          </v-row>
-          <v-row>
-            <v-text-field
-              v-model="conferenceData.conference.date"
-              label="Date"
-              disabled
-              outlined
-            ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-              v-model="conferenceData.conference.time"
-              label="Time"
-              disabled
-              outlined
-            ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-              v-model="conferenceData.conference.latitude"
-              label="Latitude"
-              outlined
-              disabled
-            >
-            </v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-              v-model="conferenceData.conference.longitude"
-              label="Longitude"
-              outlined
-              disabled
-            >
-            </v-text-field>
-          </v-row>
-          <v-row>
+
+          <h4>Title:</h4>
+          <p class="ml-3 mb-3">{{conferenceData.conference.title}}</p>
+
+          <div v-if="conferenceData.conference.categoryTitle">
+            <h4>Category:</h4>
+            <p class="ml-3 mb-3">{{conferenceData.conference.categoryTitle}}</p>
+          </div>
+
+          <h4>Country:</h4>
+          <p class="ml-3 mb-3">{{country}}</p>
+
+          <h4>Date:</h4>
+          <v-date-picker class="mt-2 tight" v-model="conferenceData.conference.date" readonly></v-date-picker>
+          
+          <h4>Time:</h4>
+          <v-time-picker class="mt-2 tight" v-model="conferenceData.conference.time" readonly></v-time-picker>
+
+          <div v-if="conferenceData.conference.latitude != 0 && conferenceData.conference.longitude != 0">
+            <h4>Position:</h4>
             <GmapMap
+              class="mt-3"
               :center="{
                 lat: conferenceData.conference.latitude,
                 lng: conferenceData.conference.longitude,
@@ -156,9 +113,8 @@
                 :draggable="false"
               />
             </GmapMap>
-          </v-row>
-          <br /><br />
-          <v-row v-if="conferenceData.canUpdate">
+          </div>
+          <v-row v-if="conferenceData.canUpdate" class="mt-5">
             <v-btn
             class="btn"
             color="warning"
@@ -234,13 +190,15 @@
           </v-row>
           <br>
         </v-container>
-      </v-form>
+      </div>
     </v-main>
   </div>
 </template>
 
 <script>
 import AppHeader from "../components/AppHeader.vue";
+import countriesMixin from '../components/mixins/countriesMixin.vue';
+
 export default {
   name: "AppDetails",
 
@@ -249,6 +207,7 @@ export default {
       back: true,
     },
     btnsLoading: false,
+    country: 'Ukraine',
   }),
   computed: {
     conferenceData() {
@@ -256,9 +215,6 @@ export default {
     },
     loading() {
       return this.$store.getters.isLoading;
-    },
-    countries() {
-      return this.$store.getters.getCountries;
     },
     isAdmin() {
       return this.$store.getters.isAdmin;
@@ -270,6 +226,13 @@ export default {
   mounted() {
     this.$store.dispatch("setCurrentConferenceData", {
       id: this.$route.params.id,
+    }).then(() => {
+      for (const key in this.countries) {
+        if(this.countries[key].state == this.conferenceData.conference.country){
+          this.country = this.countries[key].value;
+          break;
+        }
+      }
     });
     this.$store.dispatch("definePerks");
   },
@@ -334,6 +297,7 @@ export default {
     },
   },
   components: { AppHeader },
+  mixins:[countriesMixin],
 };
 </script>
 
@@ -343,7 +307,7 @@ export default {
   margin: auto;
 }
 
-.v-text-field {
+.v-text-field, .tight {
   max-width: 300px;
 }
 
