@@ -87,6 +87,7 @@
               </template>
               <v-date-picker
                 v-model="conferenceData.conference.date"
+                :min="new Date().toISOString().slice(0,10)"
               ></v-date-picker>
             </v-menu>
           </v-row>

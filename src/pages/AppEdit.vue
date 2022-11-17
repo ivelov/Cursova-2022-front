@@ -91,6 +91,7 @@
               </template>
               <v-date-picker
                 v-model="conferenceData.conference.date"
+                :min="new Date().toISOString().slice(0,10)"
               ></v-date-picker>
             </v-menu>
           </v-row>
@@ -187,7 +188,7 @@
             color="primary"
             :loading="btnsLoading"
             :disabled="btnsLoading"
-            @click="$router.push('/conference/' + conferenceData.conference.id)"
+            @click="$router.push('/conferences/1')"
           >
             <span>Cancel</span>
           </v-btn>
