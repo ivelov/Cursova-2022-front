@@ -123,7 +123,7 @@ const router = new VueRouter({
       }
     },
     {
-      path: "/meetings",
+      path: "/meetings/:page",
       component: AppMeetings,
       meta:{
         requireAuth:true

@@ -47,7 +47,15 @@
           </tr>
         </tbody>
         </v-simple-table>
-      
+        <p width="100%" class="text-center mt-3">
+        Page {{ curPage }} of {{ pageInfo.maxPage }}
+        <v-btn @click="$_prevPage" text :disabled="prevBtnDisabled || loading">
+          <span>Prev</span>
+        </v-btn>
+        <v-btn @click="$_nextPage" text :disabled="nextBtnDisabled || loading">
+          <span>Next</span>
+        </v-btn>
+      </p>
     </v-main>
   </div>
 </template>
@@ -62,21 +70,44 @@ export default {
       back: true,
       categories: true,
     },
-    loading:true
+    loading:true,
+    curPage: 1
   }),
   computed: {
     pageInfo(){
       return this.$store.getters.getMeetingsPageInfo;
     },
+    nextBtnDisabled() {
+      return this.curPage >= this.pageInfo.maxPage;
+    },
+    prevBtnDisabled() {
+      return this.curPage <= 1;
+    },
   },
   mounted() {
     this.loading = true;
-    this.$store.dispatch("setMeetingsPageInfo").finally(()=>{
+    this.curPage = this.$route.params.page;
+    this.$store.dispatch("setMeetingsPageInfo", this.curPage).finally(()=>{
       this.loading = false;
     });
   },
   methods: {
-    
+    $_nextPage() {
+      this.curPage = parseInt(this.curPage) + 1;
+      this.loading = true;
+      this.$store.dispatch("setMeetingsPageInfo", this.curPage).finally(()=>{
+        this.loading = false;
+      });
+      this.$router.push("/meetings/" + this.curPage);
+    },
+    $_prevPage() {
+      this.curPage = parseInt(this.curPage) - 1;
+      this.loading = true;
+      this.$store.dispatch("setMeetingsPageInfo", this.curPage).finally(()=>{
+        this.loading = false;
+      });
+      this.$router.push("/meetings/" + this.curPage);
+    },
   },
   components: { AppHeader },
 };

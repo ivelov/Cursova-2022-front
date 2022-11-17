@@ -111,7 +111,7 @@
               </v-list-item>
               <v-list-item>
                 <v-btn text>
-                  <router-link class="btn-link" to="/meetings">Meetings</router-link>
+                  <router-link class="btn-link" to="/meetings/1">Meetings</router-link>
                 </v-btn>
               </v-list-item>
             </v-list>
@@ -351,7 +351,7 @@
           </v-list-item>
           <v-list-item>
             <v-btn text>
-              <router-link class="btn-link" to="/meetings">Meetings</router-link>
+              <router-link class="btn-link" to="/meetings/1">Meetings</router-link>
             </v-btn>
           </v-list-item>
         </v-list>

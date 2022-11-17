@@ -418,9 +418,9 @@ export default new Vuex.Store({
         state.commit("setCategoriesList", response.data);
       });
     },
-    async setMeetingsPageInfo(state) {
+    async setMeetingsPageInfo(state, page = 1) {
       return new Promise((resolve, reject) => {
-        axios.get("/meetings").then((response) => {
+        axios.get("/meetings/"+page).then((response) => {
           state.commit("setMeetingsPageInfo", response.data);
           resolve();
         }).catch(()=>{reject()});
