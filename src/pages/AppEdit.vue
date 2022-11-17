@@ -133,7 +133,7 @@
           </v-row>
           <v-row>
             <v-text-field
-              v-model="conferenceData.conference.latitude"
+              v-model="latitude"
               label="Latitude"
               outlined
             >
@@ -141,7 +141,7 @@
           </v-row>
           <v-row>
             <v-text-field
-              v-model="conferenceData.conference.longitude"
+              v-model="longitude"
               label="Longitude"
               outlined
             >
@@ -230,6 +230,8 @@ export default {
       back: true,
     },
     selectedCategory:undefined,
+    latitude: 0,
+    longitude: 0,
   }),
   computed: {
     conferenceData() {
@@ -242,13 +244,31 @@ export default {
       return this.$store.getters.getCategories;
     },
   },
+  watch:{
+    latitude(value){
+      if(isNaN(parseFloat(value))){
+        this.conferenceData.conference.latitude = 0;
+      }else{
+        this.conferenceData.conference.latitude = value;
+      }
+    },
+    longitude(value){
+      if(isNaN(parseFloat(value))){
+        this.conferenceData.conference.longitude = 0;
+      }else{
+        this.conferenceData.conference.longitude = value;
+      }
+    },
+  },
   mounted() {
     
     this.$store.dispatch("setCurrentConferenceData", {
       id: this.$route.params.id,
     }).then(() => {
       this.selectedCategory = {id:this.conferenceData.conference.categoryId, name:this.conferenceData.conference.categoryTitle};
-        });
+      this.latitude = this.conferenceData.conference.latitude;
+      this.longitude = this.conferenceData.conference.longitude;
+    });
     this.$store.dispatch("setCategories");
   },
   methods: {
