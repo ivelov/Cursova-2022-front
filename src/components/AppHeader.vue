@@ -110,17 +110,17 @@
             </template>
             <v-list>
               <v-list-item>
-                <v-btn text>
-                  <router-link class="btn-link" to="/categories"
-                    >Categories</router-link
-                  >
+                <v-btn text
+                  @click="$router.push('/categories')"
+                >
+                  <span>Categories</span>
                 </v-btn>
               </v-list-item>
               <v-list-item>
-                <v-btn text>
-                  <router-link class="btn-link" to="/meetings/1"
-                    >Meetings</router-link
-                  >
+                <v-btn text
+                  @click="$router.push('/meetings/1')"
+                >
+                  <span>Meetings</span>
                 </v-btn>
               </v-list-item>
             </v-list>
@@ -356,17 +356,17 @@
         </template>
         <v-list>
           <v-list-item>
-            <v-btn text>
-              <router-link class="btn-link" to="/categories"
-                >Categories</router-link
-              >
+            <v-btn text
+              @click="$router.push('/categories')"
+            >
+              <span>Categories</span>
             </v-btn>
           </v-list-item>
           <v-list-item>
-            <v-btn text>
-              <router-link class="btn-link" to="/meetings/1"
-                >Meetings</router-link
-              >
+            <v-btn text
+              @click="$router.push('/meetings/1')"
+            >
+              <span>Meetings</span>
             </v-btn>
           </v-list-item>
         </v-list>

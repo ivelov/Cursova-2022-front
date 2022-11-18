@@ -134,7 +134,7 @@
             <span>Register</span>
           </v-btn>
           <br /><br />
-          <p>Have an account? <a @click="$router.push('/login')">Login</a></p>
+          <p>Have an account? <router-link to="/login">Login</router-link></p>
         </v-container>
       </v-form>
     </v-main>

@@ -39,7 +39,7 @@
           <br /><br />
           <p>
             Don't have an account?
-            <a @click="$router.push('/register')">Register</a>
+            <router-link to="/register">Register</router-link>
           </p>
         </v-container>
       </v-form>
