@@ -188,6 +188,7 @@ export default {
     this.axios.get("/account")
       .then((response) => {
         this.values = response.data;
+      }).finally(() => {
         this.loading = false;
       });
   },
@@ -208,13 +209,11 @@ export default {
               },
             })
             .then((response) => {
-              this.btnsLoading = false;
               if (response.data == 1) {
                 this.$router.push("/");
               }
             })
             .catch((e) => {
-              this.btnsLoading = false;
               console.error(e);
               let errors = e.response.data.errors;
               if (typeof errors != undefined) {
@@ -222,6 +221,8 @@ export default {
                   this.errors[key] = errors[key];
                 }
               }
+            }).finally(() => {
+              this.btnsLoading = false;
             });
         });
     },

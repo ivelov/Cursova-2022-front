@@ -253,6 +253,7 @@ export default {
               id: this.$route.params.id,
               hard: true,
           });
+        }).finally(() => {
           this.btnsLoading = false;
         });
       }else{
@@ -261,6 +262,7 @@ export default {
               id: this.$route.params.id,
               hard: true,
           });
+        }).finally(() => {
           this.btnsLoading = false;
         });
       }
@@ -273,6 +275,7 @@ export default {
               id: this.$route.params.id,
               hard: true,
           });
+        }).finally(() => {
           this.btnsLoading = false;
         });
       }else{

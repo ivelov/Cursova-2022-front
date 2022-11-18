@@ -287,9 +287,6 @@ export default {
       page: this.curPage,
     });
     this.$store.dispatch("setCategoriesList");
-    /*this.axios.get('/zoom/getToken').then((data) => {
-        console.log(data.data);
-    });*/
   },
   methods: {
     $_joinConf(id) {
@@ -300,8 +297,9 @@ export default {
         if(this.pageInfo.isListener){
           this.btnsLoading = true;
           this.axios.post("/conference/"+id+'/join').then(() => {
-            this.btnsLoading = false;
             this.$_reloadConferences();
+          }).finally(() => {
+            this.btnsLoading = false;
           });
         }else{
           this.$router.push("/addReport/" + id);

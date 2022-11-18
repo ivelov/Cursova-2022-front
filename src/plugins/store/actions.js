@@ -8,12 +8,14 @@ export default {
         if(!state.getters.isAuth){
           axios.get("/conferences/"+payload.page).then((response) => {
             state.commit("setConferencesPageInfo", response.data);
+          }).finally(() => {
             state.commit("setLoading", false);
           });
           return;
         }
         axios.post("/conferences/"+payload.page, state.getters.getFilters).then((response) => {
           state.commit("setConferencesPageInfo", response.data);
+        }).finally(() => {
           state.commit("setLoading", false);
         });
       },
@@ -56,6 +58,7 @@ export default {
         state.commit("setLoading", true);
         axios.get("/conference/" + payload.id).then((response) => {
           state.commit("setCurrentConferenceData", response.data);
+        }).finally(() => {
           state.commit("setLoading", false);
         });
       },
@@ -65,10 +68,11 @@ export default {
           {repId: payload.edit? state.getters.getCurrentReportData.report.id : false}
         ).then((response) => {
           state.commit("setReportBusyTimes", response.data);
-          state.commit("setLoading", false);
         }).catch((e)=>{
           console.log(e);
           state.commit("setReportError", true);
+        }).finally(() => {
+          state.commit("setLoading", false);
         });
       },
       async setReports(state, payload = {page: 1, favorites:false}) {
@@ -76,6 +80,7 @@ export default {
         if(!state.getters.isAuth){
           axios.get("/reports/"+payload.page).then((response) => {
             state.commit("setReportsPageInfo", response.data);
+          }).finally(() => {
             state.commit("setLoading", false);
           });
           return;
@@ -85,11 +90,13 @@ export default {
           data.favorites = true;
           axios.post("/reports/"+payload.page, data).then((response) => {
             state.commit("setReportsPageInfo", response.data);
+          }).finally(() => {
             state.commit("setLoading", false);
           });
         }else{
           axios.post("/reports/"+payload.page, state.getters.getFilters).then((response) => {
             state.commit("setReportsPageInfo", response.data);
+          }).finally(() => {
             state.commit("setLoading", false);
           });
         }
@@ -107,12 +114,15 @@ export default {
           state.commit("setLoading", true);
           axios.get("/report/" + payload.id).then((response) => {
             state.commit("setCurrentReportData", response.data);
-            state.commit("setLoading", false);
             if(payload.edit){
               state.dispatch("setReportBusyTimes", {id: state.getters.getCurrentReportData.report.conferenceId, edit: true});
             }
             resolve();
-          }).catch((er)=>reject(er));
+          }).catch((er)=>{
+            reject(er);
+          }).finally(() => {
+            state.commit("setLoading", false);
+          });
         });
         
       },
@@ -150,11 +160,13 @@ export default {
         if(payload.parentId){
           axios.get("/categories/"+payload.parentId).then((response) => {
             state.commit("setCategories", response.data);
+          }).finally(() => {
             state.commit("setLoading", false);
           });
         }else{
           axios.get("/categories").then((response) => {
             state.commit("setCategories", response.data);
+          }).finally(() => {
             state.commit("setLoading", false);
           });
         }

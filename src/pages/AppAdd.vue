@@ -277,11 +277,12 @@ export default {
         .post("/add", values)
         .then((response) => {
           console.log(response);
-          this.btnsLoading = false;
           this.$router.push('/conferences/1');
         })
         .catch((e) => {
           console.error(e);
+        }).finally(() => {
+          this.btnsLoading = false;
         });
     },
   },

@@ -338,17 +338,19 @@ export default {
       if (report.favorite) {
         this.axios.post("/report/" + report.id + "/unfavorite").then(() => {
           report.favorite = false;
-          report.favLoading = false;
           this.headerRefreshKey += 1;
           if (this.$route.params.favPage) {
             this.$store.dispatch("setFavoriteReports", { page: this.curPage });
           }
+        }).finally(() => {
+          report.favLoading = false;
         });
       } else {
         this.axios.post("/report/" + report.id + "/favorite").then(() => {
           report.favorite = true;
-          report.favLoading = false;
           this.headerRefreshKey += 1;
+        }).finally(() => {
+          report.favLoading = false;
         });
       }
     },

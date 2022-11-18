@@ -206,7 +206,6 @@ export default {
               }
             })
             .catch((e) => {
-              this.btnsLoading = false;
               console.log(e);
               let errors = e.response.data.errors;
               if (typeof errors != undefined) {
@@ -214,6 +213,8 @@ export default {
                   this.errors[key] = errors[key];
                 }
               }
+            }).finally(() => {
+              this.btnsLoading = false;
             });
         });
     },

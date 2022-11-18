@@ -87,8 +87,9 @@ export default {
         .get("/category/"+this.$route.params.id)
         .then((response) => {
           this.categoryInfo = response.data;
+        }).finally(() => {
           this.$store.commit("setLoading", false);
-        })
+        });
   },
   methods: {
     $_saveCategory() {
@@ -99,6 +100,7 @@ export default {
         .then((response) => {
           console.log(response);
           this.$router.go();
+        }).finally(() => {
           this.btnsLoading = false;
         })
     },
@@ -114,6 +116,7 @@ export default {
         .then((response) => {
           console.log(response);
           this.$router.go();
+        }).finally(() => {
           this.btnsLoading = false;
         })
     },
