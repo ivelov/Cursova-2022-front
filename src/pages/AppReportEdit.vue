@@ -295,34 +295,32 @@ export default {
   methods: {
     $_saveReport() {
       this.btnsLoading = true;
-      var report = Object.assign({}, this.currentReportData.report);
-      if(this.selectedCategory)
+      let report = Object.assign({}, this.currentReportData.report);
+      if(this.selectedCategory){
         report.categoryId = this.selectedCategory.id;
-
-      if(report.presentation){
-        var reader = new FileReader();
-        reader.readAsBinaryString(report.presentation);
-
-        reader.onload = (res) => {
-          //var presBuf = report.presentation;
-          report.presentation = res.currentTarget.result;
-
-          this.axios
-          .post("/report/"+report.id+'/save', report)
-          .then((response) => {
-            console.log(response);
-            //report.presentation = presBuf;
-            this.btnsLoading = false;
-          })
-        }
-      }else{
-        this.axios
-        .post("/report/"+report.id+'/save', report)
-        .then((response) => {
-          console.log(response);
-          this.btnsLoading = false;
-        })
       }
+      
+      var formData = new FormData();
+
+      if(this.currentReportData.report.presentation){
+        report.presentation = null;
+        formData.append("presentation", this.currentReportData.report.presentation);
+        formData.append("type", this.currentReportData.report.presentation.name.slice(this.currentReportData.report.presentation.name.lastIndexOf('.')));
+      }
+      formData.append("report", JSON.stringify(report));
+
+      this.axios
+      .post("/report/"+report.id+'/save', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then((response) => {
+        console.log(response);
+      }).catch(() => {
+        this.saveError = true;
+      }).finally(() => {
+        this.btnsLoading = false;
+      })
       
     },
     $_allowedHours(v){

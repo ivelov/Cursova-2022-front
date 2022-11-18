@@ -258,23 +258,16 @@ export default {
   },
   methods: {
     $_markerUpdate(event) {
-      this.conferenceData.conference.latitude = event.latLng.lat();
-      this.conferenceData.conference.longitude = event.latLng.lng();
+      this.latitude = event.latLng.lat();
+      this.longitude = event.latLng.lng();
     },
     $_countryChange(event) {
-      this.conferenceData.conference.latitude =
+      this.latitude =
         this.countriesLocations[event].lat;
-      this.conferenceData.conference.longitude =
+      this.longitude =
         this.countriesLocations[event].lng;
     },
     $_saveConf() {
-      if (
-        isNaN(parseFloat(this.conferenceData.conference.longitude)) ||
-        isNaN(parseFloat(this.conferenceData.conference.latitude))
-      ) {
-        alert("Enter valid posisiton");
-        return;
-      }
       this.btnsLoading = true;
       
       this.conferenceData.conference.categoryId = this.selectedCategory ? this.selectedCategory.id : null;

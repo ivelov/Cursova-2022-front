@@ -80,7 +80,7 @@
 
           <div class="tight" v-if="currentReportData.report.presentation">
             <h4>Presentation:</h4>
-            <a class="ml-3 mb-3" href="#">Presentation</a> <!-- TODO: change this when fix presentations -->
+            <a class="ml-3 mb-3 mt-3" href="#">Presentation</a> <!-- TODO: change this when fix presentations -->
           </div>
       
           <v-row  v-if="currentReportData.remainingTime">

@@ -161,6 +161,13 @@
             Sorry, the conference is busy all the time
           </v-alert>
           <v-alert
+            v-if="saveError"
+            color="red"
+            type="warning"
+          >
+            Save error
+          </v-alert>
+          <v-alert
             v-if="currentReportData.report.isOnline"
             border="left"
             colored-border
@@ -207,7 +214,8 @@ export default {
     minEndTime:'',
     maxEndTime:'',
     catMenu:false,
-    selectedCategory:undefined
+    selectedCategory:undefined,
+    saveError:false,
   }),
   computed: {
     loading(){
@@ -296,33 +304,35 @@ export default {
   },
   methods: {
     $_saveReport() {
+      this.saveError = false;
       this.btnsLoading = true;
-      if(this.selectedCategory)
+      if(this.selectedCategory){
         this.currentReportData.report.categoryId = this.selectedCategory.id;
-      if(this.currentReportData.report.presentation){
-        var reader = new FileReader();
-        reader.readAsBinaryString(this.currentReportData.report.presentation);
-        reader.onload = (res) => {
-          this.currentReportData.report.presentation = res.currentTarget.result;
-          this.axios
-          .post("/addReport", this.currentReportData.report)
-          .then((response) => {
-            console.log(response);
-            this.btnsLoading = false;
-            this.$store.commit('clearCurrentReportData');
-            this.$router.push('/reports/1');
-          })
-        }
-      }else{
-        this.axios
-        .post("/addReport", this.currentReportData.report)
-        .then((response) => {
-          console.log(response);
-          this.btnsLoading = false;
-          this.$store.commit('clearCurrentReportData');
-          this.$router.push('/reports/1');
-        })
       }
+
+      let report = Object.assign({}, this.currentReportData.report);
+      var formData = new FormData();
+
+      if(this.currentReportData.report.presentation){
+        report.presentation = null;
+        formData.append("presentation", this.currentReportData.report.presentation);
+        formData.append("type", this.currentReportData.report.presentation.name.slice(this.currentReportData.report.presentation.name.lastIndexOf('.')));
+      }
+      formData.append("report", JSON.stringify(report));
+      this.axios
+      .post("/addReport", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then((response) => {
+        console.log(response);
+        this.$store.commit('clearCurrentReportData');
+        this.$router.push('/reports/1');
+      }).catch(() => {
+        this.saveError = true;
+      }).finally(() => {
+        this.btnsLoading = false;
+      })
       
     },
     allowedHours(v){

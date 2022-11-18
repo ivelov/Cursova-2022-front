@@ -143,7 +143,6 @@ export default new Vuex.Store({
     },
     setCurrentReportData(state, currentReportData) {
       state.currentReportData = currentReportData;
-      currentReportData.report.presentation = new File([currentReportData.report.presentation], "presentation");
     },
     setReportConferenceCategory(state, reportConferenceCategory) {
       state.currentReportData.conferenceCategory = reportConferenceCategory;
