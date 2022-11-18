@@ -186,7 +186,8 @@ export default {
     $_downloadPresentation(){
       this.axios.get("/presentations/" + this.currentReportData.presentationName).then((response) => {
         let hiddenElement = document.createElement('a');  
-        hiddenElement.href = 'data:text/pptx;charset=utf-8,' + encodeURI(response);
+        let mime = this.currentReportData.presentationName.slice(this.currentReportData.presentationName.lastIndexOf('.') + 1);
+        hiddenElement.href = 'data:text/'+mime+';charset=utf-8,' + encodeURI(response);
         hiddenElement.target = '_blank';  
           
         hiddenElement.download = this.currentReportData.presentationName;
