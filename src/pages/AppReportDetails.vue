@@ -27,7 +27,7 @@
             >
             <template v-slot:item="{ item }">
               <v-breadcrumbs-item
-                style="color:blue;cursor: pointer;"
+                class="bread-item"
                 @click="
                 $_breadcrumbClick(item.categoryId);          
                 "
@@ -216,5 +216,9 @@ export default {
 
 .text-white{
   color: white;
+}
+.bread-item{
+  color:blue;
+  cursor: pointer;
 }
 </style>

@@ -25,7 +25,7 @@
               <span>Exports</span>
             </v-btn>
           </template>
-          <v-container class="overflow-x-auto" style="background-color:white">
+          <v-container class="overflow-x-auto white">
             <v-list>
               <v-list-item class="export-item">
                 <v-btn  
@@ -100,15 +100,15 @@
 
           <div v-if="conferenceData.conference.latitude != 0 && conferenceData.conference.longitude != 0">
             <h4>Position:</h4>
-            <GmapMap
-              class="mt-3"
+            <v-row>
+              <GmapMap
+              class="mt-3 gmap-size"
               :center="{
                 lat: conferenceData.conference.latitude,
                 lng: conferenceData.conference.longitude,
               }"
               :zoom="10"
               map-type-id="terrain"
-              style="width: 500px; height: 300px"
             >
               <GmapMarker
                 :key="1"
@@ -119,6 +119,8 @@
                 :draggable="false"
               />
             </GmapMap>
+            </v-row>
+            
           </div>
           <v-row v-if="conferenceData.canUpdate" class="mt-5">
             <v-btn
@@ -347,5 +349,9 @@ export default {
 
 .export-item{
   min-width: 250px;
+}
+.gmap-size{
+  width: 500px; 
+  height: 300px;
 }
 </style>

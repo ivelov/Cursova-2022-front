@@ -156,7 +156,7 @@
               }"
               :zoom="10"
               map-type-id="terrain"
-              style="width: 500px; height: 300px"
+              class="gmap-size"
             >
               <GmapMarker
                 v-if="
@@ -333,5 +333,9 @@ export default {
 
 .v-treeview{
   background-color: white;
+}
+.gmap-size{
+  width: 500px; 
+  height: 300px;
 }
 </style>
