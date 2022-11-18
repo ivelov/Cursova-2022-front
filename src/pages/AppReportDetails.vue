@@ -78,12 +78,12 @@
             format="24hr"
           ></v-time-picker>
 
-          <div class="tight" v-if="currentReportData.report.presentation">
+          <div class="tight" v-if="currentReportData.presentationName">
             <h4>Presentation:</h4>
-            <a class="ml-3 mb-3 mt-3" href="#">Presentation</a> <!-- TODO: change this when fix presentations -->
+            <a class="ml-3 mb-3 mt-3" @click="$_downloadPresentation">{{currentReportData.presentationName}}</a> <!-- TODO: change this when fix presentations -->
           </div>
       
-          <v-row  v-if="currentReportData.remainingTime">
+          <v-row  v-if="currentReportData.remainingTime" class="mt-5">
             <AppTimer
               :remaining-time-original="currentReportData.remainingTime"
               @end="$_timerEnd()"
@@ -182,6 +182,16 @@ export default {
     $_timerEnd(){
       this.$set(this.currentReportData, 'remainingTime', false);
       this.$store.dispatch("setCurrentReportData", {id: this.$route.params.repId, hard: true});
+    },
+    $_downloadPresentation(){
+      this.axios.get("/presentations/" + this.currentReportData.presentationName).then((response) => {
+        let hiddenElement = document.createElement('a');  
+        hiddenElement.href = 'data:text/pptx;charset=utf-8,' + encodeURI(response);
+        hiddenElement.target = '_blank';  
+          
+        hiddenElement.download = this.currentReportData.presentationName;
+        hiddenElement.click();  
+      });
     },
   },
   components: { AppHeader, AppComments, AppTimer },
