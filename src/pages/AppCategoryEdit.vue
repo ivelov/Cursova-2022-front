@@ -105,17 +105,12 @@ export default {
         })
     },
     $_deleteCategory() {
-      if(!this.selectedCategory){
-        this.errors = 'Required';
-        return;
-      }
-      
       this.btnsLoading = true;
       this.axios
         .post("/category/"+this.categoryInfo.category.id+'/destroy')
         .then((response) => {
           console.log(response);
-          this.$router.go();
+          this.$router.push('/categories');
         }).finally(() => {
           this.btnsLoading = false;
         })

@@ -35,7 +35,7 @@
               v-model="values.password"
               type="password"
               :rules="[rules.counter, rules.counterMax]"
-              label="New password"
+              label="New password(optional)"
               outlined
               :error-messages="errors.password"
               @change="errors.password = null"
