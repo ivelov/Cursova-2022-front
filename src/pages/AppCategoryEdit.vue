@@ -7,7 +7,7 @@
       <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
-      <v-form v-else v-model="valid">
+      <v-form v-else v-model="valid" @submit.prevent="$_saveCategory">
         <v-container>
           <v-row>
             <p>Conferences in this category:{{categoryInfo.conferencesCount}}</p>
@@ -27,9 +27,9 @@
           </v-row>
           <br /><br />
           <v-btn
+            type="submit"
             class="btn"
             color="success"
-            @click="$_saveCategory"
             :disabled="!valid || btnsLoading"
             :loading="btnsLoading"
           >
@@ -60,7 +60,8 @@
 </template>
 
 <script>
-import AppHeader from "./AppHeader.vue";
+import AppHeader from "../components/AppHeader.vue";
+import rulesMixin from '../components/mixins/rulesMixin.vue'
 export default {
   name: "AppCategoryEdit",
 
@@ -79,9 +80,6 @@ export default {
     loading() {
       return this.$store.getters.isLoading;
     },
-    rules() {
-      return this.$store.getters.getRules;
-    },
   },
   mounted() {
     this.$store.commit("setLoading", true);
@@ -89,8 +87,9 @@ export default {
         .get("/category/"+this.$route.params.id)
         .then((response) => {
           this.categoryInfo = response.data;
+        }).finally(() => {
           this.$store.commit("setLoading", false);
-        })
+        });
   },
   methods: {
     $_saveCategory() {
@@ -101,26 +100,24 @@ export default {
         .then((response) => {
           console.log(response);
           this.$router.go();
+        }).finally(() => {
           this.btnsLoading = false;
         })
     },
     $_deleteCategory() {
-      if(!this.selectedCategory){
-        this.errors = 'Required';
-        return;
-      }
-      
       this.btnsLoading = true;
       this.axios
         .post("/category/"+this.categoryInfo.category.id+'/destroy')
         .then((response) => {
           console.log(response);
-          this.$router.go();
+          this.$router.push('/categories');
+        }).finally(() => {
           this.btnsLoading = false;
         })
     },
   },
   components: { AppHeader },
+  mixins:[rulesMixin]
 };
 </script>
 

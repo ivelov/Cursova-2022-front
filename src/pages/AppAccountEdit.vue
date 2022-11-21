@@ -7,7 +7,7 @@
       <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
-      <v-form v-model="valid" v-else>
+      <v-form v-model="valid" v-else @submit.prevent="$_save">
         <v-container>
           <v-row>
             <v-text-field
@@ -35,7 +35,7 @@
               v-model="values.password"
               type="password"
               :rules="[rules.counter, rules.counterMax]"
-              label="New password"
+              label="New password(optional)"
               outlined
               :error-messages="errors.password"
               @change="errors.password = null"
@@ -123,7 +123,7 @@
           </v-row>
           <br />
           <v-btn
-            @click="$_save"
+            type="submit"
             class="btn"
             :disabled="!valid || !phoneValid || btnsLoading"
             :loading="btnsLoading"
@@ -139,10 +139,12 @@
 </template>
 
 <script>
-import AppHeader from "./AppHeader.vue";
+import AppHeader from "../components/AppHeader.vue";
 import { MazPhoneNumberInput } from "maz-ui";
 import "maz-ui/lib/css/base.css";
 import VueCookies from 'vue-cookies'
+import countriesMixin from '../components/mixins/countriesMixin.vue'
+import rulesMixin from '../components/mixins/rulesMixin.vue'
 
 export default {
   name: "AppAccountEdit",
@@ -181,19 +183,12 @@ export default {
       back: true,
     },
   }),
-  computed: {
-    countries() {
-      return this.$store.getters.getCountries;
-    },
-    rules() {
-      return this.$store.getters.getRules;
-    },
-  },
   mounted(){
     this.loading = true;
     this.axios.get("/account")
       .then((response) => {
         this.values = response.data;
+      }).finally(() => {
         this.loading = false;
       });
   },
@@ -214,13 +209,11 @@ export default {
               },
             })
             .then((response) => {
-              this.btnsLoading = false;
               if (response.data == 1) {
                 this.$router.push("/");
               }
             })
             .catch((e) => {
-              this.btnsLoading = false;
               console.error(e);
               let errors = e.response.data.errors;
               if (typeof errors != undefined) {
@@ -228,6 +221,8 @@ export default {
                   this.errors[key] = errors[key];
                 }
               }
+            }).finally(() => {
+              this.btnsLoading = false;
             });
         });
     },
@@ -236,6 +231,7 @@ export default {
     },
   },
   components: { AppHeader, MazPhoneNumberInput },
+  mixins:[countriesMixin, rulesMixin]
 };
 </script>
 

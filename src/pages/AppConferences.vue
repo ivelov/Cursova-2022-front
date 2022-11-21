@@ -11,7 +11,7 @@
       >
         <v-btn  
           class="mb-4"
-          v-if="canExport"
+          v-if="isAdmin"
           @click="$_exportConferences" 
           :disabled="channelLoading"
           :loading="channelLoading"
@@ -123,9 +123,12 @@
 
       <v-container v-if="loading">
         <v-skeleton-loader
-          class="mx-auto"
+          class="mx-auto skeleton"
           type="table-thead, table-tbody"
         ></v-skeleton-loader>
+      </v-container>
+      <v-container v-else-if="pageInfo.conferences? Object.keys(pageInfo.conferences).length == 0 : false" class="text-center">
+        No results
       </v-container>
       <v-container class="container-conferences" v-else>
 
@@ -228,12 +231,16 @@
 </template>
 
 <script>
-import AppHeader from "./AppHeader.vue";
+import AppHeader from "../components/AppHeader.vue";
 
 
 export default {
   name: "AppConferences",
   data: () => ({
+    buttons:{
+      reports:true,
+      addConference: false,
+    },
     curPage: 1,
     btnsLoading: false,
     catMenu: false,
@@ -246,9 +253,6 @@ export default {
   computed: {
     pageInfo() {
       return this.$store.getters.getConferencesPageInfo;
-    },
-    buttons() {
-      return this.$store.getters.getConferencesPageInfo.buttons;
     },
     loading() {
       return this.$store.getters.isLoading;
@@ -268,20 +272,21 @@ export default {
     channelLoading() {
       return this.$store.getters.getChannelLoading;
     },
-    canExport() {
-      return this.$store.getters.canExport;
+    isAdmin() {
+      return this.$store.getters.isAdmin;
     },
   },
   mounted() {
     this.$store.dispatch("setAuth");
-    this.$store.dispatch("setPerks");
+    this.$store.dispatch("definePerks").then(()=>{
+      this.buttons.addConference = this.$store.getters.canAdd;
+    });
 
     this.curPage = this.$route.params.page;
     this.$store.dispatch("setConferences", {
       page: this.curPage,
     });
     this.$store.dispatch("setCategoriesList");
-        
   },
   methods: {
     $_joinConf(id) {
@@ -292,8 +297,9 @@ export default {
         if(this.pageInfo.isListener){
           this.btnsLoading = true;
           this.axios.post("/conference/"+id+'/join').then(() => {
-            this.btnsLoading = false;
             this.$_reloadConferences();
+          }).finally(() => {
+            this.btnsLoading = false;
           });
         }else{
           this.$router.push("/addReport/" + id);
@@ -422,5 +428,9 @@ export default {
   padding: 80px 10px 5px 10px;
   max-width: 250px;
   width: 250px;
+}
+
+.skeleton{
+  min-width: 620px;
 }
 </style>

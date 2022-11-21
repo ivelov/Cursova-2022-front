@@ -7,8 +7,11 @@
       <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
-      <v-form v-model="valid" v-else>
+      <v-form v-model="valid" v-else @submit.prevent="$_saveReport">
         <v-container>
+          <v-row>
+            <h3 class="mb-5">Enter report info:</h3>
+          </v-row>
           <v-row>
             <v-text-field
               v-model="currentReportData.report.title"
@@ -143,18 +146,40 @@
               :rules="[rules.size]"
             ></v-file-input>
           </v-row>
+          <v-row>
+            <v-checkbox
+              v-model="currentReportData.report.isOnline"
+              label="Online"
+            >
+            </v-checkbox>
+          </v-row>
           <v-alert
-          v-if="fullBusy"
+            v-if="fullBusy"
             color="red"
             type="warning"
           >
-          Sorry, the conference is busy all the time
+            Sorry, the conference is busy all the time
+          </v-alert>
+          <v-alert
+            v-if="saveError"
+            color="red"
+            type="warning"
+          >
+            Save error
+          </v-alert>
+          <v-alert
+            v-if="currentReportData.report.isOnline"
+            border="left"
+            colored-border
+            color="green"
+          >
+            The link to the zoom meeting will be created 10 minutes before the start
           </v-alert>
           <br />
           <v-btn
+            type="submit"
             class="btn"
             color="success"
-            @click="$_saveReport"
             :disabled="!valid || btnsLoading"
             :loading="btnsLoading"
           >
@@ -170,7 +195,9 @@
 </template>
 
 <script>
-import AppHeader from "./AppHeader.vue";
+import AppHeader from "../components/AppHeader.vue";
+import rulesMixin from '../components/mixins/rulesMixin.vue';
+
 export default {
   name: "AppReportsAdd",
 
@@ -187,12 +214,10 @@ export default {
     minEndTime:'',
     maxEndTime:'',
     catMenu:false,
-    selectedCategory:undefined
+    selectedCategory:undefined,
+    saveError:false,
   }),
   computed: {
-    rules(){
-      return this.$store.getters.getRules;
-    },
     loading(){
       return this.$store.getters.isLoading;
     },
@@ -279,33 +304,35 @@ export default {
   },
   methods: {
     $_saveReport() {
+      this.saveError = false;
       this.btnsLoading = true;
-      if(this.selectedCategory)
+      if(this.selectedCategory){
         this.currentReportData.report.categoryId = this.selectedCategory.id;
-      if(this.currentReportData.report.presentation){
-        var reader = new FileReader();
-        reader.readAsBinaryString(this.currentReportData.report.presentation);
-        reader.onload = (res) => {
-          this.currentReportData.report.presentation = res.currentTarget.result;
-          this.axios
-          .post("/addReport", this.currentReportData.report)
-          .then((response) => {
-            console.log(response);
-            this.btnsLoading = false;
-            this.$store.commit('clearCurrentReportData');
-            this.$router.push('/reports/1');
-          })
-        }
-      }else{
-        this.axios
-        .post("/addReport", this.currentReportData.report)
-        .then((response) => {
-          console.log(response);
-          this.btnsLoading = false;
-          this.$store.commit('clearCurrentReportData');
-          this.$router.push('/reports/1');
-        })
       }
+
+      let report = Object.assign({}, this.currentReportData.report);
+      var formData = new FormData();
+
+      if(this.currentReportData.report.presentation){
+        report.presentation = null;
+        formData.append("presentation", this.currentReportData.report.presentation);
+        formData.append("type", this.currentReportData.report.presentation.name.slice(this.currentReportData.report.presentation.name.lastIndexOf('.')));
+      }
+      formData.append("report", JSON.stringify(report));
+      this.axios
+      .post("/addReport", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then((response) => {
+        console.log(response);
+        this.$store.commit('clearCurrentReportData');
+        this.$router.push('/reports/1');
+      }).catch(() => {
+        this.saveError = true;
+      }).finally(() => {
+        this.btnsLoading = false;
+      })
       
     },
     allowedHours(v){
@@ -368,6 +395,7 @@ export default {
     }
   },
   components: { AppHeader },
+  mixins:[rulesMixin]
 };
 </script>
 

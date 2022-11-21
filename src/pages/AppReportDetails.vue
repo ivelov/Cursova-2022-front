@@ -9,7 +9,7 @@
       </v-container>
       <v-form  v-else>
         <v-btn  
-          v-if="canExport"
+          v-if="isAdmin"
           class="float-right"
           :disabled="channelLoading"
           :loading="channelLoading"
@@ -27,7 +27,7 @@
             >
             <template v-slot:item="{ item }">
               <v-breadcrumbs-item
-                style="color:blue;cursor: pointer;"
+                class="bread-item"
                 @click="
                 $_breadcrumbClick(item.categoryId);          
                 "
@@ -46,56 +46,63 @@
           >
             <span>Go to conference</span>
           </v-btn><br><br>
-          <v-row>
-            <v-text-field
-              v-model="currentReportData.report.title"
-              label="Title"
-              outlined
-              disabled
-            ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-              v-model="currentReportData.report.categoryTitle"
-              label="Category"
-              outlined
-              disabled
-            ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-textarea
-              v-model="currentReportData.report.description"
-              outlined
-              label="Description"
-              disabled
-            ></v-textarea>
-          </v-row>
-          <v-row>
-            <v-text-field
-              v-model="currentReportData.report.startTime"
-              label="Start time"
-              outlined
-              disabled
-            ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-              v-model="currentReportData.report.endTime"
-              label="End time"
-              outlined
-              disabled
-            ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-file-input
-              v-model="currentReportData.report.presentation"
-              accept=".ppt,.pptx"
-              label="Presentation"
-              outlined
-              disabled
-            ></v-file-input>
-          </v-row>
+
+          <h4>Title:</h4>
+          <p class="ml-3 mb-3">{{currentReportData.report.title}}</p>
           
+          <div v-if="currentReportData.report.categoryTitle">
+            <h4>Category:</h4>
+            <p class="ml-3 mb-3">{{currentReportData.report.categoryTitle}}</p>
+          </div>
+          
+          <div class="tight" v-if="currentReportData.report.categoryTitle">
+            <h4>Description:</h4>
+            <p class="ml-3 mb-3">{{currentReportData.report.description}}</p>
+          </div>
+
+          <h4>Start time:</h4>
+          <v-time-picker 
+            class="mt-2 tight" 
+            v-model="currentReportData.report.startTime" 
+            readonly
+            full-width
+            format="24hr"
+          ></v-time-picker>
+
+          <h4>End time:</h4>
+          <v-time-picker 
+            class="mt-2 tight" 
+            v-model="currentReportData.report.endTime" 
+            readonly
+            full-width
+            format="24hr"
+          ></v-time-picker>
+
+          <div class="tight" v-if="currentReportData.presentationName">
+            <h4>Presentation:</h4>
+            <a class="ml-3 mb-3 mt-3" @click="$_downloadPresentation">{{currentReportData.presentationName}}</a> <!-- TODO: change this when fix presentations -->
+          </div>
+      
+          <v-row  v-if="currentReportData.remainingTime" class="mt-5">
+            <AppTimer
+              :remaining-time-original="currentReportData.remainingTime"
+              @end="$_timerEnd()"
+            />
+          </v-row>
+          <v-row  v-if="currentReportData.meetingJoinLink" class="mb-3">
+            <v-btn
+              color="success"
+            >
+              <a class="text-white" :href="currentReportData.meetingJoinLink">Join Zoom meeting</a>
+            </v-btn>
+          </v-row>
+          <v-row  v-if="currentReportData.meetingStartLink">
+            <v-btn
+              color="success"
+            >
+              <a class="text-white" :href="currentReportData.meetingStartLink">Start Zoom meeting</a>
+            </v-btn>
+          </v-row>
           <br />
           <v-btn
             v-if="currentReportData.canUpdate"
@@ -125,8 +132,10 @@
 </template>
 
 <script>
-import AppHeader from "./AppHeader.vue";
-import AppComments from "./AppComments.vue";
+import AppHeader from "../components/AppHeader.vue";
+import AppComments from "../components/AppComments.vue";
+import AppTimer from "../components/AppTimer.vue";
+
 export default {
   name: "AppReportsDetails",
 
@@ -143,8 +152,8 @@ export default {
     currentReportData(){
       return this.$store.getters.getCurrentReportData;
     },
-    canExport() {
-      return this.$store.getters.canExport;
+    isAdmin() {
+      return this.$store.getters.isAdmin;
     },
     channelLoading() {
       return this.$store.getters.getChannelLoading;
@@ -152,7 +161,7 @@ export default {
   },
   mounted() {
     this.$store.dispatch("setCurrentReportData", {id: this.$route.params.repId});
-    this.$store.dispatch("setPerks");
+    this.$store.dispatch("definePerks");
   },
   methods: {
     $_cancelPart(){
@@ -170,8 +179,23 @@ export default {
       this.$store.commit('initializePusher');
       this.axios.post("/export/report/"+this.$route.params.repId+'/comments');  
     },
+    $_timerEnd(){
+      this.$set(this.currentReportData, 'remainingTime', false);
+      this.$store.dispatch("setCurrentReportData", {id: this.$route.params.repId, hard: true});
+    },
+    $_downloadPresentation(){
+      this.axios.get("/presentations/" + this.currentReportData.presentationName).then((response) => {
+        let hiddenElement = document.createElement('a');  
+        let mime = this.currentReportData.presentationName.slice(this.currentReportData.presentationName.lastIndexOf('.') + 1);
+        hiddenElement.href = 'data:text/'+mime+';charset=utf-8,' + encodeURI(response);
+        hiddenElement.target = '_blank';  
+          
+        hiddenElement.download = this.currentReportData.presentationName;
+        hiddenElement.click();  
+      });
+    },
   },
-  components: { AppHeader, AppComments },
+  components: { AppHeader, AppComments, AppTimer },
 };
 </script>
 
@@ -181,12 +205,20 @@ export default {
   margin: auto;
 }
 
-.v-text-field {
+.v-text-field, .tight {
   max-width: 300px;
 }
 
 .btn {
   margin-right: 5px;
   margin-bottom: 5px;
+}
+
+.text-white{
+  color: white;
+}
+.bread-item{
+  color:blue;
+  cursor: pointer;
 }
 </style>

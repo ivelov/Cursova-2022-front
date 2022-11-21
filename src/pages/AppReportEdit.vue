@@ -7,7 +7,7 @@
       <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
-      <v-form v-model="valid" v-else>
+      <v-form v-model="valid" v-else @submit.prevent="$_saveReport">
         <v-container>
           <v-row>
             <v-breadcrumbs
@@ -126,6 +126,7 @@
                   v-on="on"
                   :disabled="currentReportData.report.startTime.length == 0"
                   :rules="[rules.required]"
+                  @click.once="$_startTimeClick()"
                 ></v-text-field>
               </template>
               <v-time-picker
@@ -150,12 +151,27 @@
               :rules="[rules.size]"
             ></v-file-input>
           </v-row>
-          
-          <br /><br />
+          <v-row>
+            <v-checkbox
+              v-model="currentReportData.report.isOnline"
+              label="Online"
+            >
+            </v-checkbox>
+          </v-row>
+          <br />
+          <v-alert
+            v-if="currentReportData.report.isOnline"
+            border="left"
+            colored-border
+            color="green"
+          >
+            The link to the zoom meeting will be created 10 minutes before the start
+          </v-alert>
+          <br />
           <v-btn
+            type="submit"
             class="btn"
             color="success"
-            @click="$_saveReport"
             :disabled="!valid || btnsLoading"
             :loading="btnsLoading"
           >
@@ -171,7 +187,9 @@
 </template>
 
 <script>
-import AppHeader from "./AppHeader.vue";
+import AppHeader from "../components/AppHeader.vue";
+import rulesMixin from '../components/mixins/rulesMixin.vue';
+
 export default {
   name: "AppReportsAdd",
 
@@ -191,9 +209,6 @@ export default {
     selectedCategory:undefined
   }),
   computed: {
-    rules(){
-      return this.$store.getters.getRules;
-    },
     loading(){
       return this.$store.getters.isLoading;
     },
@@ -280,34 +295,32 @@ export default {
   methods: {
     $_saveReport() {
       this.btnsLoading = true;
-      var report = Object.assign({}, this.currentReportData.report);
-      if(this.selectedCategory)
+      let report = Object.assign({}, this.currentReportData.report);
+      if(this.selectedCategory){
         report.categoryId = this.selectedCategory.id;
-
-      if(report.presentation){
-        var reader = new FileReader();
-        reader.readAsBinaryString(report.presentation);
-
-        reader.onload = (res) => {
-          //var presBuf = report.presentation;
-          report.presentation = res.currentTarget.result;
-
-          this.axios
-          .post("/report/"+report.id+'/save', report)
-          .then((response) => {
-            console.log(response);
-            //report.presentation = presBuf;
-            this.btnsLoading = false;
-          })
-        }
-      }else{
-        this.axios
-        .post("/report/"+report.id+'/save', report)
-        .then((response) => {
-          console.log(response);
-          this.btnsLoading = false;
-        })
       }
+      
+      var formData = new FormData();
+
+      if(this.currentReportData.report.presentation){
+        report.presentation = null;
+        formData.append("presentation", this.currentReportData.report.presentation);
+        formData.append("type", this.currentReportData.report.presentation.name.slice(this.currentReportData.report.presentation.name.lastIndexOf('.')));
+      }
+      formData.append("report", JSON.stringify(report));
+
+      this.axios
+      .post("/report/"+report.id+'/save', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then((response) => {
+        console.log(response);
+      }).catch(() => {
+        this.saveError = true;
+      }).finally(() => {
+        this.btnsLoading = false;
+      })
       
     },
     $_allowedHours(v){
@@ -348,8 +361,6 @@ export default {
         }
       }
       this.maxEndTime = '' + maxEndTimeBufHour + ':' + maxEndTimeBufMinute;
-      console.log(this.minEndTime+' '+this.maxEndTime);
-
     },
     /**
      * Determines is time1 is bigger than time2
@@ -372,6 +383,7 @@ export default {
     }
   },
   components: { AppHeader },
+  mixins:[rulesMixin]
 };
 </script>
 

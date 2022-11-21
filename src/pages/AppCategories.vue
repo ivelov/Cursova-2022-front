@@ -11,7 +11,7 @@
         <h2>Select category</h2>
         <br>
         <br /><br />
-        <v-card style="background-color: white;">
+        <v-card class="white">
           <v-treeview
           @update:active="$_onCategoryClick"
           activatable
@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import AppHeader from "./AppHeader.vue";
+import AppHeader from "../components/AppHeader.vue";
 export default {
   name: "AppCategories",
 

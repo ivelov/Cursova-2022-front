@@ -118,7 +118,6 @@
         <v-btn @click="filterMenu = !filterMenu"><v-icon>mdi-filter-outline</v-icon> Filters </v-btn>
         <br /><br />
       </v-container>
-
       <v-container v-if="loading">
         <v-row>
           <v-col cols="12" md="4">
@@ -144,6 +143,9 @@
           </v-col>
         </v-row>
       </v-container>
+      <v-container v-else-if="pageInfo.reports? Object.keys(pageInfo.reports).length == 0 : false" class="text-center">
+        No results
+      </v-container>
       <v-container v-else>
         <v-row>
           <v-col
@@ -154,11 +156,16 @@
             sm="4"
           >
             <v-card class="report-card" elevation="2">
-              <v-card-title
-                ><a @click="$router.push('/report/' + report.id)">{{
-                  report.title
-                }}</a></v-card-title
-              >
+              <v-card-title>
+                <router-link :to="'/report/' + report.id">
+                  <v-badge
+                    :color="report.statusColor"
+                    dot
+                  >
+                    {{report.title}}
+                  </v-badge>
+                </router-link>
+              </v-card-title>
               <v-card-text>
                 <p>Conference: {{ report.conferenceTitle }}</p>
                 <p>Time: {{ report.startTime }}-{{ report.endTime }}</p>
@@ -169,6 +176,7 @@
                   {{ report.description.slice(0, 100) }}
                   <span
                     v-if="!readMore[index] && report.description.length > 100"
+                    class="readmore-span"
                     @click="$_readMore(index)"
                   >
                     ..read more
@@ -177,9 +185,14 @@
                 <p class="report-space" v-else-if="!report.description"></p>
                 <p class="report-space" v-if="readMore[index]">
                   {{ report.description }}
-                  <span @click="$_readMore(index)"> ..hide </span>
+                  <span class="readmore-span" @click="$_readMore(index)"> Hide </span>
                 </p>
                 <p>Comments: {{ report.commentsCount }}</p>
+                <AppTimer
+                  v-if="report.statusColor == 'yellow'"
+                  :remaining-time-original="report.remainingTime"
+                  @end="$_changeStatus(report, 'red')"
+                />
               </v-card-text>
               <v-card-actions>
                 <v-row class="actions-row">
@@ -230,7 +243,8 @@
 </template>
 
 <script>
-import AppHeader from "./AppHeader.vue";
+import AppHeader from "../components/AppHeader.vue";
+import AppTimer from "../components/AppTimer.vue";
 
 export default {
   name: "AppReports",
@@ -268,7 +282,7 @@ export default {
   },
   mounted() {
     this.$store.dispatch("setAuth");
-    this.$store.dispatch("setPerks");
+    this.$store.dispatch("definePerks");
     if (this.$route.params.favPage) {
       this.curPage = this.$route.params.favPage;
       this.$store.dispatch("setReports", {
@@ -324,17 +338,19 @@ export default {
       if (report.favorite) {
         this.axios.post("/report/" + report.id + "/unfavorite").then(() => {
           report.favorite = false;
-          report.favLoading = false;
           this.headerRefreshKey += 1;
           if (this.$route.params.favPage) {
             this.$store.dispatch("setFavoriteReports", { page: this.curPage });
           }
+        }).finally(() => {
+          report.favLoading = false;
         });
       } else {
         this.axios.post("/report/" + report.id + "/favorite").then(() => {
           report.favorite = true;
-          report.favLoading = false;
           this.headerRefreshKey += 1;
+        }).finally(() => {
+          report.favLoading = false;
         });
       }
     },
@@ -358,8 +374,11 @@ export default {
         }
       }
     },
+    $_changeStatus(report, status) {
+      this.$set(report, 'statusColor', status);
+    }
   },
-  components: { AppHeader },
+  components: { AppHeader, AppTimer },
 };
 </script>
 
@@ -399,5 +418,11 @@ export default {
   padding: 80px 10px 5px 10px;
   max-width: 250px;
   width: 250px;
+}
+.readmore-span{
+  cursor: pointer;
+}
+.readmore-span:hover{
+  color:black;
 }
 </style>

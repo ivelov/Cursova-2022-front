@@ -10,21 +10,21 @@ import * as VueGoogleMaps from 'vue2-google-maps';
 import wysiwyg from "vue-wysiwyg";
 import VueCookies from 'vue-cookies'
 
-axios.defaults.baseURL='/V1';
-//axios.defaults.baseURL='http://ivelov-vm-api.groupbwt.com';
+axios.defaults.baseURL= process.env.VUE_APP_API_URL;
 axios.defaults.headers.common = {
     'X-Requested-With': 'XMLHttpRequest'
 };
 axios.defaults.withCredentials = 'true';
 axios.defaults.headers.common['Content-Type'] = 'application/json';
-Vue.use(VueAxios, axios)
-Vue.use(VueSocialSharing)
+Vue.use(VueAxios, axios);
+
+Vue.use(VueSocialSharing);
 
 Vue.config.productionTip = false
 
 Vue.use(VueGoogleMaps, {
   load: {
-    key: 'AIzaSyDvKC-wRgTVGX1cu1h7PKlfqb6eF4SIDp0',
+    key: process.env.VUE_APP_GMAP_KEY,
     libraries: 'places', 
   },
 })
@@ -32,38 +32,6 @@ Vue.use(VueGoogleMaps, {
 Vue.use(wysiwyg, {hideModules: { "image": true }});
 
 Vue.use(VueCookies);
-
-router.beforeEach((to, from, next) => {
-
-  if (to.meta.hideForAuth) {
-      if (store.getters.isAuth) {
-        next({ path: '/' });
-      } else {
-        next();
-      }
-
-  } else if (to.meta.requireAuth){
-    if (store.getters.isAuth) {
-        next();
-    } else {
-        next({ path: '/login' });
-    }
-
-  } else if (to.meta.requireEdit){
-    if (store.getters.getCurrentConferenceData.canUpdate) {
-        next();
-    } else {
-        next({ path: '/' });
-    }
-  } else if (to.meta.requireAdd){
-    if (store.getters.canAdd) {
-      next();
-    } else {
-        next({ path: '/' });
-    }
-  }
-  next();
-});
 
 new Vue({
   el:'#app',

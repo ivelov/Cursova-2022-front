@@ -4,7 +4,7 @@
 
     <v-main>
       <br /><br />
-      <v-form v-model="valid">
+      <v-form v-model="valid" @submit.prevent="$_enter">
         <v-container>
           <v-row>
             <v-text-field
@@ -28,16 +28,18 @@
             ></v-text-field>
           </v-row>
           <br />
-          <v-btn @click="$_enter" class="btn" 
-          :disabled="!valid || btnsLoading"
-          :loading="btnsLoading"
-          color="success">
+          <v-btn 
+           type="submit"
+           class="btn" 
+           :disabled="!valid || btnsLoading"
+           :loading="btnsLoading"
+           color="success">
             <span>Enter</span>
           </v-btn>
           <br /><br />
           <p>
             Don't have an account?
-            <a @click="$router.push('/register')">Register</a>
+            <router-link to="/register">Register</router-link>
           </p>
         </v-container>
       </v-form>
@@ -46,8 +48,9 @@
 </template>
 
 <script>
-import AppHeader from "./AppHeader.vue";
+import AppHeader from "../components/AppHeader.vue";
 import VueCookies from 'vue-cookies'
+import rulesMixin from '../components/mixins/rulesMixin.vue'
 
 export default {
   name: "AppLogin",
@@ -63,11 +66,6 @@ export default {
       conferences: true,
     },
   }),
-  computed: {
-    rules() {
-      return this.$store.getters.getRules;
-    },
-  },
   methods: {
     $_enter() {
       this.btnsLoading = true;
@@ -83,7 +81,6 @@ export default {
             'X-XSRF-TOKEN': VueCookies.get('XSRF-TOKEN'),
           }
         }).then((response) => {
-          this.btnsLoading = false;
           if (response.data == 1) {
             this.$store.commit('setAuth',true)
             this.$router.go();
@@ -109,6 +106,7 @@ export default {
     },
   },
   components: { AppHeader },
+  mixins:[rulesMixin]
 };
 </script>
 

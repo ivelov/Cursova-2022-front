@@ -35,41 +35,41 @@
             <div class="search-div">
               <v-container>
                 <v-row>
-                <v-col cols="7">
-                  <v-text-field
-                    v-if="search.loading"
-                    color="success"
-                    loading
-                    disabled
-                  ></v-text-field>
-                  <div v-for="(type, index) in search.results" :key="index">
-                    <p style="font-size: larger">{{ type.name }}</p>
-                    <v-list class="result-list">
-                      <v-list-item
-                        class="result transition-fast-in-fast-out"
-                        v-for="result in type.content"
-                        :key="result.id"
-                        @click="$router.push(result.path)"
-                      >
-                        <span>{{ result.title }}</span>
-                      </v-list-item>
-                    </v-list>
-                  </div>
-                </v-col>
-                <v-divider vertical></v-divider>
-                <v-col cols="5">
-                  <v-checkbox
-                    v-model="search.types.conferences"
-                    label="Conferences"
-                  ></v-checkbox>
-                  <v-checkbox
-                    v-model="search.types.reports"
-                    label="Reports"
-                  ></v-checkbox>
-                </v-col>
-              </v-row>
+                  <v-col cols="7">
+                    <v-text-field
+                      v-if="search.loading"
+                      color="success"
+                      loading
+                      disabled
+                    ></v-text-field>
+                    <div v-for="(type, index) in search.results" :key="index">
+                      <p class="text-larger">{{ type.name }}</p>
+                      <v-list class="result-list">
+                        <v-list-item
+                          class="result transition-fast-in-fast-out"
+                          v-for="result in type.content"
+                          :key="result.id"
+                          @click="$router.push(result.path)"
+                        >
+                          <span>{{ result.title }}</span>
+                        </v-list-item>
+                      </v-list>
+                    </div>
+                  </v-col>
+                  <v-divider vertical></v-divider>
+                  <v-col cols="5">
+                    <v-checkbox
+                      v-model="search.types.conferences"
+                      label="Conferences"
+                    ></v-checkbox>
+                    <v-checkbox
+                      v-model="search.types.reports"
+                      label="Reports"
+                    ></v-checkbox>
+                  </v-col>
+                </v-row>
               </v-container>
-              </div>
+            </div>
           </v-menu>
           <v-btn icon @click="search.field = !search.field">
             <v-icon>mdi-magnify</v-icon>
@@ -86,7 +86,7 @@
             text
             v-if="!$store.getters.isAuth"
           >
-            <span class="mr-2">Log in</span>
+            <span>Log in</span>
           </v-btn>
 
           <v-btn
@@ -94,27 +94,48 @@
             text
             v-if="typeof buttons['back'] != undefined ? buttons['back'] : false"
           >
-            <span class="mr-2">Back</span>
+            <span>Back</span>
           </v-btn>
 
-          <v-btn
-            @click="$router.push('/categories')"
-            text
-            v-if="
-              typeof buttons['categories'] != undefined
-                ? buttons['categories']
-                : false
-            "
-          >
-            <span class="mr-2">Categories</span>
-          </v-btn>
+          <v-menu v-if="$store.getters.isAuth" open-on-hover offset-y>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                v-bind="attrs"
+                v-on="on"
+                text
+                v-if="$store.getters.isAdmin"
+              >
+                Administration
+              </v-btn>
+            </template>
+            <v-list>
+              <v-list-item>
+                <v-btn text
+                  @click="$router.push('/categories')"
+                >
+                  <span>Categories</span>
+                </v-btn>
+              </v-list-item>
+              <v-list-item>
+                <v-btn text
+                  @click="$router.push('/meetings/1')"
+                >
+                  <span>Meetings</span>
+                </v-btn>
+              </v-list-item>
+            </v-list>
+          </v-menu>
 
           <v-btn
             @click="$_gotoAdd"
             text
-            v-if="typeof buttons['add'] != undefined ? buttons['add'] : false"
+            v-if="
+              typeof buttons['addConference'] != undefined
+                ? buttons['addConference']
+                : false
+            "
           >
-            <span class="mr-2">Add conference</span>
+            <span>Add conference</span>
           </v-btn>
 
           <v-btn
@@ -126,7 +147,7 @@
                 : false
             "
           >
-            <span class="mr-2">View conferences</span>
+            <span>View conferences</span>
           </v-btn>
 
           <v-btn
@@ -138,7 +159,7 @@
                 : false
             "
           >
-            <span class="mr-2">View reports</span>
+            <span>View reports</span>
           </v-btn>
 
           <v-menu v-if="$store.getters.isAuth" open-on-hover offset-y>
@@ -241,12 +262,11 @@
       </v-menu>
 
       <v-menu
-        class="search-menu"
+        class="search-menu overflow-x-auto"
         :close-on-content-click="false"
         transition="scroll-y-transition"
         offset-y
         width="400"
-        style="overflow-x:auto"
       >
         <template v-slot:activator="{ on, attrs }">
           <v-text-field
@@ -264,61 +284,55 @@
         </template>
         <div class="search-div">
           <v-container>
-              <v-menu
-                :close-on-content-click="false"
-                transition="scroll-y-transition"
-                offset-y
-                min-width="auto"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    Filters
-                  </v-btn>
-                </template>
-                <v-container style="background-color:white">
-                  <v-checkbox
-                    v-model="search.types.conferences"
-                    label="Conferences"
-                  ></v-checkbox>
-                  <v-checkbox
-                    v-model="search.types.reports"
-                    label="Reports"
-                  ></v-checkbox>
-                </v-container>
-              </v-menu>
-              <br><br>
-              <v-text-field
-                v-if="search.loading"
-                color="success"
-                loading
-                disabled
-              ></v-text-field>
-              <div v-for="(type, index) in search.results" :key="index">
-                <p style="font-size: larger">{{ type.name }}</p>
-                <v-list class="result-list">
-                  <v-list-item
-                    class="result transition-fast-in-fast-out"
-                    v-for="result in type.content"
-                    :key="result.id"
-                    @click="$router.push(result.path)"
-                  >
-                    <span>{{ result.title }}</span>
-                  </v-list-item>
-                </v-list>
-              </div>
-              
+            <v-menu
+              :close-on-content-click="false"
+              transition="scroll-y-transition"
+              offset-y
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn v-bind="attrs" v-on="on"> Filters </v-btn>
+              </template>
+              <v-container class="white">
+                <v-checkbox
+                  v-model="search.types.conferences"
+                  label="Conferences"
+                ></v-checkbox>
+                <v-checkbox
+                  v-model="search.types.reports"
+                  label="Reports"
+                ></v-checkbox>
+              </v-container>
+            </v-menu>
+            <br /><br />
+            <v-text-field
+              v-if="search.loading"
+              color="success"
+              loading
+              disabled
+            ></v-text-field>
+            <div v-for="(type, index) in search.results" :key="index">
+              <p class="text-larger">{{ type.name }}</p>
+              <v-list class="result-list">
+                <v-list-item
+                  class="result transition-fast-in-fast-out"
+                  v-for="result in type.content"
+                  :key="result.id"
+                  @click="$router.push(result.path)"
+                >
+                  <span>{{ result.title }}</span>
+                </v-list-item>
+              </v-list>
+            </div>
           </v-container>
-          </div>
+        </div>
       </v-menu>
       <v-btn
         @click="$router.push('/login')"
         outlined
         v-if="!$store.getters.isAuth"
       >
-        <span class="mr-2">Log in</span>
+        <span>Log in</span>
       </v-btn>
 
       <v-btn
@@ -326,27 +340,48 @@
         outlined
         v-if="typeof buttons['back'] != undefined ? buttons['back'] : false"
       >
-        <span class="mr-2">Back</span>
+        <span>Back</span>
       </v-btn>
 
-      <v-btn
-        @click="$router.push('/categories')"
-        outlined
-        v-if="
-          typeof buttons['categories'] != undefined
-            ? buttons['categories']
-            : false
-        "
-      >
-        <span class="mr-2">Categories</span>
-      </v-btn>
+      <v-menu v-if="$store.getters.isAuth" open-on-hover offset-y>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            v-bind="attrs"
+            v-on="on"
+            outlined
+            v-if="$store.getters.isAdmin"
+          >
+            Administration
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item>
+            <v-btn text
+              @click="$router.push('/categories')"
+            >
+              <span>Categories</span>
+            </v-btn>
+          </v-list-item>
+          <v-list-item>
+            <v-btn text
+              @click="$router.push('/meetings/1')"
+            >
+              <span>Meetings</span>
+            </v-btn>
+          </v-list-item>
+        </v-list>
+      </v-menu>
 
       <v-btn
         @click="$_gotoAdd"
         outlined
-        v-if="typeof buttons['add'] != undefined ? buttons['add'] : false"
+        v-if="
+          typeof buttons['addConference'] != undefined
+            ? buttons['addConference']
+            : false
+        "
       >
-        <span class="mr-2">Add conference</span>
+        <span>Add conference</span>
       </v-btn>
 
       <v-btn
@@ -358,7 +393,7 @@
             : false
         "
       >
-        <span class="mr-2">View conferences</span>
+        <span>View conferences</span>
       </v-btn>
 
       <v-btn
@@ -368,7 +403,7 @@
           typeof buttons['reports'] != undefined ? buttons['reports'] : false
         "
       >
-        <span class="mr-2">View reports</span>
+        <span>View reports</span>
       </v-btn>
     </v-navigation-drawer>
   </div>
@@ -404,10 +439,9 @@ export default {
   },
   watch: {
     searchText(value) {
-      if(value != ''){
+      if (value != "") {
         this.$_search(true);
       }
-        
     },
   },
   props: {
@@ -429,7 +463,6 @@ export default {
         .post("/logout")
         .then(() => {
           this.$store.commit("clearAuthData");
-          //this.$store.commit('clearCommentsInfo');
           this.$router.go("/login");
         })
         .catch((e) => {
@@ -503,7 +536,8 @@ export default {
   width: 230px;
 }
 
-.v-navigation-drawer .v-btn, .v-navigation-drawer .v-text-field{
+.v-navigation-drawer .v-btn,
+.v-navigation-drawer .v-text-field {
   height: 56px;
   width: 180px;
   margin: 0 15px 20px 15px;
@@ -546,17 +580,17 @@ export default {
 .search-field {
   width: 400px;
 }
-.search-field-mini{
+.search-field-mini {
   border: 1px solid black;
 }
 .search-field-row {
   align-items: center;
 }
-.result-list{
+.result-list {
   max-height: 300px;
   overflow-y: auto;
 }
-.v-menu__content{
+.v-menu__content {
   overflow: auto;
   max-height: 70%;
 }
@@ -564,4 +598,11 @@ export default {
   background-color: lightgray;
 }
 
+.btn-link {
+  color: black;
+  text-decoration: none;
+}
+.text-larger {
+  font-size: larger;
+}
 </style>

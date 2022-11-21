@@ -7,8 +7,11 @@
       <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
-      <v-form v-else v-model="valid">
+      <v-form v-else v-model="valid" @submit.prevent="$_saveConf">
         <v-container>
+          <v-row>
+            <h3 class="mb-5">Enter conference info:</h3>
+          </v-row>
           <v-row>
             <v-text-field
               v-model="conferenceData.conference.title"
@@ -84,6 +87,7 @@
               </template>
               <v-date-picker
                 v-model="conferenceData.conference.date"
+                :min="new Date().toISOString().slice(0,10)"
               ></v-date-picker>
             </v-menu>
           </v-row>
@@ -126,7 +130,7 @@
           </v-row>
           <v-row>
             <v-text-field
-              v-model="conferenceData.conference.latitude"
+              v-model="latitude"
               label="Latitude"
               outlined
               type="number"
@@ -135,7 +139,7 @@
           </v-row>
           <v-row>
             <v-text-field
-              v-model="conferenceData.conference.longitude"
+            v-model="longitude"
               label="Longitude"
               outlined
               type="number"
@@ -150,7 +154,7 @@
               }"
               :zoom="10"
               map-type-id="terrain"
-              style="width: 500px; height: 300px"
+              class="gmap-size"
             >
               <GmapMarker
                 v-if="
@@ -169,9 +173,9 @@
           </v-row>
           <br /><br />
           <v-btn
+            type="submit"
             class="btn"
             color="success"
-            @click="$_saveConf"
             :disabled="!valid || btnsLoading"
             :loading="btnsLoading"
           >
@@ -193,7 +197,10 @@
 </template>
 
 <script>
-import AppHeader from "./AppHeader.vue";
+import AppHeader from "../components/AppHeader.vue";
+import rulesMixin from '../components/mixins/rulesMixin.vue';
+import countriesMixin from '../components/mixins/countriesMixin.vue';
+
 export default {
   name: "AppEdit",
 
@@ -201,7 +208,7 @@ export default {
     valid: false,
     dateMenu: false,
     timeMenu: false,
-    catMenu:false,
+    catMenu: false,
     btnsLoading: false,
     buttons: {
       back: true,
@@ -213,55 +220,54 @@ export default {
       uk: { lat: 51.504263, lng: -0.13515 },
     },
     selectedCategory:undefined,
+    latitude: 0,
+    longitude: 0,
   }),
   computed: {
     conferenceData() {
       return this.$store.getters.getCurrentConferenceData;
     },
-    /*categoryId(){
-      return this.conferenceData.conference.categoryId;
-    },*/
     loading() {
       return this.$store.getters.isLoading;
-    },
-    countries() {
-      return this.$store.getters.getCountries;
-    },
-    rules() {
-      return this.$store.getters.getRules;
     },
     categories(){
       return this.$store.getters.getCategories;
     },
   },
+  watch:{
+    latitude(value){
+      if(isNaN(parseFloat(value))){
+        this.conferenceData.conference.latitude = 0;
+      }else{
+        this.conferenceData.conference.latitude = value;
+      }
+    },
+    longitude(value){
+      if(isNaN(parseFloat(value))){
+        this.conferenceData.conference.longitude = 0;
+      }else{
+        this.conferenceData.conference.longitude = value;
+      }
+    },
+  },
   mounted() {
     this.$store.dispatch("setCategories");
     this.$store.commit("setLoading", false);
+    this.latitude = this.conferenceData.conference.latitude;
+    this.longitude = this.conferenceData.conference.longitude;
   },
-  /*watch:{
-    categoryId(val){
-      this.selectedCategory.id = val;
-    }
-  },*/
   methods: {
     $_markerUpdate(event) {
-      this.conferenceData.conference.latitude = event.latLng.lat();
-      this.conferenceData.conference.longitude = event.latLng.lng();
+      this.latitude = event.latLng.lat();
+      this.longitude = event.latLng.lng();
     },
     $_countryChange(event) {
-      this.conferenceData.conference.latitude =
+      this.latitude =
         this.countriesLocations[event].lat;
-      this.conferenceData.conference.longitude =
+      this.longitude =
         this.countriesLocations[event].lng;
     },
     $_saveConf() {
-      if (
-        isNaN(parseFloat(this.conferenceData.conference.longitude)) ||
-        isNaN(parseFloat(this.conferenceData.conference.latitude))
-      ) {
-        alert("Enter valid posisiton");
-        return;
-      }
       this.btnsLoading = true;
       
       this.conferenceData.conference.categoryId = this.selectedCategory ? this.selectedCategory.id : null;
@@ -271,14 +277,17 @@ export default {
         .post("/add", values)
         .then((response) => {
           console.log(response);
-          this.btnsLoading = false;
+          this.$router.push('/conferences/1');
         })
         .catch((e) => {
           console.error(e);
+        }).finally(() => {
+          this.btnsLoading = false;
         });
     },
   },
   components: { AppHeader },
+  mixins:[rulesMixin, countriesMixin],
 };
 </script>
 
@@ -298,5 +307,10 @@ export default {
 }
 .v-treeview{
   background-color: white;
+}
+
+.gmap-size{
+  width: 500px; 
+  height: 300px;
 }
 </style>

@@ -7,7 +7,7 @@
       <v-container v-if="loading">
         <v-text-field color="success" loading disabled></v-text-field>
       </v-container>
-      <v-form v-else v-model="valid">
+      <v-form v-else v-model="valid" @submit.prevent="$_saveConf">
         <v-container>
           <v-row>
             <v-breadcrumbs
@@ -91,6 +91,7 @@
               </template>
               <v-date-picker
                 v-model="conferenceData.conference.date"
+                :min="new Date().toISOString().slice(0,10)"
               ></v-date-picker>
             </v-menu>
           </v-row>
@@ -133,7 +134,7 @@
           </v-row>
           <v-row>
             <v-text-field
-              v-model="conferenceData.conference.latitude"
+              v-model="latitude"
               label="Latitude"
               outlined
             >
@@ -141,7 +142,7 @@
           </v-row>
           <v-row>
             <v-text-field
-              v-model="conferenceData.conference.longitude"
+              v-model="longitude"
               label="Longitude"
               outlined
             >
@@ -155,7 +156,7 @@
               }"
               :zoom="10"
               map-type-id="terrain"
-              style="width: 500px; height: 300px"
+              class="gmap-size"
             >
               <GmapMarker
                 v-if="
@@ -174,11 +175,11 @@
           </v-row>
           <br /><br />
           <v-btn
+            type="submit"
             class="btn"
             color="success"
             :disabled="!valid || btnsLoading"
             :loading="btnsLoading"
-            @click="$_saveConf"
           >
             <span>Save</span>
           </v-btn>
@@ -187,7 +188,7 @@
             color="primary"
             :loading="btnsLoading"
             :disabled="btnsLoading"
-            @click="$router.push('/conference/' + conferenceData.conference.id)"
+            @click="$router.push('/conferences/1')"
           >
             <span>Cancel</span>
           </v-btn>
@@ -207,7 +208,10 @@
 </template>
 
 <script>
-import AppHeader from "./AppHeader.vue";
+import AppHeader from "../components/AppHeader.vue";
+import rulesMixin from '../components/mixins/rulesMixin.vue';
+import countriesMixin from '../components/mixins/countriesMixin.vue';
+
 export default {
   name: "AppEdit",
 
@@ -227,6 +231,8 @@ export default {
       back: true,
     },
     selectedCategory:undefined,
+    latitude: 0,
+    longitude: 0,
   }),
   computed: {
     conferenceData() {
@@ -235,14 +241,24 @@ export default {
     loading() {
       return this.$store.getters.isLoading;
     },
-    countries() {
-      return this.$store.getters.getCountries;
-    },
-    rules() {
-      return this.$store.getters.getRules;
-    },
     categories(){
       return this.$store.getters.getCategories;
+    },
+  },
+  watch:{
+    latitude(value){
+      if(isNaN(parseFloat(value))){
+        this.conferenceData.conference.latitude = 0;
+      }else{
+        this.conferenceData.conference.latitude = value;
+      }
+    },
+    longitude(value){
+      if(isNaN(parseFloat(value))){
+        this.conferenceData.conference.longitude = 0;
+      }else{
+        this.conferenceData.conference.longitude = value;
+      }
     },
   },
   mounted() {
@@ -251,7 +267,9 @@ export default {
       id: this.$route.params.id,
     }).then(() => {
       this.selectedCategory = {id:this.conferenceData.conference.categoryId, name:this.conferenceData.conference.categoryTitle};
-        });
+      this.latitude = this.conferenceData.conference.latitude;
+      this.longitude = this.conferenceData.conference.longitude;
+    });
     this.$store.dispatch("setCategories");
   },
   methods: {
@@ -282,6 +300,7 @@ export default {
         .then((response) => {
           console.log(response);
           this.$router.go();
+        }).finally(() => {
           this.btnsLoading = false;
         });
     },
@@ -295,6 +314,7 @@ export default {
     },
   },
   components: { AppHeader },
+  mixins:[rulesMixin, countriesMixin]
 };
 </script>
 
@@ -313,5 +333,9 @@ export default {
 
 .v-treeview{
   background-color: white;
+}
+.gmap-size{
+  width: 500px; 
+  height: 300px;
 }
 </style>
