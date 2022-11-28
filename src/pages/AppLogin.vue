@@ -87,7 +87,6 @@ export default {
           }
         })
         .catch((e) => {
-          this.btnsLoading = false;
           console.log(e);
           let errors = e.response.data.errors;
           if (typeof errors.email != undefined) {
@@ -96,6 +95,8 @@ export default {
           if (typeof errors.password != undefined) {
             this.passErrors = errors.password;
           }
+        }).finally(() => {
+          this.btnsLoading = false;
         });
       });
       
