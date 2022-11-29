@@ -12,11 +12,7 @@ import AppReportAdd from "../pages/AppReportAdd";
 import AppReports from "../pages/AppReports";
 import AppReportDetails from "../pages/AppReportDetails";
 import AppReportEdit from "../pages/AppReportEdit";
-import AppCategoryAdd from "../pages/AppCategoryAdd";
-import AppCategoryEdit from "../pages/AppCategoryEdit";
-import AppCategories from "../pages/AppCategories";
 import AppAccountEdit from "../pages/AppAccountEdit";
-import AppMeetings from "../pages/AppMeetings";
 
 Vue.use(VueRouter);
 const router = new VueRouter({
@@ -95,40 +91,12 @@ const router = new VueRouter({
       }
     },
     {
-      path: "/categories",
-      component: AppCategories,
-      meta:{
-        requireAuth:true
-      }
-    },
-    {
-      path: "/addCategory",
-      component: AppCategoryAdd,
-      meta:{
-        requireAuth:true
-      }
-    },
-    {
-      path: "/editCategory/:id",
-      component: AppCategoryEdit,
-      meta:{
-        requireAuth:true
-      }
-    },
-    {
       path: "/account/edit",
       component: AppAccountEdit,
       meta:{
         requireAuth:true
       }
-    },
-    {
-      path: "/meetings/:page",
-      component: AppMeetings,
-      meta:{
-        requireAuth:true
-      }
-    },
+    }
   ],
   mode: "history",
   
