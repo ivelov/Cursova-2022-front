@@ -44,7 +44,6 @@ export default {
       },
       clearAuthData(state){
         VueCookies.remove('isAuth');
-        VueCookies.remove('isAdmin');
         VueCookies.remove('canAdd');
         state.currentConferenceData = {
             conference: {
@@ -170,9 +169,6 @@ export default {
       },
       setChannelLoading(state, loading){
         state.channelLoading = loading;
-      },
-      setCanExport(state, can){
-        state.canExport = can;
       },
       setMeetingsPageInfo(state, pageInfo){
         state.meetingsPageInfo = pageInfo;

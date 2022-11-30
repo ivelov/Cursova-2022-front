@@ -184,7 +184,8 @@ export default {
       this.$store.dispatch("setCurrentReportData", {id: this.$route.params.repId, hard: true});
     },
     $_downloadPresentation(){
-      this.axios.get("/presentations/" + this.currentReportData.presentationName).then((response) => {
+      let presentationName = this.currentReportData.presentationName.slice(this.currentReportData.presentationName.lastIndexOf('/'));
+      this.axios.get("/presentations/" + presentationName).then((response) => {
         let hiddenElement = document.createElement('a');  
         let mime = this.currentReportData.presentationName.slice(this.currentReportData.presentationName.lastIndexOf('.') + 1);
         hiddenElement.href = 'data:text/'+mime+';charset=utf-8,' + encodeURI(response);

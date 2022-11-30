@@ -97,35 +97,6 @@
             <span>Back</span>
           </v-btn>
 
-          <v-menu v-if="$store.getters.isAuth" open-on-hover offset-y>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                v-bind="attrs"
-                v-on="on"
-                text
-                v-if="$store.getters.isAdmin"
-              >
-                Administration
-              </v-btn>
-            </template>
-            <v-list>
-              <v-list-item>
-                <v-btn text
-                  @click="$router.push('/categories')"
-                >
-                  <span>Categories</span>
-                </v-btn>
-              </v-list-item>
-              <v-list-item>
-                <v-btn text
-                  @click="$router.push('/meetings/1')"
-                >
-                  <span>Meetings</span>
-                </v-btn>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-
           <v-btn
             @click="$_gotoAdd"
             text
@@ -342,35 +313,6 @@
       >
         <span>Back</span>
       </v-btn>
-
-      <v-menu v-if="$store.getters.isAuth" open-on-hover offset-y>
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn
-            v-bind="attrs"
-            v-on="on"
-            outlined
-            v-if="$store.getters.isAdmin"
-          >
-            Administration
-          </v-btn>
-        </template>
-        <v-list>
-          <v-list-item>
-            <v-btn text
-              @click="$router.push('/categories')"
-            >
-              <span>Categories</span>
-            </v-btn>
-          </v-list-item>
-          <v-list-item>
-            <v-btn text
-              @click="$router.push('/meetings/1')"
-            >
-              <span>Meetings</span>
-            </v-btn>
-          </v-list-item>
-        </v-list>
-      </v-menu>
 
       <v-btn
         @click="$_gotoAdd"

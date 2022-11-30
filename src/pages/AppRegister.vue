@@ -30,6 +30,16 @@
           </v-row>
           <v-row>
             <v-text-field
+              v-model="values.passwordConfirm"
+              type="password"
+              :rules="[rules.required, rules.counter, rules.counterMax]"
+              label="Confirm password"
+              outlined
+              @change="errors.password = null"
+            ></v-text-field>
+          </v-row>
+          <v-row>
+            <v-text-field
               v-model="values.firstname"
               :rules="[rules.required, rules.counterMax]"
               label="Firstname"
@@ -175,6 +185,7 @@ export default {
       phone: "",
       country: "",
       role: "",
+      passwordConfirm: ""
     },
     roles: [
       { state: "Listener", value: "listener" },
@@ -190,6 +201,11 @@ export default {
       for (let errorKey in this.errors) {
         this.errors[errorKey] = null;
       }
+      if(this.values.passwordConfirm != this.values.password){
+        this.errors['password'] = 'Passwords do not match';
+        this.btnsLoading = false;
+        return;
+      }
 
       this.axios
         .get("/sanctum/csrf-cookie")
@@ -202,7 +218,8 @@ export default {
             })
             .then((response) => {
               if (response.data == 1) {
-                this.$router.go('/conferences/1');
+                this.$store.commit('setAuth',true);
+                this.$router.go();
               }
             })
             .catch((e) => {
@@ -213,9 +230,8 @@ export default {
                   this.errors[key] = errors[key];
                 }
               }
-            }).finally(() => {
               this.btnsLoading = false;
-            });
+            })
         });
     },
     $_phoneChange(event) {
