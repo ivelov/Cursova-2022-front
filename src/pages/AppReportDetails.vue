@@ -80,7 +80,7 @@
 
           <div class="tight" v-if="currentReportData.presentationName">
             <h4>Presentation:</h4>
-            <a class="ml-3 mb-3 mt-3" @click="$_downloadPresentation">{{currentReportData.presentationName}}</a> <!-- TODO: change this when fix presentations -->
+            <a class="ml-3 mb-3 mt-3" @click="$_downloadPresentation">{{currentReportData.presentationName}}</a> 
           </div>
       
           <v-row  v-if="currentReportData.remainingTime" class="mt-5">

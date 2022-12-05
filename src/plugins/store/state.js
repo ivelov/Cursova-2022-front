@@ -54,4 +54,6 @@ export default {
         meetings:{},
         maxPage:1
       },
+      currentPlan: 'default',
+      intent:undefined,
   };
