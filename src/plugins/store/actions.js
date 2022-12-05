@@ -189,6 +189,7 @@ export default {
       return new Promise((resolve, reject) => {
         axios.get("/cashier/plan").then((response) => {
           state.commit("setCurrentPlan", response.data);
+          console.log(response.data);
           resolve(response.data);
         }).catch(()=>{reject()});
       });

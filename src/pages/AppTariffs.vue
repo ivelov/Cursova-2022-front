@@ -22,8 +22,6 @@
 
             <!-- Stripe Elements Placeholder -->
             <div id="card-element" class="outlined mb-5"></div>
-
-            
           </v-card-text>
 
           <v-divider></v-divider>
@@ -34,10 +32,10 @@
               id="card-button"
               :data-secret="intent ? intent.client_secret : ''"
               color="primary"
-              text 
+              text
               @click="$_subscribe"
-              :loading="paymentLoading"
-              :disabled="paymentLoading"
+              :loading="paymentLoading != 0"
+              :disabled="paymentLoading != 0"
             >
               Subscribe
             </v-btn>
@@ -58,7 +56,7 @@
               <v-card-title>
                 <h2>Standart Plan</h2>
               </v-card-title>
-              <v-card-text>
+              <v-card-text class="text-h6">
                 <p>Joins count: 1</p>
                 <p>Price: free</p>
               </v-card-text>
@@ -66,7 +64,9 @@
                 <v-btn
                   v-if="currentPlan !== 'standart'"
                   text
-                  @click="dialog = true"
+                  :loading="paymentLoading != 0"
+                  :disabled="paymentLoading != 0"
+                  @click="$_subscribeTo('standart')"
                 >
                   Subscribe
                 </v-btn>
@@ -76,21 +76,26 @@
           <v-col>
             <v-card
               class="plan-card"
-              :class="currentPlan == 'standart' ? 'plan-card-active' : ''"
+              :class="currentPlan == 'silver' ? 'plan-card-active' : ''"
               elevation="2"
             >
               <v-card-title>
                 <h2>Silver Plan</h2>
               </v-card-title>
-              <v-card-text>
+              <v-card-text  class="text-h6">
                 <p>Joins count: 5</p>
                 <p>Price: 15$</p>
               </v-card-text>
               <v-card-actions>
                 <v-btn
-                  v-if="currentPlan !== 'standart'"
+                  v-if="currentPlan !== 'silver'"
                   text
-                  @click="dialog = false"
+                  :loading="paymentLoading != 0"
+                  :disabled="paymentLoading != 0"
+                  @click="
+                    dialog = true;
+                    choosenPlan = 'silver';
+                  "
                 >
                   Upgrade
                 </v-btn>
@@ -100,73 +105,75 @@
           <v-col>
             <v-card
               class="plan-card"
-              :class="currentPlan == 'standart' ? 'plan-card-active' : ''"
+              :class="currentPlan == 'golden' ? 'plan-card-active' : ''"
               elevation="2"
             >
               <v-card-title>
-                <h2>Standart Plan</h2>
+                <h2>Golden Plan</h2>
               </v-card-title>
-              <v-card-text>
-                <p>Joins count: 1</p>
-                <p>Price: free</p>
+              <v-card-text  class="text-h6">
+                <p>Joins count: 50</p>
+                <p>Price: 25$</p>
               </v-card-text>
               <v-card-actions>
-                <v-btn text @click="$_subscribe('standart')"> Subscribe </v-btn>
+                <v-btn
+                  v-if="currentPlan !== 'golden'"
+                  text
+                  :loading="paymentLoading != 0"
+                  :disabled="paymentLoading != 0"
+                  @click="
+                    dialog = true;
+                    choosenPlan = 'golden';
+                  "
+                >
+                  Upgrade
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-col>
           <v-col>
             <v-card
               class="plan-card"
-              :class="currentPlan == 'standart' ? 'plan-card-active' : ''"
+              :class="currentPlan == 'platinum' ? 'plan-card-active' : ''"
               elevation="2"
             >
               <v-card-title>
-                <h2>Standart Plan</h2>
+                <h2>Platinum Plan</h2>
               </v-card-title>
-              <v-card-text>
-                <p>Joins count: 1</p>
-                <p>Price: free</p>
+              <v-card-text  class="text-h6">
+                <p>Joins count: unlimited</p>
+                <p>Price: 100$</p>
               </v-card-text>
               <v-card-actions>
-                <v-btn text @click="$_subscribe('standart')"> Subscribe </v-btn>
+                <v-btn
+                  v-if="currentPlan !== 'platinum'"
+                  text
+                  :loading="paymentLoading != 0"
+                  :disabled="paymentLoading != 0"
+                  @click="
+                    dialog = true;
+                    choosenPlan = 'platinum';
+                  "
+                >
+                  Upgrade
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-col>
         </v-row>
       </v-container>
-      <v-snackbar
-        v-model="error"
-        color="red"
-        right
-      >
+      <v-snackbar v-model="error" color="red" right>
         Error occured
 
         <template v-slot:action="{ attrs }">
-          <v-btn
-            text
-            v-bind="attrs"
-            @click="error = false"
-          >
-            Close
-          </v-btn>
+          <v-btn text v-bind="attrs" @click="error = false"> Close </v-btn>
         </template>
       </v-snackbar>
-      <v-snackbar
-        v-model="success"
-        color="success"
-        right
-      >
+      <v-snackbar v-model="success" color="success" right>
         Subscription success
 
         <template v-slot:action="{ attrs }">
-          <v-btn
-            text
-            v-bind="attrs"
-            @click="success = false"
-          >
-            Close
-          </v-btn>
+          <v-btn text v-bind="attrs" @click="success = false"> Close </v-btn>
         </template>
       </v-snackbar>
     </v-main>
@@ -193,11 +200,11 @@ export default {
     error: false,
     success: false,
     paymentMethod: null,
-    paymentLoading: true,
+    paymentLoading: 4,
   }),
   computed: {
     currentPlan() {
-      return this.$store.getters.getCurrentPlan;
+      return this.$store.state.currentPlan;
     },
     isAdmin() {
       return this.$store.getters.isAdmin;
@@ -208,11 +215,14 @@ export default {
   },
   mounted() {
     this.$store.dispatch("setAuth");
-    this.$store.dispatch("definePerks").then(() => {
-      this.buttons.addConference = this.$store.getters.canAdd;
+    this.$store.dispatch("definePerks").finally(() => {
+      this.paymentLoading--;
     });
-    this.$store.dispatch("setIntent").then(() => {
-      this.paymentLoading = false;
+    this.$store.dispatch("setIntent").finally(() => {
+      this.paymentLoading--;
+    });
+    this.$store.dispatch("setCurrentPlan").finally(() => {
+      this.paymentLoading--;
     });
 
     loadStripe(process.env.VUE_APP_STRIPE_KEY).then((stripe) => {
@@ -220,12 +230,14 @@ export default {
       this.elements = this.stripe.elements();
       this.cardElement = this.elements.create("card");
       this.cardElement.mount("#card-element");
+    }).finally(() => {
+      this.paymentLoading--;
     });
   },
   methods: {
     async $_subscribe() {
-      this.paymentLoading = true;
-      if(!this.paymentMethod){
+      this.paymentLoading++;
+      if (!this.paymentMethod) {
         const cardHolderName = document.getElementById("card-holder-name");
         const cardButton = document.getElementById("card-button");
         const clientSecret = cardButton.dataset.secret;
@@ -242,21 +254,30 @@ export default {
         if (error) {
           console.error(error);
           this.error = true;
-          this.paymentLoading = false;
+          this.paymentLoading--;
           return;
-        }else{
+        } else {
           this.paymentMethod = setupIntent.payment_method;
         }
       }
-
-      this.axios.post("/cashier/subscribe",{payment: this.paymentMethod}).then((response) => {
-        console.log(response.data);
-        this.success = true;
-      }).catch(()=>{
-        this.error = true;
-      }).finally(()=>{
-        this.paymentLoading = false;
-      });
+      this.$_subscribeTo(this.choosenPlan);
+      this.paymentLoading--;
+    },
+    $_subscribeTo(plan) {
+      this.paymentLoading++;
+      this.axios
+        .post("/cashier/subscribe", { payment: this.paymentMethod, plan: plan })
+        .then(() => {
+          this.success = true;//TODO: check if swaping works
+          this.dialog = false;
+          this.$router.go();
+        })
+        .catch(() => {
+          this.error = true;
+        })
+        .finally(() => {
+          this.paymentLoading--;
+        });
     },
   },
   components: { AppHeader },
@@ -265,6 +286,11 @@ export default {
 </script>
 
 <style scoped>
+.plan-card{
+  height: 232px;
+  min-height: 200px;
+  min-width: 200px;
+}
 .plan-card-active {
   border: 1px solid red;
 }
