@@ -163,7 +163,7 @@
         </v-row>
       </v-container>
       <v-snackbar v-model="errorsFromJoins" color="red" right>
-        You have exceeded the limit of joins
+        You have exceeded the limit of joins for this month
         <template v-slot:action="{ attrs }">
           <v-btn text v-bind="attrs" @click="errorsFromJoins = false"> Close </v-btn>
         </template>
