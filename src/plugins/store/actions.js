@@ -4,36 +4,45 @@ import VueCookies from 'vue-cookies';
 export default {
     //async
     async setConferences(state, payload = {page:1}) {
-      state.commit("setLoading", true);
-      if(!state.getters.isAuth){
-        axios.get("/conferences/"+payload.page).then((response) => {
+      return new Promise((resolve) => {
+        state.commit("setLoading", true);
+        if(!state.getters.isAuth){
+          axios.get("/conferences/"+payload.page).then((response) => {
+            state.commit("setConferencesPageInfo", response.data);
+          }).finally(() => {
+            state.commit("setLoading", false);
+            resolve();
+          });
+          return;
+        }
+        axios.post("/conferences/"+payload.page, state.getters.getFilters).then((response) => {
           state.commit("setConferencesPageInfo", response.data);
         }).finally(() => {
           state.commit("setLoading", false);
+          resolve();
         });
-        return;
-      }
-      axios.post("/conferences/"+payload.page, state.getters.getFilters).then((response) => {
-        state.commit("setConferencesPageInfo", response.data);
-      }).finally(() => {
-        state.commit("setLoading", false);
       });
     },
     async setAuth(state) {
-      axios.get("/isAuth",{},{
-        headers: {
-          'X-XSRF-TOKEN': VueCookies.get('XSRF-TOKEN'),
-        }
-      }).then((response) => {
-        if(response.status == 200 && response.data == 1){
-          state.commit("setAuth", true);
-        }else{
+      return new Promise((resolve, reject) => {
+        axios.get("/isAuth",{},{
+          headers: {
+            'X-XSRF-TOKEN': VueCookies.get('XSRF-TOKEN'),
+          }
+        }).then((response) => {
+          if(response.status == 200 && response.data == 1){
+            state.commit("setAuth", true);
+            resolve(true);
+          }else{
+            state.commit("setAuth", false);
+            resolve(false);
+          }
+          
+        }).catch(()=>{
           state.commit("setAuth", false);
-        }
-        
-      }).catch(()=>{
-        state.commit("setAuth", false);
-        state.commit("clearAuthData");
+          state.commit("clearAuthData");
+          reject();
+        });
       });
     },
     async definePerks(state) {
@@ -173,8 +182,11 @@ export default {
       
     },
     async setCategoriesList(state) {
-      axios.get("/categoriesList").then((response) => {
-        state.commit("setCategoriesList", response.data);
+      return new Promise((resolve) => {
+        axios.get("/categoriesList").then((response) => {
+          state.commit("setCategoriesList", response.data);
+          resolve();
+        });
       });
     },
     async setMeetingsPageInfo(state, page = 1) {

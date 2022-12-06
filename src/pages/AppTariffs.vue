@@ -165,7 +165,7 @@
       <v-snackbar v-model="errorsFromJoins" color="red" right>
         You have exceeded the limit of joins
         <template v-slot:action="{ attrs }">
-          <v-btn text v-bind="attrs" @click="error = false"> Close </v-btn>
+          <v-btn text v-bind="attrs" @click="errorsFromJoins = false"> Close </v-btn>
         </template>
       </v-snackbar>
       <v-snackbar v-model="error" color="red" right>
