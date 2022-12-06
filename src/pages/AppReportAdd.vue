@@ -221,6 +221,14 @@ export default {
     loading(){
       return this.$store.getters.isLoading;
     },
+    availableJoins:{
+      get(){
+        return this.$store.getters.getAvailableJoins;
+      },
+      set(newValue){
+        return this.$store.commit('setAvailableJoins', newValue);
+      }
+    },
     currentReportData(){
       return this.$store.getters.getCurrentReportData;
     },
@@ -326,6 +334,7 @@ export default {
         }
       }).then((response) => {
         console.log(response);
+        this.availableJoins = this.availableJoins - 1;
         this.$store.commit('clearCurrentReportData');
         this.$router.push('/reports/1');
       }).catch(() => {

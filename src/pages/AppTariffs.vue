@@ -162,6 +162,12 @@
           </v-col>
         </v-row>
       </v-container>
+      <v-snackbar v-model="errorsFromJoins" color="red" right>
+        You have exceeded the limit of joins
+        <template v-slot:action="{ attrs }">
+          <v-btn text v-bind="attrs" @click="error = false"> Close </v-btn>
+        </template>
+      </v-snackbar>
       <v-snackbar v-model="error" color="red" right>
         Error occured
 
@@ -200,7 +206,7 @@ export default {
     error: false,
     success: false,
     paymentMethod: null,
-    paymentLoading: 4,
+    paymentLoading: 3,
   }),
   computed: {
     currentPlan() {
@@ -212,6 +218,14 @@ export default {
     intent() {
       return this.$store.getters.getIntent;
     },
+    errorsFromJoins:{
+      get(){
+        return this.$store.getters.isErrorFromJoins;
+      },
+      set(newValue){
+        return this.$store.commit('setErrorFromJoins', newValue);
+      }
+    },
   },
   mounted() {
     this.$store.dispatch("setAuth");
@@ -219,9 +233,6 @@ export default {
       this.paymentLoading--;
     });
     this.$store.dispatch("setIntent").finally(() => {
-      this.paymentLoading--;
-    });
-    this.$store.dispatch("setCurrentPlan").finally(() => {
       this.paymentLoading--;
     });
 
@@ -268,7 +279,7 @@ export default {
       this.axios
         .post("/cashier/subscribe", { payment: this.paymentMethod, plan: plan })
         .then(() => {
-          this.success = true;//TODO: check if swaping works
+          this.success = true;
           this.dialog = false;
           this.$router.go();
         })

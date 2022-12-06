@@ -194,8 +194,8 @@
             </v-btn>
             <v-btn
               class="conf-btn"
-              :disabled="btnsLoading"
-              :loading="btnsLoading"
+              :disabled="(btnsLoading || planLoading)"
+              :loading="(btnsLoading || planLoading)"
               @click="$_joinConf(conference.id)"
               color="primary"
               v-if="!conference.participant"
@@ -232,7 +232,6 @@
 
 <script>
 import AppHeader from "../components/AppHeader.vue";
-
 
 export default {
   name: "AppConferences",
@@ -275,6 +274,20 @@ export default {
     isAdmin() {
       return this.$store.getters.isAdmin;
     },
+    planLoading(){
+      return this.$store.getters.isPlanLoading;
+    },
+    availableJoins:{
+      get(){
+        return this.$store.getters.getAvailableJoins;
+      },
+      set(newValue){
+        return this.$store.commit('setAvailableJoins', newValue);
+      }
+    },
+    currentPlan() {
+      return this.$store.state.currentPlan;
+    },
   },
   mounted() {
     this.$store.dispatch("setAuth");
@@ -294,9 +307,19 @@ export default {
         this.$store.commit("setLoading", true);
         this.$router.push("/login");
       } else {
+        if(this.availableJoins < 1 && this.currentPlan != 'platinum' && !this.$store.getters.isAdmin){
+          this.$store.commit('setErrorFromJoins', true);
+          this.$router.push('/tariffs');
+          return;
+        }
+
         if(this.pageInfo.isListener){
           this.btnsLoading = true;
+          
           this.axios.post("/conference/"+id+'/join').then(() => {
+            console.log(this.availableJoins);
+            this.availableJoins = this.availableJoins - 1;
+            console.log(this.availableJoins);
             this.$_reloadConferences();
           }).finally(() => {
             this.btnsLoading = false;
@@ -316,11 +339,13 @@ export default {
       if(this.pageInfo.isListener){
         this.$store.commit("setLoading", true);
         this.axios.post("/conference/" + id + '/cancelJoin').then(() => {
+          this.availableJoins = this.availableJoins + 1;
           this.$store.dispatch("setConferences", { page: this.curPage });
         });
       }else{
         this.$store.commit("setLoading", true);
         this.axios.post("/reports/delete/" + id).then(() => {
+          this.availableJoins = this.availableJoins + 1;
           this.$store.dispatch("setConferences", { page: this.curPage });
         });
       }

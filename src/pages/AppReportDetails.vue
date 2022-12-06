@@ -158,6 +158,14 @@ export default {
     channelLoading() {
       return this.$store.getters.getChannelLoading;
     },
+    availableJoins:{
+      get(){
+        return this.$store.getters.getAvailableJoins;
+      },
+      set(newValue){
+        return this.$store.commit('setAvailableJoins', newValue);
+      }
+    },
   },
   mounted() {
     this.$store.dispatch("setCurrentReportData", {id: this.$route.params.repId});
@@ -168,6 +176,7 @@ export default {
       this.btnsLoading = true;
       this.axios.post("/reports/delete/" + this.currentReportData.report.conferenceId, {reportId: this.$route.params.repId}).then(() => {
         this.$router.push('/reports/1');
+        this.availableJoins = this.availableJoins + 1;
       });
     },
     $_breadcrumbClick(categoryId){

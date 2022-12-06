@@ -185,13 +185,24 @@ export default {
         }).catch(()=>{reject()});
       });
     },
-    async setCurrentPlan(state) {
+    async setCurrentPlanInfo(state) {
       return new Promise((resolve, reject) => {
+        if(state.getters.getCurrentPlan != '' || state.getters.isAdmin || !state.getters.isAuth){
+          return resolve();
+        }
+        state.commit("setPlanLoading", true); 
+        console.log('getting plan');
         axios.get("/cashier/plan").then((response) => {
-          state.commit("setCurrentPlan", response.data);
+          if(!response.data.admin){
+            state.commit("setCurrentPlan", response.data.name);
+            state.commit("setAvailableJoins", response.data.availableJoins);
+          }
+          
           console.log(response.data);
-          resolve(response.data);
+          resolve();
         }).catch(()=>{reject()});
+      }).finally(()=>{
+        state.commit("setPlanLoading", false);
       });
     },
     async setIntent(state) {
