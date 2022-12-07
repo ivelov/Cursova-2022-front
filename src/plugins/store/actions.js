@@ -203,14 +203,12 @@ export default {
           return resolve();
         }
         state.commit("setPlanLoading", true); 
-        console.log('getting plan');
         axios.get("/cashier/plan").then((response) => {
           if(!response.data.admin){
             state.commit("setCurrentPlan", response.data.name);
             state.commit("setAvailableJoins", response.data.availableJoins);
           }
           
-          console.log(response.data);
           resolve();
         }).catch(()=>{reject()});
       }).finally(()=>{
