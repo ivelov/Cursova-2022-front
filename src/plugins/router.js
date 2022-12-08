@@ -13,6 +13,7 @@ import AppReports from "../pages/AppReports";
 import AppReportDetails from "../pages/AppReportDetails";
 import AppReportEdit from "../pages/AppReportEdit";
 import AppAccountEdit from "../pages/AppAccountEdit";
+import AppTariffs from "../pages/AppTariffs";
 
 Vue.use(VueRouter);
 const router = new VueRouter({
@@ -96,7 +97,14 @@ const router = new VueRouter({
       meta:{
         requireAuth:true
       }
-    }
+    },
+    {
+      path: "/tariffs",
+      component: AppTariffs,
+      meta:{
+        requireAuth:true
+      }
+    },
   ],
   mode: "history",
   

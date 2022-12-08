@@ -54,4 +54,9 @@ export default {
         meetings:{},
         maxPage:1
       },
+      currentPlan: '',
+      availableJoins: 0, 
+      intent:undefined,
+      planLoading:true,
+      errorFromJoins:false,
   };

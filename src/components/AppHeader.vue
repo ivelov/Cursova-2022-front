@@ -153,6 +153,24 @@
             </template>
 
             <v-list>
+              <div v-if="currentPlan != ''">
+                <v-list-item>
+                  Current plan: {{currentPlan}}
+                </v-list-item>
+                <v-list-item v-if="currentPlan != 'platinum'">
+                  Remaining joins: {{availableJoins}}
+                </v-list-item>
+                <v-list-item>
+                  <v-btn
+                    @click="$router.push('/tariffs')"
+                    text
+                  >
+                    <span>{{currentPlan == 'standart'?'Upgrade':'Tariffs'}}</span>
+                  </v-btn>
+                </v-list-item>
+                <v-divider></v-divider>
+              </div>
+              
               <v-list-item>
                 <v-btn
                   @click="$router.push('/account/edit')"
@@ -204,6 +222,24 @@
           </v-btn>
         </template>
         <v-list>
+          <div v-if="currentPlan != ''">
+            <v-list-item>
+              Current plan: {{currentPlan}}
+            </v-list-item>
+            <v-list-item v-if="currentPlan != 'platinum'">
+              Remaining joins: {{availableJoins}}
+            </v-list-item>
+            <v-list-item>
+              <v-btn
+                @click="$router.push('/tariffs')"
+                text
+              >
+                <span>{{currentPlan == 'standart'?'Upgrade':'Tariffs'}}</span>
+              </v-btn>
+            </v-list-item>
+            <v-divider></v-divider>
+          </div>
+
           <v-list-item>
             <v-btn
               @click="$router.push('/account/edit')"
@@ -378,6 +414,12 @@ export default {
     searchText() {
       return this.search.text;
     },
+    currentPlan(){
+      return this.$store.getters.getCurrentPlan;
+    },
+    availableJoins(){
+      return this.$store.getters.getAvailableJoins;
+    },
   },
   watch: {
     searchText(value) {
@@ -397,6 +439,7 @@ export default {
         this.favLoading = false;
       });
     }
+    this.$store.dispatch("setCurrentPlanInfo");
   },
   methods: {
     $_logout() {

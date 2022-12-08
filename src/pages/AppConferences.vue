@@ -121,7 +121,7 @@
         <br /><br />
       </v-container>
 
-      <v-container v-if="loading">
+      <v-container v-if="(loading != 0)">
         <v-skeleton-loader
           class="mx-auto skeleton"
           type="table-thead, table-tbody"
@@ -194,8 +194,8 @@
             </v-btn>
             <v-btn
               class="conf-btn"
-              :disabled="btnsLoading"
-              :loading="btnsLoading"
+              :disabled="(btnsLoading || planLoading)"
+              :loading="(btnsLoading || planLoading)"
               @click="$_joinConf(conference.id)"
               color="primary"
               v-if="!conference.participant"
@@ -233,7 +233,6 @@
 <script>
 import AppHeader from "../components/AppHeader.vue";
 
-
 export default {
   name: "AppConferences",
   data: () => ({
@@ -249,13 +248,11 @@ export default {
     startDateMenu: false,
     endDateMenu: false,
     queueFull:false,
+    loading: 4,
   }),
   computed: {
     pageInfo() {
       return this.$store.getters.getConferencesPageInfo;
-    },
-    loading() {
-      return this.$store.getters.isLoading;
     },
     nextBtnDisabled() {
       return this.curPage >= this.pageInfo.maxPage;
@@ -275,28 +272,59 @@ export default {
     isAdmin() {
       return this.$store.getters.isAdmin;
     },
+    planLoading(){
+      return this.$store.getters.isPlanLoading;
+    },
+    availableJoins:{
+      get(){
+        return this.$store.getters.getAvailableJoins;
+      },
+      set(newValue){
+        return this.$store.commit('setAvailableJoins', newValue);
+      }
+    },
+    currentPlan() {
+      return this.$store.state.currentPlan;
+    },
   },
   mounted() {
-    this.$store.dispatch("setAuth");
+    this.$store.dispatch("setAuth").finally(()=>{
+      this.loading--;
+    });
     this.$store.dispatch("definePerks").then(()=>{
       this.buttons.addConference = this.$store.getters.canAdd;
+    }).finally(()=>{
+      this.loading--;
     });
 
     this.curPage = this.$route.params.page;
     this.$store.dispatch("setConferences", {
       page: this.curPage,
+    }).finally(()=>{
+      this.loading--;
     });
-    this.$store.dispatch("setCategoriesList");
+    this.$store.dispatch("setCategoriesList").finally(()=>{
+      this.loading--;
+    });
   },
   methods: {
     $_joinConf(id) {
       if (!this.$store.getters.isAuth) {
-        this.$store.commit("setLoading", true);
         this.$router.push("/login");
       } else {
+        if(this.availableJoins < 1 && this.currentPlan != 'platinum' && !this.isAdmin){
+          this.$store.commit('setErrorFromJoins', true);
+          this.$router.push('/tariffs');
+          return;
+        }
+
         if(this.pageInfo.isListener){
           this.btnsLoading = true;
+          
           this.axios.post("/conference/"+id+'/join').then(() => {
+            console.log(this.availableJoins);
+            this.availableJoins = this.availableJoins - 1;
+            console.log(this.availableJoins);
             this.$_reloadConferences();
           }).finally(() => {
             this.btnsLoading = false;
@@ -307,47 +335,60 @@ export default {
       }
     },
     $_deleteConf(id) {
-      this.$store.commit("setLoading", true);
+      this.loading++;
       this.axios.post("/conferences/delete/" + id).then(() => {
         this.$store.dispatch("setConferences", { page: this.curPage });
+      }).finally(()=>{
+        this.loading--;
       });
     },
     $_cancelJoin(id) {
+      this.loading++;
       if(this.pageInfo.isListener){
-        this.$store.commit("setLoading", true);
         this.axios.post("/conference/" + id + '/cancelJoin').then(() => {
+          this.availableJoins = this.availableJoins + 1;
           this.$store.dispatch("setConferences", { page: this.curPage });
+        }).finally(()=>{
+          this.loading--;
         });
       }else{
-        this.$store.commit("setLoading", true);
         this.axios.post("/reports/delete/" + id).then(() => {
+          this.availableJoins = this.availableJoins + 1;
           this.$store.dispatch("setConferences", { page: this.curPage });
+        }).finally(()=>{
+          this.loading--;
         });
       }
     },
     $_details(id) {
       if (!this.$store.getters.isAuth) {
-        this.$store.commit("setLoading", true);
         this.$router.push("/login");
       } else {
-        this.$store.commit("setLoading", true);
         this.$router.push("/conference/" + id);
       }
     },
     $_nextPage() {
+      this.loading++;
       this.curPage = parseInt(this.curPage) + 1;
-      this.$store.dispatch("setConferences", { page: this.curPage });
+      this.$store.dispatch("setConferences", { page: this.curPage }).finally(()=>{
+        this.loading--;
+      });
       this.$router.push("/conferences/" + this.curPage);
     },
     $_prevPage() {
       this.curPage = parseInt(this.curPage) - 1;
-      this.$store.dispatch("setConferences", { page: this.curPage });
+      this.$store.dispatch("setConferences", { page: this.curPage }).finally(()=>{
+        this.loading--;
+      });
       this.$router.push("/conferences/" + this.curPage);
     },
     $_reloadConferences(fromOutside = true) {
-      if(!this.loading){
+      if(this.loading == 0){
         this.queueFull = false;
-        this.$store.dispatch("setConferences", { page: this.curPage });
+        this.loading++;
+        this.$store.dispatch("setConferences", { page: this.curPage }).finally(()=>{
+          this.loading--;
+        });
       }else{
         if(!fromOutside){
           setTimeout(() => {

@@ -221,6 +221,17 @@ export default {
     loading(){
       return this.$store.getters.isLoading;
     },
+    currentPlan() {
+      return this.$store.state.currentPlan;
+    },
+    availableJoins:{
+      get(){
+        return this.$store.getters.getAvailableJoins;
+      },
+      set(newValue){
+        return this.$store.commit('setAvailableJoins', newValue);
+      }
+    },
     currentReportData(){
       return this.$store.getters.getCurrentReportData;
     },
@@ -304,6 +315,12 @@ export default {
   },
   methods: {
     $_saveReport() {
+      if(this.availableJoins < 1 && this.currentPlan != 'platinum' && !this.$store.getters.isAdmin){
+        this.$store.commit('setErrorFromJoins', true);
+        this.$router.push('/tariffs');
+        return;
+      }
+
       this.saveError = false;
       this.btnsLoading = true;
       if(this.selectedCategory){
@@ -326,6 +343,7 @@ export default {
         }
       }).then((response) => {
         console.log(response);
+        this.availableJoins = this.availableJoins - 1;
         this.$store.commit('clearCurrentReportData');
         this.$router.push('/reports/1');
       }).catch(() => {
